@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-const Discover = ({ navigation }) => {
+export default Discover = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text>Discover</Text>
@@ -17,4 +17,3 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
 })
-export default Discover;

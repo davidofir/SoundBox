@@ -5,6 +5,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Discover from './screens/Discover'
 import Homepage from './screens/Homepage';
+import ArtistProfile from './screens/ArtistProfile';
+import Store from './screens/Store';
+import Events from './screens/Events';
 const Stack = createStackNavigator();
 export default function App() {
   return (
@@ -12,6 +15,9 @@ export default function App() {
       <Stack.Navigator>
       <Stack.Screen name="Homepage" component={Homepage}/>
       <Stack.Screen name="Discover" component={Discover}/>
+      <Stack.Screen name="Artist" component={ArtistProfile}/>
+      <Stack.Screen name="Merch Store" component={Store}/>
+      <Stack.Screen name="Upcoming Events" component={Events}/>
 
       </Stack.Navigator>
     </NavigationContainer>

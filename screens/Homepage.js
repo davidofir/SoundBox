@@ -2,11 +2,20 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-const Homepage = ({navigation}) =>{
+export default Homepage = ({navigation}) =>{
     return (
     <View style={styles.container}>
         <TouchableOpacity style={{marginRight:8,padding:10}} onPress={()=>navigation.navigate("Discover")}>
             <Text>Discover Artists</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{marginRight:8,padding:10}} onPress={()=>navigation.navigate("Artist")}>
+            <Text>Artist Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{marginRight:8,padding:10}} onPress={()=>navigation.navigate("Upcoming Events")}>
+            <Text>Upcoming Events</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{marginRight:8,padding:10}} onPress={()=>navigation.navigate("Merch Store")}>
+            <Text>Store</Text>
         </TouchableOpacity>
     </View>)
 }
@@ -18,4 +27,3 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
 })
-export default Homepage
