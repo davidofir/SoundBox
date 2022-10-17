@@ -14,7 +14,7 @@ export default ArtistProfile = ({ navigation }) => {
             <View style={[styles.verticalProfileContainer, { justifyContent: "center" }]}>
                 <View>
                     <Text>Upcoming Events</Text>
-                    <TouchableOpacity style={{ marginTop: 50, paddingBottom: 50 }}>
+                    <TouchableOpacity onPress={()=> navigation.navigate("Upcoming Events")} style={{ marginTop: 50, paddingBottom: 50 }}>
                         <Text>Event 1</Text>
                         <Text>Event 2</Text>
                         <Text>Event 3</Text>
