@@ -8,6 +8,8 @@ import Homepage from './screens/Homepage';
 import ArtistProfile from './screens/ArtistProfile';
 import Store from './screens/Store';
 import Events from './screens/Events';
+import Login from './screens/Login';
+
 const Stack = createStackNavigator();
 export default function App() {
   return (
@@ -18,7 +20,7 @@ export default function App() {
         <Stack.Screen name="Artist" component={ArtistProfile} />
         <Stack.Screen name="Merch Store" component={Store} />
         <Stack.Screen name="Upcoming Events" component={Events} />
-        <Stack.Screen name="Login Screen" component={Login} />
+        <Stack.Screen name="Login" component={Login} />
       </Stack.Navigator>
     </NavigationContainer>
   );
