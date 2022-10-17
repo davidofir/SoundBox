@@ -10,34 +10,50 @@ export default Store =()=>{
             <View style={[styles.verticalContainer, { justifyContent: "center" }]}>
                 <View>
                     <View style={{ marginTop: 50, paddingBottom: 50 }}>
-                        <Text>Merch Item 1</Text>
-                        <Text>Merch Item 2</Text>
-                        <Text>Merch Item 3</Text>
-                        <Text>Merch Item 4</Text>
-                        <Text>Merch Item 5</Text>
-                        <Text>Merch Item 6</Text>
-                        <Text>Merch Item 7</Text>
-                        <Text>Merch Item 8</Text>
-                        <Text>Merch Item 9</Text>
-                        <Text>Merch Item 10</Text>
-                        <Text>Merch Item 11</Text>
-                        <Text>Merch Item 12</Text>
-                        <Text>Merch Item 13</Text>
-                        <Text>Merch Item 14</Text>
-                        <Text>Merch Item 15</Text>
-                        <Text>Merch Item 16</Text>
-                        <Text>Merch Item 17</Text>
-                        <Text>Merch Item 18</Text>
-                        <Text>Merch Item 20</Text>
-                        <Text>Merch Item 21</Text>
-                        <Text>Merch Item 22</Text>
-                        <Text>Merch Item 23</Text>
-                        <Text>Merch Item 24</Text>
-                        <Text>Merch Item 25</Text>
-                        <Text>Merch Item 26</Text>
-                        <Text>Merch Item 27</Text>
-                        <Text>Merch Item 28</Text>
-                        <Text>Merch Item 29</Text>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.square} />
+                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
+                        </View>
                     </View>
                 </View>
             </View>
@@ -63,4 +79,11 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         flexDirection: "row"
     },
+    square: {
+        width: 50,
+        height: 50,
+        backgroundColor: "black",
+        marginRight: 10,
+        borderRadius: 30
+    }
 });
