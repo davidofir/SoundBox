@@ -1,74 +1,49 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react'
-import { StyleSheet, Text, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { StyleSheet, Text, View,FlatList } from 'react-native';
+const data = [];
+for(var i = 0; i < 12; i+=3){
+    data.push({
+        title:`Shirt${i+1}`
+    })
+    data.push({
+        title:`Hoodie${i+2}`
+    })
+    data.push({
+        title:`Lighter${i+3}`
+    })
+}
 export default Store =()=>{
+
+      const renderItem = ({ item }) => (
+        <Item title={item.title} />
+      );
+    
     return(
         <View>
             <View style={styles.verticalContainer}>
+                    <FlatList
+                        data={data}
+                        renderItem={renderItem}
+                        keyExtractor={(item,key) => key}/>
             </View>
-            <View style={[styles.verticalContainer, { justifyContent: "center" }]}>
-                <View>
-                    <View style={{ marginTop: 50, paddingBottom: 50 }}>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                        <View style={{flexDirection:"row"}}>
-                        <View style={styles.square} />
-                        <Text style={{marginLeft:40}}>Merch Item 1</Text>
-                        </View>
-                    </View>
-                </View>
-            </View>
-
         </View>
     )
 }
+const Item = ({ title }) => (
+    <View style={styles.item}>
+        <View style={styles.square}/>
+            <Text style={{textAlignVertical:"center"}}>{title}</Text>
+    </View>
+  ); 
 const styles = StyleSheet.create({
     verticalContainer: {
         backgroundColor: '#fff',
         flexDirection: "row",
-        alignItems: 'flex-start',
+        alignItems: 'center',
         margin: 10,
         width: 'auto',
-        height: "auto"
+        height: "auto",
 
     },
     horizontalContainer: {
@@ -80,10 +55,14 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     square: {
-        width: 50,
-        height: 50,
+        width: 70,
+        height: 70,
         backgroundColor: "black",
         marginRight: 10,
-        borderRadius: 30
+        borderRadius: 15
+    },
+    item:{
+        flexDirection:"row",
+        padding:10,
     }
 });
