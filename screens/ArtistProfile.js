@@ -27,12 +27,16 @@ export default ArtistProfile = ({ navigation }) => {
                 <View>
                     <Text style={{textAlign:"center",marginTop:"5%"}}>Upcoming Events</Text>
                     <View>
+                    <TouchableOpacity onPress={()=>navigation.navigate("Upcoming Events")}>
                         <View style={[styles.verticalProfileContainer,{marginTop:50}]}>
-                            <FlatList
-                                data={data}
-                                renderItem={renderItem}
-                                keyExtractor={(item, key) => key} />
+
+                                <FlatList
+                                    data={data}
+                                    renderItem={renderItem}
+                                    keyExtractor={(item, key) => key} />
+
                         </View>
+                        </TouchableOpacity>
                     </View>
                     <View style={{marginBottom: 20,marginTop:"95%" }}>
                         <ButtonComponent textColor={Colors.secondary} background={Colors.primary} borderColorStyle={Colors.secondary} buttonTitle="To Buy Merch" clickEvent={() => navigation.navigate("Merch Store")} />
