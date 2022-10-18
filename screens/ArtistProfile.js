@@ -1,29 +1,41 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react'
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View,FlatList } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import ButtonComponent from '../components/ButtonComponent';
+import Colors from '../constants/colors';
+const data = []
+for(var i = 0; i < 5; i++){
+    data.push(
+        {title:`Event${i+1}`}
+    )
+}
 export default ArtistProfile = ({ navigation }) => {
+    const renderItem = ({ item }) => (
+        <Item title={item.title} />
+      );
+
     return (
         <View>
             <View style={styles.verticalProfileContainer}>
-                <View style={styles.horizontalProfileContainer}>
+                <View style={[styles.horizontalProfileContainer, { padding: 6 }]}>
                     <View style={styles.square} />
                     <Text>Artist Name</Text>
                 </View>
             </View>
-            <View style={[styles.verticalProfileContainer, { justifyContent: "center" }]}>
+            <View style={[styles.verticalProfileContainer, { justifyContent: "center",height:'75%' }]}>
                 <View>
-                    <Text>Upcoming Events</Text>
-                    <TouchableOpacity onPress={()=> navigation.navigate("Upcoming Events")} style={{ marginTop: 50, paddingBottom: 50 }}>
-                        <Text>Event 1</Text>
-                        <Text>Event 2</Text>
-                        <Text>Event 3</Text>
-                        <Text>Event 4</Text>
-                    </TouchableOpacity>
-                    <View style={{paddingTop:300}}>
-                    <TouchableOpacity style={{ marginRight: 8, padding: 10}} onPress={() => navigation.navigate("Merch Store")}>
-                        <Text>To Buy Merch</Text>
-                    </TouchableOpacity>
+                    <Text style={{textAlign:"center",marginTop:"5%"}}>Upcoming Events</Text>
+                    <View>
+                        <View style={[styles.verticalProfileContainer,{marginTop:50}]}>
+                            <FlatList
+                                data={data}
+                                renderItem={renderItem}
+                                keyExtractor={(item, key) => key} />
+                        </View>
+                    </View>
+                    <View style={{marginBottom: 20,marginTop:"95%" }}>
+                        <ButtonComponent textColor={Colors.secondary} background={Colors.primary} borderColorStyle={Colors.secondary} buttonTitle="To Buy Merch" clickEvent={() => navigation.navigate("Merch Store")} />
                     </View>
                 </View>
             </View>
@@ -31,6 +43,11 @@ export default ArtistProfile = ({ navigation }) => {
         </View>
     )
 }
+const Item = ({ title }) => (
+    <View style={styles.item}>
+            <Text style={{textAlign:"center"}}>{title}</Text>
+    </View>
+  ); 
 const styles = StyleSheet.create({
     verticalProfileContainer: {
         backgroundColor: '#fff',
@@ -54,6 +71,6 @@ const styles = StyleSheet.create({
         height: 100,
         backgroundColor: "black",
         marginRight: 10,
-        borderRadius: 30
-    }
+        borderRadius: 30,
+    },
 })
