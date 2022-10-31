@@ -9,6 +9,7 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
+soundboxkey*
 
 # macOS
 .DS_Store

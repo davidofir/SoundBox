@@ -1,18 +1,36 @@
+import { StyleSheet, Text, View,FlatList,TouchableWithoutFeedback } from 'react-native';
+import Colors from '../constants/colors';
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect } from 'react'
-import { Button, StyleSheet, Text, View,FlatList } from 'react-native';
+import React, { useEffect,useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
-import Colors from '../constants/colors';
-const data = []
-for(var i = 0; i < 5; i++){
-    data.push(
-        {title:`Event${i+1}`}
-    )
-}
+import {REACT_APP_EVENTS_API_SECRET} from '@env'
+
+let artistName = "sum41";
+let time = "upcoming";
+const eventsURL = 'https://rest.bandsintown.com/artists'
+
 export default ArtistProfile = ({ navigation }) => {
+    const [events,setEvents] = useState([]);
+    useEffect(()=>{
+
+        fetch(`${eventsURL}/${artistName}/events?app_id=${process.env.REACT_APP_EVENTS_API_SECRET}&date=${time}`)
+        .then((res)=>res.json().then(
+            (resp)=>resp.map((e)=>{
+                setEvents(prevEvents=>[
+                    ...prevEvents,{
+                        location:`${e.venue.city},${e.venue.country}`,
+                        date:`${new Date(e["starts_at"]).toLocaleDateString()}`,
+                        time:`${new Date(e["starts_at"]).toLocaleTimeString()}`
+                    }
+                ])
+            })
+        ))
+
+    },[])
+
     const renderItem = ({ item }) => (
-        <Item title={item.title} />
+        <Item location={item.location} date={item.date} time={item.time} />
       );
 
     return (
@@ -23,23 +41,25 @@ export default ArtistProfile = ({ navigation }) => {
                     <Text>Artist Name</Text>
                 </View>
             </View>
-            <View style={[styles.verticalProfileContainer, { justifyContent: "center",height:'75%' }]}>
+            <View style={[styles.verticalProfileContainer, { justifyContent: "center",height:'78%' }]}>
                 <View>
                     <Text style={{textAlign:"center",marginTop:"5%"}}>Upcoming Events</Text>
                     <View>
-                    <TouchableOpacity onPress={()=>navigation.navigate("Upcoming Events")}>
+                    <TouchableWithoutFeedback onPress={()=>navigation.navigate("Upcoming Events",{events:events})}>
                         <View style={[styles.verticalProfileContainer,{marginTop:50}]}>
 
                                 <FlatList
-                                    data={data}
+                                    data={events.slice(0,5)}
                                     renderItem={renderItem}
-                                    keyExtractor={(item, key) => key} />
+                                    keyExtractor={(item, key) => key}
+                                    initialNumToRender={5} />
 
                         </View>
-                        </TouchableOpacity>
+                        </TouchableWithoutFeedback>
                     </View>
-                    <View style={{marginBottom: 20,marginTop:"95%" }}>
-                        <ButtonComponent textColor={Colors.secondary} background={Colors.primary} borderColorStyle={Colors.secondary} buttonTitle="To Buy Merch" clickEvent={() => navigation.navigate("Merch Store")} />
+                    <View style={{marginBottom: 20,justifyContent:"flex-end",flex:1 }}>
+                        <ButtonComponent textColor={Colors.secondary} background={Colors.primary} borderColorStyle={Colors.secondary} buttonTitle="To Buy Merch" clickEvent={() => navigation.navigate("Merch Store")
+                        } />
                     </View>
                 </View>
             </View>
@@ -47,9 +67,12 @@ export default ArtistProfile = ({ navigation }) => {
         </View>
     )
 }
-const Item = ({ title }) => (
+const Item = ({ location,date,time }) => (
     <View style={styles.item}>
-            <Text style={{textAlign:"center"}}>{title}</Text>
+            <Text>{location}</Text>
+            <View style={{flexDirection:"row"}}>
+                <Text>Date:{date}</Text><Text> at {time}</Text>
+            </View>
     </View>
   ); 
 const styles = StyleSheet.create({
