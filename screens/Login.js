@@ -1,8 +1,9 @@
 // SearchBar.js
 // Test
 import React from "react";
-import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Alert } from "react-native";
+import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Alert, KeyboardAvoidingView } from "react-native";
 import { Feather, Entypo } from "@expo/vector-icons";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const Separator = () => (
     <View style={styles.separator} />
@@ -11,87 +12,86 @@ const Separator = () => (
 
 const Login = ({ clicked, searchPhrase, setSearchPhrase, setClicked }) => {
     return (
-        <View style={styles.container}>
-            <View
-                style={
-                    clicked
-                        ? styles.searchBar__clicked
-                        : styles.searchBar__unclicked
-                }
-            >
-                {/* search Icon */}
-                <Feather
-                    name="search"
-                    size={20}
-                    color="black"
-                    style={{ marginLeft: 1 }}
-                />
-                {/* Input field */}
-                <TextInput
-                    style={styles.input}
-                    placeholder="Search"
-                    value={searchPhrase}
-                    onChangeText={setSearchPhrase}
+        <KeyboardAvoidingView style={styles.container} behavior="padding">
 
+            <View style={styles.inputContainer}>
+                <TextInput placeholder="Email"
+                    //</View>value={ } 
+                    //onChaneText={Text => }
+                    style={styles.input}
                 />
-                {/* cross Icon, depending on whether the search bar is clicked or not */}
-                {clicked && (
-                    <Entypo name="cross" size={20} color="black" style={{ padding: 1 }} onPress={() => {
-                        setSearchPhrase("")
-                    }} />
-                )}
+                <TextInput placeholder="Password"
+                    //</View>value={ } 
+                    //onChaneText={Text => }
+                    style={styles.input}
+                    secureTextEntry
+                />
             </View>
-            {/* cancel button, depending on whether the search bar is clicked or not */}
-            {clicked && (
-                <View>
-                    <Button
-                        title="Cancel"
-                        onPress={() => {
-                            Keyboard.dismiss();
-                            setClicked(false);
-                        }}
-                    ></Button>
-                </View>
-            )}
-        </View>
+
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    onPress={() => { }}
+                    style={styles.button}
+                >
+                    <Text style={styles.buttonText}>Login</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => { }}
+                    style={[styles.button, styles.buttonOutline]}
+                >
+                    <Text style={styles.buttonOutlineText}>Create Account</Text>
+                </TouchableOpacity>
+            </View>
+
+        </KeyboardAvoidingView>
     );
 };
-
-
-
 
 // styles
 const styles = StyleSheet.create({
     container: {
-        margin: 15,
-        justifyContent: "flex-start",
-        alignItems: "center",
-        flexDirection: "row",
-        width: "90%",
-
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    searchBar__unclicked: {
-        padding: 10,
-        flexDirection: "row",
-        width: "95%",
-        backgroundColor: "#d9dbda",
-        borderRadius: 15,
-        alignItems: "center",
-    },
-    searchBar__clicked: {
-        padding: 10,
-        flexDirection: "row",
-        width: "80%",
-        backgroundColor: "#d9dbda",
-        borderRadius: 15,
-        alignItems: "center",
-        justifyContent: "space-evenly",
+    inputContainer: {
+        width: '80%',
     },
     input: {
-        fontSize: 20,
-        marginLeft: 10,
-        width: "90%",
+        backgroundColor: 'white',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderRadius: 10,
+        marginTop: 5,
     },
+    buttonContainer: {
+        width: '60%',
+        justifyContent: 'center',
+        marginTop: 40
+    },
+    button: {
+        backgroundColor: '#0366fc',
+        width: '100%',
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    buttonOutline: {
+        backgroundColor: 'white',
+        marginTop: 5,
+        borderColor: '#0366fc',
+        borderWidth: 2,
+    },
+    buttonText: {
+        color: 'white',
+        fontWeight: '700',
+        fontSize: 16,
+    },
+    buttonOutlineText: {
+        color: '#0366fc',
+        fontWeight: '700',
+        fontSize: 16,
+    }
 });
 
 export default Login;
