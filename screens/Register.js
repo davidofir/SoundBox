@@ -10,16 +10,28 @@ const Separator = () => (
 );
 
 
-const Login = ({ navigation }) => {
+const Register = ({ navigation }) => {
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
+            <Text
+                style={styles.header}>
+                Register
+            </Text>
 
             <View style={styles.inputContainer}>
-                <TextInput placeholder="Email"
+                <Text style={styles.Text}>Username</Text>
+                <TextInput placeholder="Username"
                     //</View>value={ } 
                     //onChaneText={Text => }
                     style={styles.input}
                 />
+                <Text style={styles.Text}>Email</Text>
+                <TextInput placeholder="Example@mail.com"
+                    //</View>value={ } 
+                    //onChaneText={Text => }
+                    style={styles.input}
+                />
+                <Text style={styles.Text}>Password</Text>
                 <TextInput placeholder="Password"
                     //</View>value={ } 
                     //onChaneText={Text => }
@@ -30,18 +42,17 @@ const Login = ({ navigation }) => {
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate("Homepage")}
-                    style={styles.button}
-                >
-                    <Text style={styles.buttonText}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate("Register")}
+                    onPress={() => navigation.navigate("Login")}
                     style={[styles.button, styles.buttonOutline]}
                 >
-                    <Text style={styles.buttonOutlineText}>Create Account</Text>
+                    <Text style={styles.buttonOutlineText}>Sign up</Text>
                 </TouchableOpacity>
             </View>
+
+            <Text
+                style={styles.footer}>
+                Already have an Account? Sign in
+            </Text>
 
         </KeyboardAvoidingView>
     );
@@ -55,14 +66,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     inputContainer: {
-        width: '80%',
+        width: '90%',
     },
     input: {
         backgroundColor: 'white',
         paddingHorizontal: 15,
         paddingVertical: 10,
         borderRadius: 10,
-        marginTop: 5,
+        marginTop: 10,
     },
     buttonContainer: {
         width: '60%',
@@ -91,7 +102,19 @@ const styles = StyleSheet.create({
         color: '#0366fc',
         fontWeight: '700',
         fontSize: 16,
+    },
+    header: {
+        color: '#0366fc',
+        fontWeight: '700',
+        paddingBottom: 30,
+        fontSize: 25,
+    },
+    footer: {
+        paddingTop: 70,
+    },
+    Text: {
+        paddingTop: 20,
     }
 });
 
-export default Login;
+export default Register;

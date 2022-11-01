@@ -9,10 +9,11 @@ import ArtistProfile from './screens/ArtistProfile';
 import Store from './screens/Store';
 import Events from './screens/Events';
 import Login from './screens/Login';
+import Register from './screens/Register';
 import {
   REACT_APP_FIREBASE_API_KEY,
   REACT_APP_FIREBASE_AUTH_DOMAIN,
-  REACT_APP_FIREBASE_PROJECT_ID,REACT_APP_FIREBASE_STORAGE_BUCKET,
+  REACT_APP_FIREBASE_PROJECT_ID, REACT_APP_FIREBASE_STORAGE_BUCKET,
   REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
   REACT_APP_FIREBASE_APP_ID,
   REACT_APP_FIREBASE_MEASUREMENT_ID
@@ -47,6 +48,7 @@ export default function App() {
         <Stack.Screen name="Merch Store" component={Store} />
         <Stack.Screen name="Upcoming Events" component={Events} />
         <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Register" component={Register} />
       </Stack.Navigator>
     </NavigationContainer>
   );
