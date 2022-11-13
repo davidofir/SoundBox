@@ -4,28 +4,29 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect,useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
-import {REACT_APP_EVENTS_API_SECRET} from '@env'
+import EventsRepository from '../domain/EventsRepository';
 
 let artistName = "sum41";
 let time = "upcoming";
-const eventsURL = 'https://rest.bandsintown.com/artists'
 
+const eventsRepo = new EventsRepository;
 export default ArtistProfile = ({ navigation }) => {
     const [events,setEvents] = useState([]);
     useEffect(()=>{
+        eventsRepo.GetEventsByArtistName(artistName,time)
+        .then((res)=>{
+                res.map((e)=>{
+                    setEvents(prevEvents=>[
+                        ...prevEvents,{
+                            location:`${e.venue.city},${e.venue.country}`,
+                            date:`${new Date(e["starts_at"]).toLocaleDateString()}`,
+                            time:`${new Date(e["starts_at"]).toLocaleTimeString()}`
+                        }
+                    ])
+                })
+            }
+        )
 
-        fetch(`${eventsURL}/${artistName}/events?app_id=${process.env.REACT_APP_EVENTS_API_SECRET}&date=${time}`)
-        .then((res)=>res.json().then(
-            (resp)=>resp.map((e)=>{
-                setEvents(prevEvents=>[
-                    ...prevEvents,{
-                        location:`${e.venue.city},${e.venue.country}`,
-                        date:`${new Date(e["starts_at"]).toLocaleDateString()}`,
-                        time:`${new Date(e["starts_at"]).toLocaleTimeString()}`
-                    }
-                ])
-            })
-        ))
 
     },[])
 
