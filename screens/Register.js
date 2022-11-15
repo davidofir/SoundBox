@@ -1,9 +1,11 @@
 // SearchBar.js
 // Test
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Alert, KeyboardAvoidingView } from "react-native";
 import { Feather, Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { authentication } from "../firebase";
 
 const Separator = () => (
     <View style={styles.separator} />
@@ -11,6 +13,20 @@ const Separator = () => (
 
 
 const Register = ({ navigation }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const RegisterAccount = () => {
+        createUserWithEmailAndPassword(authentication, email, password)
+            .then((re) => {
+                console.log(re);
+            })
+            .catch((re) => {
+                console.log(re);
+            })
+        navigation.navigate("Login")
+    }
+
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
             <Text
@@ -20,29 +36,32 @@ const Register = ({ navigation }) => {
 
             <View style={styles.inputContainer}>
                 <Text style={styles.Text}>Username</Text>
-                <TextInput placeholder="Username"
+                <TextInput
+                    placeholder="Username"
                     //</View>value={ } 
                     //onChaneText={Text => }
                     style={styles.input}
                 />
                 <Text style={styles.Text}>Email</Text>
-                <TextInput placeholder="Example@mail.com"
-                    //</View>value={ } 
-                    //onChaneText={Text => }
+                <TextInput
+                    placeholder="Example@mail.com"
+                    value={email}
+                    onChangeText={text => setEmail(text)}
                     style={styles.input}
                 />
                 <Text style={styles.Text}>Password</Text>
-                <TextInput placeholder="Password"
-                    //</View>value={ } 
-                    //onChaneText={Text => }
+                <TextInput
+                    placeholder="Password"
+                    value={password}
+                    onChangeText={text => setPassword(text)}
                     style={styles.input}
-                    secureTextEntry
+                    secureTextEntry={true}
                 />
             </View>
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate("Login")}
+                    onPress={RegisterAccount}
                     style={[styles.button, styles.buttonOutline]}
                 >
                     <Text style={styles.buttonOutlineText}>Sign up</Text>

@@ -15,7 +15,7 @@ export default Homepage = ({ navigation }) => {
                 <Text>Store</Text>
             </TouchableOpacity>
             <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("Login")}>
-                <Text>Login</Text>
+                <Text>Logout</Text>
             </TouchableOpacity>
         </View>)
 }

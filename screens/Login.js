@@ -1,28 +1,55 @@
 // SearchBar.js
 // Test
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Alert, KeyboardAvoidingView } from "react-native";
 import { Feather, Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { authentication } from "../firebase";
 
 const Separator = () => (
     <View style={styles.separator} />
 );
 
-
 const Login = ({ navigation }) => {
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+
+    useEffect(() => {
+        const unsubscribe = authentication.onAuthStateChanged(user => {
+            if (user) {
+                navigation.navigate("Home")
+            }
+        })
+
+        return unsubscribe
+    }, [])
+
+    const SignIn = () => {
+        signInWithEmailAndPassword(authentication, email, password)
+            .then((re) => {
+                console.log(re);
+            })
+            .catch((re) => {
+                console.log(re);
+            })
+    }
+
+
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
 
             <View style={styles.inputContainer}>
-                <TextInput placeholder="Email"
-                    //</View>value={ } 
-                    //onChaneText={Text => }
+                <TextInput
+                    placeholder="Email"
+                    value={email}
+                    onChangeText={text => setEmail(text)}
                     style={styles.input}
                 />
-                <TextInput placeholder="Password"
-                    //</View>value={ } 
-                    //onChaneText={Text => }
+                <TextInput
+                    placeholder="Password"
+                    value={password}
+                    onChangeText={text => setPassword(text)}
                     style={styles.input}
                     secureTextEntry
                 />
@@ -30,7 +57,7 @@ const Login = ({ navigation }) => {
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate("Homepage")}
+                    onPress={SignIn}
                     style={styles.button}
                 >
                     <Text style={styles.buttonText}>Login</Text>
