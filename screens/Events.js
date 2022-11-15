@@ -17,15 +17,15 @@ export default Events = ({ route,navigation }) => {
 
 
     const renderItem = ({ item }) => (
-        <Item location={item.location} date={item.date} time={item.time} />
+        <Item city={item.venue.city} country={item.venue.country} date={new Date (item.startDateTime).toLocaleDateString()} time={new Date (item.startDateTime).toLocaleTimeString()} />
       );
+
     return (
         
         <View>
 
             <View style={[styles.verticalContainer, { marginTop:"5%" }]}>
                 <View style={styles.verticalContainer}>
-
                     <FlatList
                         data={events}
                         renderItem={renderItem}
@@ -37,9 +37,9 @@ export default Events = ({ route,navigation }) => {
         </View>
     )
 }
-const Item = ({ location,date,time }) => (
+const Item = ({ city,country,date,time }) => (
     <View style={styles.item}>
-            <Text>{location}</Text>
+            <Text>{city},{country}</Text>
             <View style={{flexDirection:"row"}}>
                 <Text>Date:{date}</Text><Text> at {time}</Text>
             </View>

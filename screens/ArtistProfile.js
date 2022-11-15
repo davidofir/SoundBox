@@ -4,14 +4,13 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect,useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
-import EventsRepositoryImpl from '../domain/EventsAPI/EventsRepositoryImpl';
+import EventsRepository from '../domain/EventsAPI/EventsRepository';
 
 let artistName = "sum41";
 let time = "upcoming";
 
-const eventsRepo = new EventsRepositoryImpl;
+const eventsRepo = new EventsRepository;
 export default ArtistProfile = ({ navigation }) => {
-    const [events,setEvents] = useState([]);
     const [data,setData] = useState([]);
     useEffect(()=>{
         var fetchData = async()=>{
@@ -41,10 +40,8 @@ export default ArtistProfile = ({ navigation }) => {
                 <View>
                     <Text style={{textAlign:"center",marginTop:"5%"}}>Upcoming Events</Text>
                     <View>
-                        {console.log(data)}
                      <TouchableWithoutFeedback onPress={()=>navigation.navigate("Upcoming Events",{events:data})}>
                         <View style={[styles.verticalProfileContainer,{marginTop:50}]}>
-                                {console.log(data[0])}
                                  <FlatList
                                     data={data.slice(0,5)}
                                     renderItem={renderItem}
