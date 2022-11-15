@@ -4,34 +4,29 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect,useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
-import EventsRepository from '../domain/EventsRepository';
+import EventsRepositoryImpl from '../domain/EventsAPI/EventsRepositoryImpl';
 
 let artistName = "sum41";
 let time = "upcoming";
 
-const eventsRepo = new EventsRepository;
+const eventsRepo = new EventsRepositoryImpl;
 export default ArtistProfile = ({ navigation }) => {
     const [events,setEvents] = useState([]);
+    const [data,setData] = useState([]);
     useEffect(()=>{
-        eventsRepo.GetEventsByArtistName(artistName,time)
-        .then((res)=>{
-                res.map((e)=>{
-                    setEvents(prevEvents=>[
-                        ...prevEvents,{
-                            location:`${e.venue.city},${e.venue.country}`,
-                            date:`${new Date(e["starts_at"]).toLocaleDateString()}`,
-                            time:`${new Date(e["starts_at"]).toLocaleTimeString()}`
-                        }
-                    ])
-                })
+        var fetchData = async()=>{
+            var resp = await eventsRepo.GetEventsByArtistName(artistName,time)
+            return resp;
+        }
+        fetchData().then(
+            (result)=>{
+                setData(result)
             }
         )
-
-
     },[])
 
     const renderItem = ({ item }) => (
-        <Item location={item.location} date={item.date} time={item.time} />
+        <Item city={item.venue.city} country={item.venue.country} date={new Date (item.startDateTime).toLocaleDateString()} time={new Date (item.startDateTime).toLocaleTimeString()} />
       );
 
     return (
@@ -46,11 +41,12 @@ export default ArtistProfile = ({ navigation }) => {
                 <View>
                     <Text style={{textAlign:"center",marginTop:"5%"}}>Upcoming Events</Text>
                     <View>
-                    <TouchableWithoutFeedback onPress={()=>navigation.navigate("Upcoming Events",{events:events})}>
+                        {console.log(data)}
+                     <TouchableWithoutFeedback onPress={()=>navigation.navigate("Upcoming Events",{events:data})}>
                         <View style={[styles.verticalProfileContainer,{marginTop:50}]}>
-
-                                <FlatList
-                                    data={events.slice(0,5)}
+                                {console.log(data[0])}
+                                 <FlatList
+                                    data={data.slice(0,5)}
                                     renderItem={renderItem}
                                     keyExtractor={(item, key) => key}
                                     initialNumToRender={5} />
@@ -68,9 +64,9 @@ export default ArtistProfile = ({ navigation }) => {
         </View>
     )
 }
-const Item = ({ location,date,time }) => (
+const Item = ({ city,country,date,time }) => (
     <View style={styles.item}>
-            <Text>{location}</Text>
+            <Text>{city},{country}</Text>
             <View style={{flexDirection:"row"}}>
                 <Text>Date:{date}</Text><Text> at {time}</Text>
             </View>

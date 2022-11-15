@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
-import EventsRepository from '../domain/EventsRepository';
+import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
 import { authentication } from '../firebase';
 
 let artistName = "sum41";
