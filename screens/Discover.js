@@ -1,96 +1,102 @@
-// SearchBar.js
-import React from "react";
-import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Alert } from "react-native";
-import { Feather, Entypo } from "@expo/vector-icons";
+import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Image,
+} from 'react-native';
 
-const Separator = () => (
-  <View style={styles.separator} />
-);
-
-
-const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setClicked}) => {
-  return (
-    <View style={styles.container}>
-      <View
-        style={
-          clicked
-            ? styles.searchBar__clicked
-            : styles.searchBar__unclicked
-        }
-      >
-        {/* search Icon */}
-        <Feather
-          name="search"
-          size={20}
-          color="black"
-          style={{ marginLeft: 1 }}
-        />
-        {/* Input field */}
-        <TextInput
-          style={styles.input}
-          placeholder="Search"
-          value={searchPhrase}
-          onChangeText={setSearchPhrase}
-     
-        />
-        {/* cross Icon, depending on whether the search bar is clicked or not */}
-        {clicked && (
-          <Entypo name="cross" size={20} color="black" style={{ padding: 1 }} onPress={() => {
-              setSearchPhrase("")
-          }}/>
-        )}
-      </View>
-      {/* cancel button, depending on whether the search bar is clicked or not */}
-      {clicked && (
-        <View>
-          <Button
-            title="Cancel"
-            onPress={() => {
-              Keyboard.dismiss();
-              setClicked(false);
-            }}
-          ></Button>
+class Cell extends React.Component{
+  render(){
+    return(
+        <View style={styles.cell}>
+          <Image 
+            style={styles.imageView} 
+            source={{uri: this.props.cellItem.image[3]['#text']}}/>
+          <View style={styles.contentView}>
+            <Text style={[styles.whiteText, styles.boldText]}>{this.props.cellItem.name}</Text>
+            <Text style={styles.whiteText}>{this.props.cellItem.artist.name}</Text>
+          </View>
+          <View style={styles.accessoryView}>
+          <Text style={[styles.textCenter, styles.whiteText]}></Text>
+          </View>
         </View>
-      )}
-    </View>
-  );
-};
+    )
+  }
+}
+
+export default class App extends React.Component {
+  fetchTopTracks(){
+    const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca"
+    const url = `http://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks&api_key=${apiKey}&format=json`
+
+    return fetch(url)
+    .then(response => response.json())
+  }
+
+  constructor(props){
+    super(props)
+
+    this.state = { tracks:[] }
+
+    //fetch api data
+    this.fetchTopTracks()
+    .then(json => { this.setState({tracks: json.tracks.track}) 
+    })
+  }
+  render() {
+
+    const tableData = Array(50).fill('Hello, World!')
 
 
+    return ( <View style = {styles.container}>
+      <FlatList 
+        data={this.state.tracks}
+        renderItem={({item}) => (
+          <Cell cellItem={item}/>
+        )}
+        keyExtractor={(_, index) => index}
+      />
+      </View>
+    );
+  }
+}
 
-
-// styles
 const styles = StyleSheet.create({
   container: {
-    margin: 15,
-    justifyContent: "flex-start",
-    alignItems: "center",
+    flex: 1,
+    paddingTop: 40,
+    paddingLeft: 15,
+    paddingRight: 15,
     flexDirection: "row",
-    width: "90%",
-
+    backgroundColor: '#000'
   },
-  searchBar__unclicked: {
-    padding: 10,
-    flexDirection: "row",
-    width: "95%",
-    backgroundColor: "#d9dbda",
-    borderRadius: 15,
-    alignItems: "center",
+  cell: {
+    flexDirection: 'row',
+    height: 75,
+    marginBottom: 5,
   },
-  searchBar__clicked: {
-    padding: 10,
-    flexDirection: "row",
-    width: "80%",
-    backgroundColor: "#d9dbda",
-    borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "space-evenly",
+  imageView:{
+    width: 75,
+    height: 75,
+    borderRadius: 10,
+    marginRight: 10,
   },
-  input: {
-    fontSize: 20,
-    marginLeft: 10,
-    width: "90%",
+  contentView:{
+    flex: 1,
   },
+  accessoryView:{
+    width: 40,
+    justifyContent: 'center'
+  },  
+  textCenter: {
+    textAlign: 'center'
+  },
+  whiteText:{
+    color: 'white',
+  },
+  boldText:{
+    fontWeight: 'bold'
+  }
 });
-
-export default SearchBar;

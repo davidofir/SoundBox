@@ -20,7 +20,7 @@ export default Homepage = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("Discover")}>
-                <Text>Discover Artists</Text>
+                <Text>Discover and Rate</Text>
             </TouchableOpacity>
             <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("Profile")}>
                 <Text>Profile Page</Text>
