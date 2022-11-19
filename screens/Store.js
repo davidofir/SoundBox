@@ -1,22 +1,29 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useEffect } from 'react'
-import { StyleSheet, Text, View,FlatList } from 'react-native';
-const data = [];
-for(var i = 0; i < 12; i+=3){
-    data.push({
-        title:`Shirt${i+1}`
-    })
-    data.push({
-        title:`Hoodie${i+2}`
-    })
-    data.push({
-        title:`Lighter${i+3}`
-    })
-}
-export default Store =()=>{
+import React, { useContext, useEffect, useState } from 'react'
+import { StyleSheet, Text, View,FlatList,Image } from 'react-native';
+import MerchRepositoryImpl from '../domain/MerchAPI/MerchRepositoryImpl';
+const merchRepo = new MerchRepositoryImpl;
 
+
+    
+export default Store =({route,navigation})=>{
+    const [data,setData] = useState([]);
+    useEffect(()=>{
+        var fetchData = async()=>{
+            var resp = await merchRepo.GetMerchByArtistName(route.params.artistName)
+            return resp;
+        }
+        fetchData().then(
+            (result)=>{
+                if(result !== undefined){
+                setData(result)
+                }
+            }
+        )
+        
+    },[])
       const renderItem = ({ item }) => (
-        <Item title={item.title} />
+        <Item name={item.name} image={item.image} />
       );
     
     return(
@@ -30,10 +37,12 @@ export default Store =()=>{
         </View>
     )
 }
-const Item = ({ title }) => (
+const Item = ({ name,image }) => (
     <View style={styles.item}>
-        <View style={styles.square}/>
-            <Text style={{textAlignVertical:"center"}}>{title}</Text>
+        <Image style={styles.square} source={{
+            uri:image
+        }}/>
+            <Text style={{textAlignVertical:"center"}}>{name}</Text>
     </View>
   ); 
 const styles = StyleSheet.create({
@@ -55,8 +64,8 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     square: {
-        width: 70,
-        height: 70,
+        width: 150,
+        height: 150,
         backgroundColor: "black",
         marginRight: 10,
         borderRadius: 15

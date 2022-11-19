@@ -5,11 +5,13 @@ import React, { useEffect,useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepository';
+import MerchRepositoryImpl from '../domain/MerchAPI/MerchRepositoryImpl';
 
-let artistName = "sum41";
+let artistName = "a day to remember";
 let time = "upcoming";
 
 const eventsRepo = new EventsRepository;
+
 export default ArtistProfile = ({ navigation }) => {
     const [data,setData] = useState([]);
     useEffect(()=>{
@@ -52,7 +54,7 @@ export default ArtistProfile = ({ navigation }) => {
                         </TouchableWithoutFeedback>
                     </View>
                     <View style={{marginBottom: 20,justifyContent:"flex-end",flex:1 }}>
-                        <ButtonComponent textColor={Colors.secondary} background={Colors.primary} borderColorStyle={Colors.secondary} buttonTitle="To Buy Merch" clickEvent={() => navigation.navigate("Merch Store")
+                        <ButtonComponent textColor={Colors.secondary} background={Colors.primary} borderColorStyle={Colors.secondary} buttonTitle="To Buy Merch" clickEvent={() => navigation.navigate("Merch Store",{artistName: artistName})
                         } />
                     </View>
                 </View>
