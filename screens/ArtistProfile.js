@@ -7,7 +7,7 @@ import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepository';
 import MerchRepositoryImpl from '../domain/MerchAPI/MerchRepositoryImpl';
 
-let artistName = "metallica";
+let artistName = "a day to remember";
 let time = "upcoming";
 
 const eventsRepo = new EventsRepository;

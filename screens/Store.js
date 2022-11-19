@@ -64,8 +64,8 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     square: {
-        width: 70,
-        height: 70,
+        width: 150,
+        height: 150,
         backgroundColor: "black",
         marginRight: 10,
         borderRadius: 15
