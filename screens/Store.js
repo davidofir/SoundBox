@@ -9,6 +9,7 @@ const merchRepo = new MerchRepositoryImpl;
 export default Store =({route,navigation})=>{
     const [data,setData] = useState([]);
     useEffect(()=>{
+        setData([]);
         var fetchData = async()=>{
             var resp = await merchRepo.GetMerchByArtistName(route.params.artistName)
             return resp;

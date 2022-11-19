@@ -1,7 +1,8 @@
 import {REACT_APP_STORE_API_URL} from '@env'
-const data = [];
+let data = [];
 export default class {
     GetMerchByArtistName = async(artistName)=> {
+      data = [];
         const response = await fetch(`${process.env.REACT_APP_STORE_API_URL}/${artistName}`)
         if (!response.ok) {
           throw new Error('Data coud not be fetched!')

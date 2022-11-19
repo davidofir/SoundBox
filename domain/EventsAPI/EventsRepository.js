@@ -2,10 +2,10 @@ import {REACT_APP_EVENTS_API_SECRET} from '@env'
 
 const eventsURL = 'https://rest.bandsintown.com/artists'
 
-const data = [];
+let data = [];
 
 export default class EventsRepository {
-  
+    data = [];
     GetEventsByArtistName = async(artistName,time)=> {
         const response = await fetch(`${eventsURL}/${artistName}/events?app_id=${process.env.REACT_APP_EVENTS_API_SECRET}&date=${time}`)
         if (!response.ok) {
