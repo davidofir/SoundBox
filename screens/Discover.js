@@ -1,16 +1,38 @@
 import React from 'react';
+import { Feather, Entypo } from "@expo/vector-icons";
+
 import {
   StyleSheet,
+  SearchBar,
+  TextInput,
   Text,
   View,
+  Keyboard,
+  Button,
   FlatList,
   Image,
 } from 'react-native';
 
+
 class Cell extends React.Component{
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      loading: false,
+      error: null,
+      searchValue: "",
+    };
+  }
+
+  
   render(){
+    
     return(
+
+      
         <View style={styles.cell}>
+          
           <Image 
             style={styles.imageView} 
             source={{uri: this.props.cellItem.image[3]['#text']}}/>
@@ -50,7 +72,17 @@ export default class App extends React.Component {
     const tableData = Array(50).fill('Hello, World!')
 
 
-    return ( <View style = {styles.container}>
+    return ( 
+    
+    
+    <View style = {styles.container}>
+      {/* Searchbar */}
+        
+
+      {/* Heading */}
+      <Text style={styles.heading}>Popular Right Now</Text>
+
+      {/* Songs*/}
       <FlatList 
         data={this.state.tracks}
         renderItem={({item}) => (
@@ -69,7 +101,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingLeft: 15,
     paddingRight: 15,
-    flexDirection: "row",
+    flexDirection: "column",
     backgroundColor: '#000'
   },
   cell: {
@@ -98,5 +130,11 @@ const styles = StyleSheet.create({
   },
   boldText:{
     fontWeight: 'bold'
+  },
+  heading: {
+    color: "white",
+    fontWeight: 'bold',
+    fontSize: "30",
+    paddingBottom: 20
   }
 });
