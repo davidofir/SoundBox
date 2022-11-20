@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import { Feather, Entypo } from "@expo/vector-icons";
 //import { SearchBar } from "react-native-elements";
+import RatingPage from './RatingPage';
+//import { SearchBar } from 'react-native-elements';
 import {
   StyleSheet,
+
   TextInput,
   Text,
   View,
@@ -13,12 +16,14 @@ import {
   Alert,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { TouchableHighlight } from 'react-native-gesture-handler';
+import { NavigationHelpersContext } from '@react-navigation/native';
 
-
-class Cell extends React.Component{
+class Cell extends React.Component {
 
   constructor(props) {
     super(props);
+    
     this.state = {
       loading: false,
       error: null,
@@ -26,17 +31,21 @@ class Cell extends React.Component{
     };
   }
 
+
+
   
   render(){
     
     return(
-
-      <TouchableWithoutFeedback onPress={() => {Alert.alert("View Clicked " + this.props.cellItem.name)}}>
+      //onPress={() => {Alert.alert("View Clicked " + this.props.cellItem.name)}}
+      
+      <TouchableWithoutFeedback >
         <View style={styles.cell} onStartShouldSetResponder={() => true} >
           
           
 
           <Image 
+          
             style={styles.imageView} 
             source={{uri: this.props.cellItem.image[3]['#text']}}/>
           <View style={styles.contentView} >
@@ -53,14 +62,19 @@ class Cell extends React.Component{
   }
 }
 
-export default class App extends React.Component {
+class App extends React.Component  {
+
+
   fetchTopTracks(){
     const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca"
     const url = `http://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks&api_key=${apiKey}&format=json`
 
+    
     return fetch(url)
     .then(response => response.json())
   }
+
+  
 
   constructor(props){
     super(props)
@@ -72,32 +86,56 @@ export default class App extends React.Component {
     .then(json => { this.setState({tracks: json.tracks.track}) 
     })
   }
+
+
+
   render() {
 
     const tableData = Array(50).fill('Hello, World!')
 
-
-    return ( 
+      return ( 
     
     
-    <View style = {styles.container} >
-      {/* Searchbar */}
-
-      {/* Heading */}
-      <Text style={styles.heading}>Popular Right Now</Text>
-
-      {/* Songs*/}
-      <FlatList 
-        data={this.state.tracks}
-        renderItem={({item}) => (
-          <Cell cellItem={item}/>
-        )}
-        keyExtractor={(_, index) => index}
-      />
-      </View>
-    );
+        <View style = {styles.container} >
+          {/* Searchbar */}
+          <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          clearButtonMode="always"
+         
+          
+          placeholder="Search"
+          style={styles.searchBar}
+        />
+          {/* Heading */}
+          <Text style={styles.heading  }>Popular Right Now</Text>
+    
+          {/* Songs*/}
+          <FlatList 
+          
+            data={this.state.tracks}
+           
+            renderItem={({item}) => (
+              <TouchableHighlight
+              onPress={() => this.props.navigation.navigate('RatingPage')}>
+              <Cell cellItem={item}/>
+              
+              </TouchableHighlight>
+              
+            )}
+            
+            keyExtractor={(_, index) => index}
+            
+            
+            
+          />
+         
+          </View>
+        );
   }
+
 }
+export default App;
 
 const styles = StyleSheet.create({
   container: {
@@ -139,6 +177,13 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: 'bold',
     fontSize: "30",
-    paddingBottom: 20
+    paddingBottom: 20,
+    paddingTop: 30,
+  },
+  searchBar: {
+    backgroundColor: "white",
+    height: 35,
+    borderRadius: 20,
+    paddingLeft: 10,
   }
 });
