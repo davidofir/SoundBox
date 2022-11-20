@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 import { Feather, Entypo } from "@expo/vector-icons";
 //import { SearchBar } from "react-native-elements";
 import RatingPage from './RatingPage';
-//import { withNavigation } from 'react-navigation';
+//import { SearchBar } from 'react-native-elements';
 import {
   StyleSheet,
+
   TextInput,
   Text,
   View,
@@ -97,7 +98,15 @@ class App extends React.Component  {
     
         <View style = {styles.container} >
           {/* Searchbar */}
-    
+          <TextInput
+          autoCapitalize="none"
+          autoCorrect={false}
+          clearButtonMode="always"
+         
+          
+          placeholder="Search"
+          style={styles.searchBar}
+        />
           {/* Heading */}
           <Text style={styles.heading  }>Popular Right Now</Text>
     
@@ -168,6 +177,13 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: 'bold',
     fontSize: "30",
-    paddingBottom: 20
+    paddingBottom: 20,
+    paddingTop: 30,
+  },
+  searchBar: {
+    backgroundColor: "white",
+    height: 35,
+    borderRadius: 20,
+    paddingLeft: 10,
   }
 });
