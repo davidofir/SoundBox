@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Feather, Entypo } from "@expo/vector-icons";
-
+//import { SearchBar } from "react-native-elements";
 import {
   StyleSheet,
-  SearchBar,
   TextInput,
   Text,
   View,
@@ -11,6 +10,8 @@ import {
   Button,
   FlatList,
   Image,
+  Alert,
+  TouchableWithoutFeedback,
 } from 'react-native';
 
 
@@ -30,13 +31,16 @@ class Cell extends React.Component{
     
     return(
 
-      
-        <View style={styles.cell}>
+      <TouchableWithoutFeedback onPress={() => {Alert.alert("View Clicked " + this.props.cellItem.name)}}>
+        <View style={styles.cell} onStartShouldSetResponder={() => true} >
           
+          
+
           <Image 
             style={styles.imageView} 
             source={{uri: this.props.cellItem.image[3]['#text']}}/>
-          <View style={styles.contentView}>
+          <View style={styles.contentView} >
+            
             <Text style={[styles.whiteText, styles.boldText]}>{this.props.cellItem.name}</Text>
             <Text style={styles.whiteText}>{this.props.cellItem.artist.name}</Text>
           </View>
@@ -44,6 +48,7 @@ class Cell extends React.Component{
           <Text style={[styles.textCenter, styles.whiteText]}></Text>
           </View>
         </View>
+        </TouchableWithoutFeedback>
     )
   }
 }
@@ -75,9 +80,8 @@ export default class App extends React.Component {
     return ( 
     
     
-    <View style = {styles.container}>
+    <View style = {styles.container} >
       {/* Searchbar */}
-        
 
       {/* Heading */}
       <Text style={styles.heading}>Popular Right Now</Text>
