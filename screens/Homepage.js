@@ -22,6 +22,9 @@ export default Homepage = ({ navigation }) => {
             <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("Discover")}>
                 <Text>Discover and Rate</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("RatingPage")}>
+                <Text> Rating Page (Temporary Button)</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("Profile")}>
                 <Text>Profile Page</Text>
             </TouchableOpacity>

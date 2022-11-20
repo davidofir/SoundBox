@@ -11,6 +11,8 @@ import Events from './screens/Events';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import ProfilePage from './screens/ProfilePage';
+import RatingPage from './screens/RatingPage'
+
 
 const Stack = createStackNavigator();
 export default function App() {
@@ -25,6 +27,7 @@ export default function App() {
         <Stack.Screen name="Home" component={Homepage} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Profile" component={ProfilePage} />
+        <Stack.Screen name="RatingPage" component={RatingPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
