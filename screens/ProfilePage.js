@@ -7,20 +7,36 @@ import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepository';
 import { authentication } from '../firebase';
 
-let artistName = "sum41";
-let time = "upcoming";
-
 const eventsRepo = new EventsRepository;
 export default ProfilePage = ({ navigation }) => {
     const [events, setEvents] = useState([]);
 
     return (
         <View>
-            <View style={styles.verticalProfileContainer}>
-                <View style={[styles.horizontalProfileContainer, { padding: 6 }]}>
-                    <View style={styles.square} />
-                    <Text>Email: {authentication.currentUser?.email}</Text>
+            <View style={styles.backgroundContainer}>
+                <View style={styles.verticalProfileContainer}>
+                    <View style={[styles.horizontalProfileContainer, { padding: 6 }]}>
+                        <View style={styles.circle} />
+                        <Text>Email: {authentication.currentUser?.email}</Text>
+                    </View>
                 </View>
+                <View style={styles.followContainer}>
+                    <View style={styles.statsBox}>
+                        <Text style={[styles.text, styles.subText]}>Posts</Text>
+                        <Text style={[styles.text, { fontSize: 24 }]}>14</Text>
+                    </View>
+                    <View style={[styles.statsBox, { borderColor: "#DFD8C8", borderLeftWidth: 1, borderRightWidth: 1 }]}>
+                        <Text style={[styles.text, styles.subText]}>Followers</Text>
+                        <Text style={[styles.text, { fontSize: 24 }]}>124</Text>
+                    </View>
+                    <View style={styles.statsBox}>
+                        <Text style={[styles.text, styles.subText]}>Following</Text>
+                        <Text style={[styles.text, { fontSize: 24 }]}>119</Text>
+                    </View>
+                </View>
+            </View>
+            <View>
+                <Text style={[styles.text, { fontSize: 18, padding: 10 }]}>POSTS</Text>
             </View>
         </View>
     )
@@ -28,7 +44,6 @@ export default ProfilePage = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     verticalProfileContainer: {
-        backgroundColor: '#fff',
         flexDirection: "row",
         alignItems: 'flex-start',
         margin: 10,
@@ -36,19 +51,37 @@ const styles = StyleSheet.create({
         height: "auto"
 
     },
+    backgroundContainer: {
+        backgroundColor: "white"
+    },
     horizontalProfileContainer: {
         flex: 2,
-        backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: "flex-start",
         marginLeft: 15,
         flexDirection: "row"
     },
-    square: {
+    circle: {
         width: 100,
         height: 100,
         backgroundColor: "black",
         marginRight: 10,
-        borderRadius: 30,
+        borderRadius: 100,
     },
+    followContainer: {
+        flexDirection: "row",
+        alignSelf: "center",
+        marginTop: 15
+    },
+    statsBox: {
+        alignItems: "center",
+        flex: 1,
+        paddingBottom: 15
+    },
+    subText: {
+        fontSize: 12,
+        color: "#AEB5BC",
+        textTransform: "uppercase",
+        fontWeight: "500"
+    }
 })

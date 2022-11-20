@@ -5,7 +5,7 @@ import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Aler
 import { Feather, Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { authentication } from "../firebase";
+import { authentication, db } from "../firebase";
 
 const Separator = () => (
     <View style={styles.separator} />
@@ -13,17 +13,20 @@ const Separator = () => (
 
 
 const Register = ({ navigation }) => {
+    const [userName, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const RegisterAccount = () => {
         createUserWithEmailAndPassword(authentication, email, password)
-            .then((re) => {
-                console.log(re);
+            .then(userCredentials => {
+                const user = userCredentials.user;
+                console.log("Registered in with:", user.email);
+                return db.collection('users').doc(user.uid).set({
+                    username: userName
+                });
             })
-            .catch((re) => {
-                console.log(re);
-            })
+            .catch(error => alert(error.message));
         navigation.navigate("Login")
     }
 
@@ -38,8 +41,8 @@ const Register = ({ navigation }) => {
                 <Text style={styles.Text}>Username</Text>
                 <TextInput
                     placeholder="Username"
-                    //</View>value={ } 
-                    //onChaneText={Text => }
+                    value={userName}
+                    onChangeText={text => setUser(text)}
                     style={styles.input}
                 />
                 <Text style={styles.Text}>Email</Text>

@@ -27,12 +27,11 @@ const Login = ({ navigation }) => {
 
     const SignIn = () => {
         signInWithEmailAndPassword(authentication, email, password)
-            .then((re) => {
-                console.log(re);
+            .then(userCredentials => {
+                const user = userCredentials.user;
+                console.log("Logged in with:", user.email);
             })
-            .catch((re) => {
-                console.log(re);
-            })
+            .catch(error => alert(error.message))
     }
 
 
