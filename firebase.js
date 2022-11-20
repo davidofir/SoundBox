@@ -32,5 +32,5 @@ const db = getFirestore(app);
 
 export {
     authentication,
-    db,
+    db
 };

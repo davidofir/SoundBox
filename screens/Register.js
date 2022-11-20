@@ -6,6 +6,8 @@ import { Feather, Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { authentication, db } from "../firebase";
+import { addDoc, collection, setDoc } from "firebase/firestore";
+import { async } from "@firebase/util";
 
 const Separator = () => (
     <View style={styles.separator} />
@@ -22,9 +24,11 @@ const Register = ({ navigation }) => {
             .then(userCredentials => {
                 const user = userCredentials.user;
                 console.log("Registered in with:", user.email);
-                return db.collection('users').doc(user.uid).set({
-                    username: userName
-                });
+                async () => {
+                    await setDoc(doc(db, "users", user.uid), {
+                        username: userName
+                    });
+                }
             })
             .catch(error => alert(error.message));
         navigation.navigate("Login")
