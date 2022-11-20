@@ -21,14 +21,16 @@ const Register = ({ navigation }) => {
 
     const RegisterAccount = () => {
         createUserWithEmailAndPassword(authentication, email, password)
-            .then(userCredentials => {
+            .then(async (userCredentials) => {
                 const user = userCredentials.user;
                 console.log("Registered in with:", user.email);
-                async () => {
-                    await setDoc(doc(db, "users", user.uid), {
-                        username: userName
+                await addDoc(collection(db, "users"), { userName })
+                    .then((re) => {
+                        alert("Data has been saved");
+                    })
+                    .catch((e) => {
+                        console.log(e.message);
                     });
-                }
             })
             .catch(error => alert(error.message));
         navigation.navigate("Login")
