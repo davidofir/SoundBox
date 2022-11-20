@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
 import { Feather, Entypo } from "@expo/vector-icons";
-//import { SearchBar } from "react-native-elements";
-import RatingPage from './RatingPage';
-//import { SearchBar } from 'react-native-elements';
 import {
   StyleSheet,
 
@@ -17,7 +14,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
-import { NavigationHelpersContext } from '@react-navigation/native';
+
 
 class Cell extends React.Component {
 
@@ -37,7 +34,7 @@ class Cell extends React.Component {
   render(){
     
     return(
-      //onPress={() => {Alert.alert("View Clicked " + this.props.cellItem.name)}}
+
       
       <TouchableWithoutFeedback >
         <View style={styles.cell} onStartShouldSetResponder={() => true} >
@@ -176,7 +173,7 @@ const styles = StyleSheet.create({
   heading: {
     color: "white",
     fontWeight: 'bold',
-    fontSize: "30",
+    fontSize: 30,
     paddingBottom: 20,
     paddingTop: 30,
   },
