@@ -17,8 +17,6 @@ export default class {
             })
           })
           return data;
-        }else{
-          return undefined
         }
 
         }
