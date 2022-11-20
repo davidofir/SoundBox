@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback } from 'reac
 import Colors from '../constants/colors';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react'
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepository';
 import { authentication } from '../firebase';
@@ -27,16 +27,26 @@ export default ProfilePage = ({ navigation }) => {
                     </View>
                     <View style={[styles.statsBox, { borderColor: "#DFD8C8", borderLeftWidth: 1, borderRightWidth: 1 }]}>
                         <Text style={[styles.text, styles.subText]}>Followers</Text>
-                        <Text style={[styles.text, { fontSize: 24 }]}>124</Text>
+                        <Text onPress={() => navigation.navigate("Followers")} style={[styles.text, { fontSize: 24 }]}>124</Text>
                     </View>
                     <View style={styles.statsBox}>
                         <Text style={[styles.text, styles.subText]}>Following</Text>
-                        <Text style={[styles.text, { fontSize: 24 }]}>119</Text>
+                        <Text onPress={() => navigation.navigate("Following")} style={[styles.text, { fontSize: 24 }]}>119</Text>
                     </View>
                 </View>
             </View>
             <View>
-                <Text style={[styles.text, { fontSize: 18, padding: 10 }]}>POSTS</Text>
+                <Text style={[styles.text, { fontSize: 18, padding: 10, paddingBottom: 0 }]}>POSTS</Text>
+            </View>
+            <View>
+                <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{ marginTop: 20 }}>
+                    <View>
+                        <View style={styles.verticalImageContainer} />
+                    </View>
+                    <View>
+                        <View style={styles.verticalImageContainer} />
+                    </View>
+                </ScrollView>
             </View>
         </View>
     )
@@ -83,5 +93,14 @@ const styles = StyleSheet.create({
         color: "#AEB5BC",
         textTransform: "uppercase",
         fontWeight: "500"
+    },
+    verticalImageContainer: {
+        width: 370,
+        height: 250,
+        borderRadius: 12,
+        backgroundColor: "grey",
+        overflow: "hidden",
+        marginVertical: 6,
+        marginHorizontal: 10
     }
 })

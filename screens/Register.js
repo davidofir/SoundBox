@@ -6,7 +6,7 @@ import { Feather, Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { authentication, db } from "../firebase";
-import { addDoc, collection, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { async } from "@firebase/util";
 
 const Separator = () => (
@@ -24,7 +24,7 @@ const Register = ({ navigation }) => {
             .then(async (userCredentials) => {
                 const user = userCredentials.user;
                 console.log("Registered in with:", user.email);
-                await addDoc(collection(db, "users"), { userName })
+                await setDoc(doc(db, "users", userCredentials.user.uid), { userName })
                     .then((re) => {
                         alert("Data has been saved");
                     })

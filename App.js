@@ -12,6 +12,9 @@ import Login from './screens/Login';
 import Register from './screens/Register';
 import ProfilePage from './screens/ProfilePage';
 import RatingPage from './screens/RatingPage'
+import SocialFeed from './screens/SocialFeed';
+import FollowersPage from './screens/FollowersPage';
+import FollowingPage from './screens/FollowingPage';
 
 
 const Stack = createStackNavigator();
@@ -27,6 +30,9 @@ export default function App() {
         <Stack.Screen name="Home" component={Homepage} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Profile" component={ProfilePage} />
+        <Stack.Screen name="Social Feed" component={SocialFeed} />
+        <Stack.Screen name="Followers" component={FollowersPage} />
+        <Stack.Screen name="Following" component={FollowingPage} />
         <Stack.Screen name="RatingPage" component={RatingPage} />
       </Stack.Navigator>
     </NavigationContainer>
