@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View, Image } from 'react-native';
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 
@@ -6,27 +6,38 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 
 const RatingPage = () => {
     const [defaultRating, setdefaultRating] = useState(2)
-    const [maxRating, setmaxRating] = useState([1,2,3,4,5])
+    const [maxRating, setmaxRating] = useState([1, 2, 3, 4, 5])
 
     const starImgFilled = 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true'
     const starImgCorner = 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true'
+
+    //Profanity API
+    const [text, setText] = useState('')
+    const url = `https://www.purgomalum.com/service/json?text=${text}`
+    async function getCensoredText() {
+        const response = await fetch(url);
+        const data = await response.json();
+        const message = `${defaultRating} stars \n ${data.result}`;
+        alert(message);
+    }
+
     const CustomRatingBar = () => {
         return (
             <View style={styles.customRatingBarStyle}>
                 {
-                    maxRating.map((item,key) => {
+                    maxRating.map((item, key) => {
                         return (
                             <TouchableOpacity
-                            activeOpacity={0.7}
-                            key={item}
-                            onPress={() => setdefaultRating(item)}
+                                activeOpacity={0.7}
+                                key={item}
+                                onPress={() => setdefaultRating(item)}
                             >
                                 <Image
                                     style={styles.starImgStyle}
                                     source={
                                         item <= defaultRating
-                                            ? { uri: starImgFilled}
-                                            : { uri: starImgCorner}
+                                            ? { uri: starImgFilled }
+                                            : { uri: starImgCorner }
                                     }
                                 />
 
@@ -41,29 +52,28 @@ const RatingPage = () => {
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.textStyle}> Rate This Song </Text>
-            <CustomRatingBar/>
+            <CustomRatingBar />
             <Text style={styles.textStyle}>
                 {defaultRating + ' / ' + maxRating.length}
             </Text>
 
             <TextInput
-        style={styles.input}
-        
-    
-        placeholder="Write a review (optional)"
-        keyboardType="alphabetical"
-      />
+                style={styles.input}
+                onChangeText={text => setText(text)}
+                placeholder="Write a review (optional)"
+                keyboardType="alphabetical"
+            />
             <TouchableOpacity
-            activeOpacity={0.7}
-            style={styles.buttonStyle}
-            onPress={() => alert(defaultRating)}
+                activeOpacity={0.7}
+                style={styles.buttonStyle}
+                onPress={getCensoredText}
             >
-            <Text style={{color: 'white'}}>Save Review</Text>
+                <Text style={{ color: 'white' }}>Save Review</Text>
             </TouchableOpacity>
         </SafeAreaView>
 
     );
-    
+
 };
 
 
@@ -74,23 +84,23 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-      },
-      textStyle: {
+    },
+    textStyle: {
         textAlign: 'center',
         fontSize: 23,
         marginTop: 20,
-      }, 
-      customRatingBarStyle: {
+    },
+    customRatingBarStyle: {
         justifyContent: "center",
         flexDirection: 'row',
         marginTop: 30,
-      }, 
-      starImgStyle: {
-        width: 40, 
-        height: 40, 
+    },
+    starImgStyle: {
+        width: 40,
+        height: 40,
         resizeMode: "cover"
-      },
-      buttonStyle: {
+    },
+    buttonStyle: {
         justifyContent: "center",
         alignItems: 'center',
         marginTop: 30,
@@ -98,14 +108,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'black',
         fontSize: 40,
         color: "white"
-      },
-      input: {
+    },
+    input: {
         height: 150,
         width: 300,
         margin: 12,
         borderWidth: 1,
         padding: 10,
-      },
-    });
+    },
+});
 
-    export default RatingPage
+export default RatingPage
