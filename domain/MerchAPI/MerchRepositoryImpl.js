@@ -1,7 +1,6 @@
 import {REACT_APP_STORE_API_URL} from '@env'
 let data = [];
-export default class {
-    GetMerchByArtistName = async(artistName)=> {
+    export default async function GetMerchByArtistNameImpl(artistName) {
       data = [];
         const response = await fetch(`${process.env.REACT_APP_STORE_API_URL}/${artistName}`)
         if (!response.ok) {
@@ -21,4 +20,3 @@ export default class {
 
         }
     }
-}

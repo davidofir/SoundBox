@@ -4,9 +4,8 @@ const eventsURL = 'https://rest.bandsintown.com/artists'
 
 let data = [];
 
-export default class EventsRepository {
-    data = [];
-    GetEventsByArtistName = async(artistName,time)=> {
+     export default async function GetEventsByArtistNameImpl(artistName,time) {
+      data = [];
         const response = await fetch(`${eventsURL}/${artistName}/events?app_id=${process.env.REACT_APP_EVENTS_API_SECRET}&date=${time}`)
         if (!response.ok) {
           throw new Error('Data coud not be fetched!')
@@ -21,4 +20,4 @@ export default class EventsRepository {
           return data;
         }
     }
-}
+

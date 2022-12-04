@@ -4,19 +4,18 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect,useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
-import EventsRepository from '../domain/EventsAPI/EventsRepository';
-import MerchRepositoryImpl from '../domain/MerchAPI/MerchRepositoryImpl';
+import { GetEventsByArtistName } from '../domain/ArtistRepository/ArtistRepository';
+
 
 let artistName = "a day to remember";
 let time = "upcoming";
 
-const eventsRepo = new EventsRepository;
 
 export default ArtistProfile = ({ navigation }) => {
     const [data,setData] = useState([]);
     useEffect(()=>{
         var fetchData = async()=>{
-            var resp = await eventsRepo.GetEventsByArtistName(artistName,time)
+            var resp = await GetEventsByArtistName(artistName,time)
             return resp;
         }
         fetchData().then(

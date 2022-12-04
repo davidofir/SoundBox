@@ -4,7 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react'
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
-import EventsRepository from '../domain/EventsAPI/EventsRepository';
+import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
 import { authentication } from '../firebase';
 
 const eventsRepo = new EventsRepository;

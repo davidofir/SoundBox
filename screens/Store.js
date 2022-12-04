@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useContext, useEffect, useState } from 'react'
 import { StyleSheet, Text, View,FlatList,Image } from 'react-native';
+import GetMerchByArtistName from '../domain/ArtistRepository/ArtistRepository';
 import MerchRepositoryImpl from '../domain/MerchAPI/MerchRepositoryImpl';
 const merchRepo = new MerchRepositoryImpl;
 
@@ -11,7 +12,7 @@ export default Store =({route,navigation})=>{
     useEffect(()=>{
         setData([]);
         var fetchData = async()=>{
-            var resp = await merchRepo.GetMerchByArtistName(route.params.artistName)
+            var resp = await GetMerchByArtistName(route.params.artistName)
             return resp;
         }
         fetchData().then(
