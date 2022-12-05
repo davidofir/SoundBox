@@ -1,28 +1,20 @@
 import { StyleSheet, Text, View,FlatList,TouchableWithoutFeedback } from 'react-native';
-import Colors from '../constants/colors';
-import { StatusBar } from 'expo-status-bar';
-import React, { useEffect,useState } from 'react'
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import ButtonComponent from '../components/ButtonComponent';
-import { GetEventsByArtistName } from '../domain/ArtistRepository/ArtistRepository';
-import EventItem from '../components/EventItem'
+import Colors from '../../constants/colors';
+import React, { useEffect,useState } from 'react';
 
+import useViewModel from './ArtistViewModel'
+import EventItem from '../../components/EventItem';
+import ButtonComponent from '../../components/ButtonComponent';
 let artistName = "a day to remember";
 let time = "upcoming";
 
 
 export default ArtistProfile = ({ navigation }) => {
-    const [data,setData] = useState([]);
+    
+    const {events,getEventsByArtistName} = useViewModel();
+
     useEffect(()=>{
-        var fetchData = async()=>{
-            var resp = await GetEventsByArtistName(artistName,time)
-            return resp;
-        }
-        fetchData().then(
-            (result)=>{
-                setData(result)
-            }
-        )
+        getEventsByArtistName(artistName,time);
     },[])
 
     const renderItem = ({ item }) => (
@@ -41,10 +33,10 @@ export default ArtistProfile = ({ navigation }) => {
                 <View>
                     <Text style={{textAlign:"center",marginTop:"5%"}}>Upcoming Events</Text>
                     <View>
-                     <TouchableWithoutFeedback onPress={()=>navigation.navigate("Upcoming Events",{events:data})}>
+                     <TouchableWithoutFeedback onPress={()=>navigation.navigate("Upcoming Events",{events:events})}>
                         <View style={[styles.verticalProfileContainer,{marginTop:50}]}>
                                  <FlatList
-                                    data={data.slice(0,5)}
+                                    data={events.slice(0,5)}
                                     renderItem={renderItem}
                                     keyExtractor={(item, key) => key}
                                     initialNumToRender={5} />
