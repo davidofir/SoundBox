@@ -5,7 +5,7 @@ import React, { useEffect,useState } from 'react';
 import useViewModel from './ArtistViewModel'
 import EventItem from '../../components/EventItem';
 import ButtonComponent from '../../components/ButtonComponent';
-let artistName = "gojira";
+let artistName = "slipknot";
 let time = "upcoming";
 
 
