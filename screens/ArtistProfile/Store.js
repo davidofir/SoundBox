@@ -1,38 +1,35 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useContext, useEffect, useState } from 'react'
 import { StyleSheet, Text, View,FlatList,Image } from 'react-native';
-import GetMerchByArtistName from '../domain/ArtistRepository/ArtistRepository';
-import MerchRepositoryImpl from '../domain/MerchAPI/MerchRepositoryImpl';
+import MerchItem from '../../components/MerchItem';
+import GetMerchByArtistName from '../../domain/ArtistRepository/ArtistRepository';
+import MerchRepositoryImpl from '../../domain/MerchAPI/MerchRepositoryImpl';
+import useViewModel from './MerchViewModel';
+
+
+
 const merchRepo = new MerchRepositoryImpl;
 
 
     
 export default Store =({route,navigation})=>{
+
+    const {merch,getMerchByArtistName} = useViewModel();
+
     const [data,setData] = useState([]);
     useEffect(()=>{
-        setData([]);
-        var fetchData = async()=>{
-            var resp = await GetMerchByArtistName(route.params.artistName)
-            return resp;
-        }
-        fetchData().then(
-            (result)=>{
-                if(result !== undefined){
-                setData(result)
-                }
-            }
-        )
+        getMerchByArtistName(route.params.artistName);
         
     },[])
       const renderItem = ({ item }) => (
-        <Item name={item.name} image={item.image} />
+        <MerchItem name={item.name} image={item.image} />
       );
     
     return(
         <View>
             <View style={styles.verticalContainer}>
                     <FlatList
-                        data={data}
+                        data={merch}
                         renderItem={renderItem}
                         keyExtractor={(item,key) => key}/>
             </View>

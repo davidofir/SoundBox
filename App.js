@@ -5,9 +5,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Discover from './screens/Discover'
 import Homepage from './screens/Homepage';
-import ArtistProfile from './screens/ArtistProfile';
-import Store from './screens/Store';
-import Events from './screens/Events';
+import ArtistProfile from './screens/ArtistProfile/ArtistProfile';
+import Store from './screens/ArtistProfile/Store';
+import Events from './screens/ArtistProfile/Events';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import ProfilePage from './screens/ProfilePage';
