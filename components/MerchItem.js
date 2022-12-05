@@ -1,11 +1,14 @@
-import { View,Image,StyleSheet,Text } from "react-native";
+import { View,Image,StyleSheet,Text, Linking } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const MerchItem = props => (
     <View style={styles.item}>
-        <Image style={styles.square} source={{
-            uri:props.image
-        }}/>
-            <Text style={{textAlignVertical:"center"}}>{props.name}</Text>
+        <TouchableOpacity onPress={()=>Linking.openURL(props.url)}>
+            <Image style={styles.square} source={{
+                uri:props.image
+            }}/>
+                <Text style={{textAlignVertical:"center"}}>{props.name}</Text>
+        </TouchableOpacity>
     </View>
   ); 
 const styles = StyleSheet.create({
