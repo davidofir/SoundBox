@@ -22,7 +22,7 @@ export default Store =({route,navigation})=>{
         
     },[])
       const renderItem = ({ item }) => (
-        <MerchItem name={item.name} image={item.image} url={item.url}/>
+        <MerchItem name={item.name} price={item.price} image={item.image} url={item.url}/>
       );
     
     return(

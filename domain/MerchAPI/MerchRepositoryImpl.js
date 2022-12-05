@@ -12,7 +12,8 @@ let data = [];
             data.push({
                 name: item.name,
                 image:item.images["lg"],
-                url:item.url
+                url:item.url,
+                price: item.description[3].content
             })
           })
           return data;
