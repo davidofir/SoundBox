@@ -16,6 +16,7 @@ import {
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 
+
 class Cell extends React.Component {
 
   constructor(props) {
@@ -47,6 +48,7 @@ class Cell extends React.Component {
             source={{uri: this.props.cellItem.image[3]['#text']}}/>
           <View style={styles.contentView} >
             
+            
             <Text style={[styles.whiteText, styles.boldText]}>{this.props.cellItem.name}</Text>
             <Text style={styles.whiteText}>{this.props.cellItem.artist.name}</Text>
           </View>
@@ -61,6 +63,7 @@ class Cell extends React.Component {
 
 class App extends React.Component  {
 
+  searchInput = ""
 
   fetchTopTracks(){
     const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca"
@@ -71,7 +74,30 @@ class App extends React.Component  {
     .then(response => response.json())
   }
 
-  
+  fetchSong(){
+    const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca"
+    const url = `https://ws.audioscrobbler.com/2.0/?method=track.search&track=${this.searchInput}&api_key=${apiKey}&format=json`
+
+    
+    return fetch(url)
+    .then(response => response.json())
+  }
+
+  fetchArtists(){
+    const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca"
+    const url = `https://ws.audioscrobbler.com/2.0/?method=artist.search&artist=Homecoming&api_key=${apiKey}&format=json`
+
+    
+    return fetch(url)
+    .then(response => response.json())
+  }
+
+  getSearch() {
+    console.log(this.searchInput)
+
+  }
+
+ 
 
   constructor(props){
     super(props)
@@ -92,18 +118,27 @@ class App extends React.Component  {
 
       return ( 
     
-    
+        
         <View style = {styles.container} >
+
+          
           {/* Searchbar */}
           <TextInput
           autoCapitalize="none"
           autoCorrect={false}
           clearButtonMode="always"
          
-          
+          onChangeText={(text) => this.searchInput = text}
           placeholder="Search"
           style={styles.searchBar}
         />
+        <Button
+          onPress={() => this.fetchSong()
+            .then(json => { this.setState({tracks: json.results.trackmatches.track}) 
+            })}
+          title="Search"
+          />
+
           {/* Heading */}
           <Text style={styles.heading  }>Popular Right Now</Text>
     

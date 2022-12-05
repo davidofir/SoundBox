@@ -16,7 +16,6 @@ import SocialFeed from './screens/SocialFeed';
 import FollowersPage from './screens/FollowersPage';
 import FollowingPage from './screens/FollowingPage';
 
-
 const Stack = createStackNavigator();
 export default function App() {
   return (
