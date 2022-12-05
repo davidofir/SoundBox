@@ -1,7 +1,7 @@
 import {REACT_APP_EVENTS_API_SECRET} from '@env'
 
 const eventsURL = 'https://rest.bandsintown.com/artists'
-
+let artistData = {};
 let data = [];
 
      export default async function GetEventsByArtistNameImpl(artistName,time) {
@@ -11,13 +11,21 @@ let data = [];
           throw new Error('Data coud not be fetched!')
         } else {
           const resp = await response.json();
+
           resp.map((item)=>{
               data.push({
                   startDateTime: item[Object.keys(item)[2]],
                   venue:item.venue
                 })
           })
+          artistData = resp[0].artist;
           return data;
         }
+    }
+    export function GetArtistDetails(){
+      return {
+        artistName: artistData.name,
+        profilePic: artistData['thumb_url']
+      };
     }
 

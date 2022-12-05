@@ -1,22 +1,25 @@
-import { StyleSheet, Text, View,FlatList,TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View,FlatList,TouchableWithoutFeedback,Image } from 'react-native';
 import Colors from '../../constants/colors';
 import React, { useEffect,useState } from 'react';
 
 import useViewModel from './ArtistViewModel'
 import EventItem from '../../components/EventItem';
 import ButtonComponent from '../../components/ButtonComponent';
-let artistName = "a day to remember";
+let artistName = "gojira";
 let time = "upcoming";
 
 
 export default ArtistProfile = ({ navigation }) => {
     
-    const {events,getEventsByArtistName} = useViewModel();
+    const {events,getEventsByArtistName,artistProfile,getArtistProfile} = useViewModel();
 
     useEffect(()=>{
         getEventsByArtistName(artistName,time);
-    },[])
 
+    },[])
+    useEffect(()=>{
+        getArtistProfile();
+    },[events])
     const renderItem = ({ item }) => (
         <EventItem city={item.venue.city} country={item.venue.country} date={new Date (item.startDateTime).toLocaleDateString()} time={new Date (item.startDateTime).toLocaleTimeString()} />
       );
@@ -25,12 +28,14 @@ export default ArtistProfile = ({ navigation }) => {
         <View>
             <View style={styles.verticalProfileContainer}>
                 <View style={[styles.horizontalProfileContainer, { padding: 6 }]}>
-                    <View style={styles.square} />
-                    <Text>Artist Name</Text>
+                    <Image style={styles.square} source={{
+                        uri:artistProfile.profilePic
+                    }} />
+                    <Text>{artistProfile.artistName}</Text>
                 </View>
             </View>
             <View style={[styles.verticalProfileContainer, { justifyContent: "center",height:'78%' }]}>
-                <View>
+                <View style={{maxWidth:"85%"}}>
                     <Text style={{textAlign:"center",marginTop:"5%"}}>Upcoming Events</Text>
                     <View>
                      <TouchableWithoutFeedback onPress={()=>navigation.navigate("Upcoming Events",{events:events})}>
@@ -45,7 +50,7 @@ export default ArtistProfile = ({ navigation }) => {
                         </TouchableWithoutFeedback>
                     </View>
                     <View style={{marginBottom: 20,justifyContent:"flex-end",flex:1 }}>
-                        <ButtonComponent textColor={Colors.secondary} background={Colors.primary} borderColorStyle={Colors.secondary} buttonTitle="To Buy Merch" clickEvent={() => navigation.navigate("Merch Store",{artistName: artistName})
+                        <ButtonComponent textColor={Colors.secondary} background={Colors.primary} borderColorStyle={Colors.secondary} buttonTitle="Browse Merch" clickEvent={() => navigation.navigate("Merch Store",{artistName: artistName})
                         } />
                     </View>
                 </View>

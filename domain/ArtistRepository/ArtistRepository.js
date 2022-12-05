@@ -1,4 +1,4 @@
-import GetEventsByArtistNameImpl from "../EventsAPI/EventsRepositoryImpl";
+import GetEventsByArtistNameImpl, { GetArtistDetails } from "../EventsAPI/EventsRepositoryImpl";
 import GetMerchByArtistNameImpl from "../MerchAPI/MerchRepositoryImpl";
 export async function GetEventsByArtistName(artistName,time){
     const data = await GetEventsByArtistNameImpl(artistName,time);
@@ -7,4 +7,8 @@ export async function GetEventsByArtistName(artistName,time){
 export default async function GetMerchByArtistName(artistName){
     const data = await GetMerchByArtistNameImpl(artistName);
     return data;
+}
+export function GetEventArtistProfile(){
+    const artist = GetArtistDetails();
+    return artist;
 }
