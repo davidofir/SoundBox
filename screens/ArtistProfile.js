@@ -5,7 +5,7 @@ import React, { useEffect,useState } from 'react'
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
 import { GetEventsByArtistName } from '../domain/ArtistRepository/ArtistRepository';
-
+import EventItem from '../components/EventItem'
 
 let artistName = "a day to remember";
 let time = "upcoming";
@@ -26,7 +26,7 @@ export default ArtistProfile = ({ navigation }) => {
     },[])
 
     const renderItem = ({ item }) => (
-        <Item city={item.venue.city} country={item.venue.country} date={new Date (item.startDateTime).toLocaleDateString()} time={new Date (item.startDateTime).toLocaleTimeString()} />
+        <EventItem city={item.venue.city} country={item.venue.country} date={new Date (item.startDateTime).toLocaleDateString()} time={new Date (item.startDateTime).toLocaleTimeString()} />
       );
 
     return (

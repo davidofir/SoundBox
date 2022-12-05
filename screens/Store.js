@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useContext, useEffect, useState } from 'react'
 import { StyleSheet, Text, View,FlatList,Image } from 'react-native';
+import MerchItem from '../components/MerchItem';
 import GetMerchByArtistName from '../domain/ArtistRepository/ArtistRepository';
 import MerchRepositoryImpl from '../domain/MerchAPI/MerchRepositoryImpl';
 const merchRepo = new MerchRepositoryImpl;
@@ -25,7 +26,7 @@ export default Store =({route,navigation})=>{
         
     },[])
       const renderItem = ({ item }) => (
-        <Item name={item.name} image={item.image} />
+        <MerchItem name={item.name} image={item.image} />
       );
     
     return(

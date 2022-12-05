@@ -3,6 +3,7 @@ import React, { useEffect,useState } from 'react'
 import { StyleSheet, Text, View,FlatList } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import {REACT_APP_EVENTS_API_SECRET} from '@env'
+import EventItem from '../components/EventItem';
 let artistName = "sum41";
 let time = "upcoming";
 const eventsURL = 'https://rest.bandsintown.com/artists'
@@ -17,7 +18,7 @@ export default Events = ({ route,navigation }) => {
 
 
     const renderItem = ({ item }) => (
-        <Item city={item.venue.city} country={item.venue.country} date={new Date (item.startDateTime).toLocaleDateString()} time={new Date (item.startDateTime).toLocaleTimeString()} />
+        <EventItem city={item.venue.city} country={item.venue.country} date={new Date (item.startDateTime).toLocaleDateString()} time={new Date (item.startDateTime).toLocaleTimeString()} />
       );
 
     return (
@@ -37,14 +38,7 @@ export default Events = ({ route,navigation }) => {
         </View>
     )
 }
-const Item = ({ city,country,date,time }) => (
-    <View style={styles.item}>
-            <Text>{city},{country}</Text>
-            <View style={{flexDirection:"row"}}>
-                <Text>Date:{date}</Text><Text> at {time}</Text>
-            </View>
-    </View>
-  ); 
+
 const styles = StyleSheet.create({
     verticalContainer: {
         backgroundColor: '#fff',
