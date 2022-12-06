@@ -30,7 +30,8 @@ export default Events = ({ route,navigation }) => {
                     <FlatList
                         data={events}
                         renderItem={renderItem}
-                        keyExtractor={(item, key) => key} />
+                        keyExtractor={(item, key) => key}
+                        scrollIndicatorInsets={{ right: 1 }} />
 
                 </View>
             </View>

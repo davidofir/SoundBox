@@ -44,7 +44,8 @@ export default ArtistProfile = ({ navigation }) => {
                                     data={events.slice(0,5)}
                                     renderItem={renderItem}
                                     keyExtractor={(item, key) => key}
-                                    initialNumToRender={5} />
+                                    initialNumToRender={5}
+                                    showsVerticalScrollIndicator={false} />
 
                         </View>
                         </TouchableWithoutFeedback>
