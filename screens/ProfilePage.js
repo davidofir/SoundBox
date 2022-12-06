@@ -1,37 +1,59 @@
-import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback, Image } from 'react-native';
 import Colors from '../constants/colors';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
-import { authentication } from '../firebase';
+import { authentication, db } from "../firebase";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 
 const eventsRepo = new EventsRepository;
 export default ProfilePage = ({ navigation }) => {
-    const [events, setEvents] = useState([]);
+    const [username, setUser] = useState('');
+    const [followers, setFollowers] = useState([]);
+    const [following, setFollowing] = useState([]);
+
+    // Get the current user
+    var userId = authentication.currentUser.uid;
+
+    // Query Firestore database with current UID
+    useEffect(() => {
+
+        const userRef = doc(db, "users", userId);
+
+        getDoc(userRef)
+            .then((doc) => {
+                setUser(doc.data().userName);
+                setFollowers(doc.data().followers);
+                setFollowing(doc.data().following);
+                console.log(followers);
+            })
+    }, [])
 
     return (
         <View>
             <View style={styles.backgroundContainer}>
                 <View style={styles.verticalProfileContainer}>
                     <View style={[styles.horizontalProfileContainer, { padding: 6 }]}>
-                        <View style={styles.circle} />
-                        <Text>Email: {authentication.currentUser?.email}</Text>
+                        <View style={styles.circle}>
+                            <Image source={require("../assets/defaultPic.png")} style={styles.circle} />
+                        </View>
+                        <Text>Username: {username}</Text>
                     </View>
                 </View>
                 <View style={styles.followContainer}>
                     <View style={styles.statsBox}>
                         <Text style={[styles.text, styles.subText]}>Posts</Text>
-                        <Text style={[styles.text, { fontSize: 24 }]}>14</Text>
+                        <Text style={[styles.text, { fontSize: 24 }]}>0</Text>
                     </View>
                     <View style={[styles.statsBox, { borderColor: "#DFD8C8", borderLeftWidth: 1, borderRightWidth: 1 }]}>
                         <Text style={[styles.text, styles.subText]}>Followers</Text>
-                        <Text onPress={() => navigation.navigate("Followers")} style={[styles.text, { fontSize: 24 }]}>124</Text>
+                        <Text onPress={() => navigation.navigate("Followers", { followerArray: followers })} style={[styles.text, { fontSize: 24 }]}>{followers.length}</Text>
                     </View>
                     <View style={styles.statsBox}>
                         <Text style={[styles.text, styles.subText]}>Following</Text>
-                        <Text onPress={() => navigation.navigate("Following")} style={[styles.text, { fontSize: 24 }]}>119</Text>
+                        <Text onPress={() => navigation.navigate("Following", { followingArray: following })} style={[styles.text, { fontSize: 24 }]}>{following.length}</Text>
                     </View>
                 </View>
             </View>
