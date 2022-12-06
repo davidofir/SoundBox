@@ -15,6 +15,8 @@ import RatingPage from './screens/RatingPage'
 import SocialFeed from './screens/SocialFeed';
 import FollowersPage from './screens/FollowersPage';
 import FollowingPage from './screens/FollowingPage';
+import SearchPage from './screens/SearchPage';
+import UserPage from './screens/UserPage';
 
 const Stack = createStackNavigator();
 export default function App() {
@@ -33,6 +35,8 @@ export default function App() {
         <Stack.Screen name="Followers" component={FollowersPage} />
         <Stack.Screen name="Following" component={FollowingPage} />
         <Stack.Screen name="RatingPage" component={RatingPage} />
+        <Stack.Screen name="Search" component={SearchPage} />
+        <Stack.Screen name="UserPage" component={UserPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
