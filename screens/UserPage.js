@@ -6,11 +6,13 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
 import { authentication, db } from "../firebase";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 
 const eventsRepo = new EventsRepository;
 export default UserPage = ({ navigation, route }) => {
     const [username, setUser] = useState('');
+    const [userFollowers, setUserFollowers] = useState([]);
+    const [userFollowing, setUserFollowing] = useState([]);
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
     const [isFollow, setFollow] = useState(false);
@@ -26,19 +28,25 @@ export default UserPage = ({ navigation, route }) => {
     useEffect(() => {
 
         const userRef = doc(db, "users", userId);
+        const userRef2 = doc(db, "users", currId);
 
         getDoc(userRef)
             .then((doc) => {
                 setUser(doc.data().userName);
                 setFollowers(doc.data().followers);
                 setFollowing(doc.data().following);
-                console.log(followers);
 
-                if (followers.includes(currId) == true) {
+                if (doc.data().followers.includes(currId) == true) {
                     setFollow(true);
                 } else {
                     setFollow(false);
                 }
+            })
+
+        getDoc(userRef2)
+            .then((doc2) => {
+                setUserFollowing(doc2.data().following);
+                setUserFollowers(doc2.data().followers);
             })
     }, [])
 
@@ -47,10 +55,45 @@ export default UserPage = ({ navigation, route }) => {
         // Pass the whole followers list into an array
         // Update the array that is passed and cut the unfollowed user 
         // after modifying the array, update the array using the modified array
+        var tempFollowers = followers;
+        var tempFollowing = userFollowing;
+
+        tempFollowers.splice(tempFollowers.indexOf(currId), 1);
+        tempFollowing.splice(tempFollowing.indexOf(userId), 1);
+
+        // update document
+        const userRef = doc(db, "users", userId);
+        updateDoc(userRef, {
+            followers: tempFollowers
+        })
+        const userRef2 = doc(db, "users", currId);
+        updateDoc(userRef2, {
+            following: tempFollowing
+        })
+
+        setFollow(false);
+
     }
 
     // Follow user
     const Follow = () => {
+        var tempFollowers = followers;
+        var tempFollowing = userFollowing;
+
+        tempFollowers.push(currId);
+        tempFollowing.push(userId);
+
+        // update document
+        const userRef = doc(db, "users", userId);
+        updateDoc(userRef, {
+            followers: tempFollowers
+        })
+        const userRef2 = doc(db, "users", currId);
+        updateDoc(userRef2, {
+            following: tempFollowing
+        })
+
+        setFollow(true);
     }
 
     return (
@@ -65,7 +108,7 @@ export default UserPage = ({ navigation, route }) => {
                     </View>
                 </View>
                 <View style={styles.buttonContainer}>
-                    {following ? (
+                    {isFollow ? (
                         <TouchableOpacity
                             onPress={Unfollow}
                             style={styles.button}
