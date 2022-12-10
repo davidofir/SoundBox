@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View, Image } from 'react-native';
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
+import { TouchableWithoutFeedback, Keyboard} from 'react-native';
 
 
-
-const RatingPage = () => {
+const RatingPage = ({route}) => {
+    
     const [defaultRating, setdefaultRating] = useState(2)
     const [maxRating, setmaxRating] = useState([1, 2, 3, 4, 5])
-
+    
     const starImgFilled = 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true'
     const starImgCorner = 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true'
 
@@ -50,8 +51,12 @@ const RatingPage = () => {
         )
     }
     return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <SafeAreaView style={styles.container}>
             <Text style={styles.textStyle}> Rate This Song </Text>
+            <Text style={styles.textStyleSong}> {route.params.paramSongName}</Text>
+            <Text style={styles.textStyleArtist}> {route.params.paramArtistName}</Text>
+
             <CustomRatingBar />
             <Text style={styles.textStyle}>
                 {defaultRating + ' / ' + maxRating.length}
@@ -62,6 +67,9 @@ const RatingPage = () => {
                 onChangeText={text => setText(text)}
                 placeholder="Write a review (optional)"
                 keyboardType="alphabetical"
+                multiline = {true}
+                
+                
             />
             <TouchableOpacity
                 activeOpacity={0.7}
@@ -71,7 +79,7 @@ const RatingPage = () => {
                 <Text style={{ color: 'white' }}>Save Review</Text>
             </TouchableOpacity>
         </SafeAreaView>
-
+        </TouchableWithoutFeedback>
     );
 
 };
@@ -83,12 +91,26 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'center',
+        
     },
     textStyle: {
-        textAlign: 'center',
+        textAlign: 'top',
         fontSize: 23,
         marginTop: 20,
+        
+    },
+    textStyleSong: {
+        fontSize: 29,
+        marginTop: 20,
+        alignItems: "baseline",
+        fontWeight: "bold"
+    },
+    textStyleArtist: {
+        fontSize: 23,
+        marginTop: 20,
+        alignItems: "baseline",
+        fontWeight: "bold",
+        color:"lightslategrey"
     },
     customRatingBarStyle: {
         justifyContent: "center",

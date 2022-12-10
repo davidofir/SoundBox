@@ -111,11 +111,10 @@ class App extends React.Component  {
   }
 
 
-
   render() {
 
     const tableData = Array(50).fill('Hello, World!')
-
+    
       return ( 
     
         
@@ -135,6 +134,7 @@ class App extends React.Component  {
         <Button
           onPress={() => this.fetchSong()
             .then(json => { this.setState({tracks: json.results.trackmatches.track}) 
+
             })}
           title="Search"
           />
@@ -149,7 +149,17 @@ class App extends React.Component  {
            
             renderItem={({item}) => (
               <TouchableHighlight
-              onPress={() => this.props.navigation.navigate('RatingPage')}>
+              onPress={() => {
+                                 
+                                this.props.navigation.navigate('RatingPage', {
+                                paramArtistName: item.artist.name, 
+                                paramSongName: item.name,
+                                
+                                
+                              })
+                              
+                              }}>
+
               <Cell cellItem={item}/>
               
               </TouchableHighlight>
