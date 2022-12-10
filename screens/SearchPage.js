@@ -7,71 +7,82 @@ import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
 import { authentication, db } from "../firebase";
 import SegmentedControlTab from "react-native-segmented-control-tab";
-import { AntDesign } from '@expo/vector-icons'; 
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { AntDesign } from '@expo/vector-icons';
+import { collection, doc, getDoc, getDocs, onSnapshot, QuerySnapshot } from "firebase/firestore";
 import useViewModel from './ArtistProfile/ArtistViewModel'
 import colors from '../constants/colors';
-const data = [
+var data = [
     { id: 'testuser2', text: 'Username: testuser2', image: require("../assets/defaultPic.png"), uid: '4pBUs4l8FvaeziP5bkNNTLL5wnO2' },
     { id: 'testuser3', text: 'Username: testuser3', image: require("../assets/defaultPic.png"), uid: 'Gckdu1VtBtaxk03N1PvltC13tlD2' },
     // ...
 ];
 
 export default SearchPage = ({ navigation }) => {
-    const [selectedSearchIndex,setSelectedSearchIndex] = useState(0);
+    const [selectedSearchIndex, setSelectedSearchIndex] = useState(0);
     const [search, setSearch] = useState('');
     const [results, setResults] = useState([]);
-    const [isArtist,setIsArtist] = useState(false);
-    const {events,getEventsByArtistName,artistProfile,getArtistProfile} = useViewModel();
+    const [isArtist, setIsArtist] = useState(false);
+    const { events, getEventsByArtistName, artistProfile, getArtistProfile } = useViewModel();
     const searchOptions = ['Users', 'Artists']
-    useEffect(()=>{
-        if(isArtist){
+    useEffect(() => {
+        const userRef = collection(db, "users");
+        getDocs(userRef)
+            .then((snapshot) => {
+                let users = []
+                snapshot.docs.forEach((doc) => {
+                    users.push({ ...doc.data(), id: doc.id })
+                })
+                data = users;
+            })
+    })
+    useEffect(() => {
+        if (isArtist) {
             getArtistProfile();
         }
-    },[events])
-    useEffect(()=>{
-        if(isArtist){
-            setResults([{id:"123", text:artistProfile.artistName,image: artistProfile.profilePic}])
+    }, [events])
+    useEffect(() => {
+        if (isArtist) {
+            setResults([{ id: "123", text: artistProfile.artistName, image: artistProfile.profilePic }])
         }
 
-    },[artistProfile])
+    }, [artistProfile])
     const onChangeSearch = (text) => {
 
-            if(selectedSearchIndex == 0){
-            const newResults = data.filter(item => item.text.includes(text));
+        if (selectedSearchIndex == 0) {
+            const newResults = data.filter(item => item.userName.includes(text));
             setIsArtist(false);
             setResults(newResults);
-        }else{
+        } else {
             setIsArtist(true);
-            getEventsByArtistName(search,"upcoming");
+            getEventsByArtistName(search, "upcoming");
 
         }
     };
 
     const onPressItem = (item) => {
-        if(!isArtist){
+        if (!isArtist) {
             navigation.navigate('UserPage', { item });
-        }else{
-            navigation.navigate("Artist",{artistProfile:artistProfile,events:events})
+        } else {
+            navigation.navigate("Artist", { artistProfile: artistProfile, events: events })
         }
 
     };
     const handleSearchIndexSelect = (index) => {
         //handle tab selection for custom Tab Selection SegmentedControlTab
         setSelectedSearchIndex(index);
-      };
+    };
     return (
         <View style={styles.container}>
-        <View style={styles.searchContainer}>
-            <SegmentedControlTab
-            values={searchOptions}
-            selectedIndex={selectedSearchIndex}
-            onTabPress={handleSearchIndexSelect}
-            />
-        </View>
+            <View style={styles.searchContainer}>
+                <SegmentedControlTab
+                    values={searchOptions}
+                    selectedIndex={selectedSearchIndex}
+                    onTabPress={handleSearchIndexSelect}
+                />
+            </View>
             <View style={styles.searchContainer}>
                 <View style={styles.searchContainerField}>
-                    <View style={{flex:1}}>
+                    <View style={{ flex: 1 }}>
                         <TextInput
                             style={styles.searchInput}
                             value={search}
@@ -79,8 +90,8 @@ export default SearchPage = ({ navigation }) => {
                             placeholder={searchOptions[selectedSearchIndex]}
                         />
                     </View>
-                    <View style={{padding:5}}>
-                        <TouchableOpacity onPress={()=>onChangeSearch(search)}>
+                    <View style={{ padding: 5 }}>
+                        <TouchableOpacity onPress={() => onChangeSearch(search)}>
                             <AntDesign name="search1" size={24} color="black" />
                         </TouchableOpacity>
                     </View>
@@ -99,8 +110,8 @@ export default SearchPage = ({ navigation }) => {
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => onPressItem(item)}>
                             <View style={styles.item}>
-                                <Image source={isArtist? {uri:item.image} : item.image} style={styles.itemImage} />
-                                <Text style={styles.itemText}>{item.text}</Text>
+                                <Image source={isArtist ? { uri: item.image } : require("../assets/defaultPic.png")} style={styles.itemImage} />
+                                <Text style={styles.itemText}>Username: {item.userName}</Text>
                             </View>
                         </TouchableOpacity>
                     )}
@@ -123,7 +134,7 @@ const styles = StyleSheet.create({
     },
     searchContainerField: {
         width: '90%',
-        flexDirection:"row"
+        flexDirection: "row"
     },
     searchInput: {
         height: 40,
@@ -156,7 +167,7 @@ const styles = StyleSheet.create({
     itemText: {
         fontSize: 18,
     },
-    segmentContainer:{
+    segmentContainer: {
         backgroundColor: '#fff',
         alignItems: 'center',
     }

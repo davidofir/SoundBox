@@ -19,7 +19,7 @@ export default UserPage = ({ navigation, route }) => {
     const { item } = route.params;
 
     // Get the searched user
-    var userId = item.uid
+    var userId = item.id
 
     // Get the current user
     var currId = authentication.currentUser.uid;
