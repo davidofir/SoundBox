@@ -25,23 +25,31 @@ export default SearchPage = ({ navigation }) => {
     const { events, getEventsByArtistName, artistProfile, getArtistProfile } = useViewModel();
     const searchOptions = ['Users', 'Artists']
     useEffect(() => {
-        const userRef = collection(db, "users");
-        getDocs(userRef)
-            .then((snapshot) => {
-                let users = []
-                snapshot.docs.forEach((doc) => {
-                    users.push({ ...doc.data(), id: doc.id })
+        if(!isArtist){
+            const userRef = collection(db, "users");
+            getDocs(userRef)
+                .then((snapshot) => {
+                    let users = []
+                    snapshot.docs.forEach((doc) => {
+                        users.push({ ...doc.data(), id: doc.id })
+                    })
+                    data = users;
                 })
-                data = users;
-            })
-    })
+        }
+
+    },[isArtist])
     useEffect(() => {
         if (isArtist) {
-            getArtistProfile();
+            if(events.length>0){
+                getArtistProfile();
+            }else{
+                setResults([]);
+            }
+
         }
     }, [events])
     useEffect(() => {
-        if (isArtist) {
+        if (isArtist && events.length > 0) {
             setResults([{ id: "123", text: artistProfile.artistName, image: artistProfile.profilePic }])
         }
 
@@ -52,7 +60,7 @@ export default SearchPage = ({ navigation }) => {
             const newResults = data.filter(item => item.userName.includes(text));
             setIsArtist(false);
             setResults(newResults);
-        } else {
+        } else if(selectedSearchIndex == 1) {
             setIsArtist(true);
             getEventsByArtistName(search, "upcoming");
 
@@ -111,7 +119,7 @@ export default SearchPage = ({ navigation }) => {
                         <TouchableOpacity onPress={() => onPressItem(item)}>
                             <View style={styles.item}>
                                 <Image source={isArtist ? { uri: item.image } : require("../assets/defaultPic.png")} style={styles.itemImage} />
-                                <Text style={styles.itemText}>Username: {item.userName}</Text>
+                                { isArtist ? <Text>{artistProfile.artistName}</Text> : <Text style={styles.itemText}>Username: {item.userName}</Text>}
                             </View>
                         </TouchableOpacity>
                     )}
