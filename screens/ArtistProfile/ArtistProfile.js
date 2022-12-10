@@ -51,7 +51,7 @@ export default ArtistProfile = ({ route,navigation }) => {
                         </TouchableWithoutFeedback>
                     </View>
                     <View style={{marginBottom: 20,justifyContent:"flex-end",flex:1 }}>
-                        <ButtonComponent textColor={Colors.secondary} background={Colors.primary} borderColorStyle={Colors.secondary} buttonTitle="Browse Merch" clickEvent={() => navigation.navigate("Merch Store",{artistName: artistName})
+                        <ButtonComponent textColor={Colors.secondary} background={Colors.primary} borderColorStyle={Colors.secondary} buttonTitle="Browse Merch" clickEvent={() => navigation.navigate("Merch Store",{artistName: route.params.artistProfile.artistName})
                         } />
                     </View>
                 </View>
