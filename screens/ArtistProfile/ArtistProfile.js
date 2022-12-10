@@ -9,17 +9,17 @@ let artistName = "slipknot";
 let time = "upcoming";
 
 
-export default ArtistProfile = ({ navigation }) => {
+export default ArtistProfile = ({ route,navigation }) => {
     
     const {events,getEventsByArtistName,artistProfile,getArtistProfile} = useViewModel();
 
-    useEffect(()=>{
-        getEventsByArtistName(artistName,time);
+    // useEffect(()=>{
+    //     getEventsByArtistName(artistName,time);
 
-    },[])
-    useEffect(()=>{
-        getArtistProfile();
-    },[events])
+    // },[])
+    // useEffect(()=>{
+    //     getArtistProfile();
+    // },[events])
     const renderItem = ({ item }) => (
         <EventItem city={item.venue.city} country={item.venue.country} date={new Date (item.startDateTime).toLocaleDateString()} time={new Date (item.startDateTime).toLocaleTimeString()} />
       );
@@ -29,19 +29,19 @@ export default ArtistProfile = ({ navigation }) => {
             <View style={styles.verticalProfileContainer}>
                 <View style={[styles.horizontalProfileContainer, { padding: 6 }]}>
                     <Image style={styles.square} source={{
-                        uri:artistProfile.profilePic
+                        uri:route.params.artistProfile.profilePic
                     }} />
-                    <Text>{artistProfile.artistName}</Text>
+                    <Text>{route.params.artistProfile.artistName}</Text>
                 </View>
             </View>
             <View style={[styles.verticalProfileContainer, { justifyContent: "center",height:'78%' }]}>
                 <View style={{maxWidth:"85%"}}>
                     <Text style={{textAlign:"center",marginTop:"5%"}}>Upcoming Events</Text>
                     <View>
-                     <TouchableWithoutFeedback onPress={()=>navigation.navigate("Upcoming Events",{events:events})}>
+                     <TouchableWithoutFeedback onPress={()=>navigation.navigate("Upcoming Events",{events:route.params.events})}>
                         <View style={[styles.verticalProfileContainer,{marginTop:50}]}>
                                  <FlatList
-                                    data={events.slice(0,5)}
+                                    data={route.params.events.slice(0,5)}
                                     renderItem={renderItem}
                                     keyExtractor={(item, key) => key}
                                     initialNumToRender={5}

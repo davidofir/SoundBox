@@ -6,8 +6,11 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
 import { authentication, db } from "../firebase";
+import SegmentedControlTab from "react-native-segmented-control-tab";
+import { AntDesign } from '@expo/vector-icons'; 
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
-
+import useViewModel from './ArtistProfile/ArtistViewModel'
+import colors from '../constants/colors';
 const data = [
     { id: 'testuser2', text: 'Username: testuser2', image: require("../assets/defaultPic.png"), uid: '4pBUs4l8FvaeziP5bkNNTLL5wnO2' },
     { id: 'testuser3', text: 'Username: testuser3', image: require("../assets/defaultPic.png"), uid: 'Gckdu1VtBtaxk03N1PvltC13tlD2' },
@@ -15,28 +18,73 @@ const data = [
 ];
 
 export default SearchPage = ({ navigation }) => {
+    const [selectedSearchIndex,setSelectedSearchIndex] = useState(0);
     const [search, setSearch] = useState('');
     const [results, setResults] = useState([]);
+    const [isArtist,setIsArtist] = useState(false);
+    const {events,getEventsByArtistName,artistProfile,getArtistProfile} = useViewModel();
+    const searchOptions = ['Users', 'Artists']
+    useEffect(()=>{
+        if(isArtist){
+            getArtistProfile();
+        }
+    },[events])
+    useEffect(()=>{
+        if(isArtist){
+            setResults([{id:"123", text:artistProfile.artistName,image: artistProfile.profilePic}])
+        }
 
+    },[artistProfile])
     const onChangeSearch = (text) => {
-        setSearch(text);
-        const newResults = data.filter(item => item.text.includes(text));
-        setResults(newResults);
+
+            if(selectedSearchIndex == 0){
+            const newResults = data.filter(item => item.text.includes(text));
+            setIsArtist(false);
+            setResults(newResults);
+        }else{
+            setIsArtist(true);
+            getEventsByArtistName(search,"upcoming");
+
+        }
     };
 
     const onPressItem = (item) => {
-        navigation.navigate('UserPage', { item });
-    };
+        if(!isArtist){
+            navigation.navigate('UserPage', { item });
+        }else{
+            navigation.navigate("Artist",{artistProfile:artistProfile,events:events})
+        }
 
+    };
+    const handleSearchIndexSelect = (index) => {
+        //handle tab selection for custom Tab Selection SegmentedControlTab
+        setSelectedSearchIndex(index);
+      };
     return (
         <View style={styles.container}>
+        <View style={styles.searchContainer}>
+            <SegmentedControlTab
+            values={searchOptions}
+            selectedIndex={selectedSearchIndex}
+            onTabPress={handleSearchIndexSelect}
+            />
+        </View>
             <View style={styles.searchContainer}>
-                <TextInput
-                    style={styles.searchInput}
-                    value={search}
-                    onChangeText={onChangeSearch}
-                    placeholder="Search"
-                />
+                <View style={styles.searchContainerField}>
+                    <View style={{flex:1}}>
+                        <TextInput
+                            style={styles.searchInput}
+                            value={search}
+                            onChangeText={setSearch}
+                            placeholder={searchOptions[selectedSearchIndex]}
+                        />
+                    </View>
+                    <View style={{padding:5}}>
+                        <TouchableOpacity onPress={()=>onChangeSearch(search)}>
+                            <AntDesign name="search1" size={24} color="black" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </View>
             {results.length > 0 && (
                 <View style={styles.searchResultContainer}>
@@ -51,7 +99,7 @@ export default SearchPage = ({ navigation }) => {
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => onPressItem(item)}>
                             <View style={styles.item}>
-                                <Image source={item.image} style={styles.itemImage} />
+                                <Image source={isArtist? {uri:item.image} : item.image} style={styles.itemImage} />
                                 <Text style={styles.itemText}>{item.text}</Text>
                             </View>
                         </TouchableOpacity>
@@ -72,6 +120,10 @@ const styles = StyleSheet.create({
     searchContainer: {
         width: '90%',
         marginTop: 20,
+    },
+    searchContainerField: {
+        width: '90%',
+        flexDirection:"row"
     },
     searchInput: {
         height: 40,
@@ -104,4 +156,8 @@ const styles = StyleSheet.create({
     itemText: {
         fontSize: 18,
     },
+    segmentContainer:{
+        backgroundColor: '#fff',
+        alignItems: 'center',
+    }
 });
