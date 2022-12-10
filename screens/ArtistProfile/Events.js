@@ -18,7 +18,7 @@ export default Events = ({ route,navigation }) => {
 
 
     const renderItem = ({ item }) => (
-        <EventItem city={item.venue.city} country={item.venue.country} date={new Date (item.startDateTime).toLocaleDateString()} time={new Date (item.startDateTime).toLocaleTimeString()} />
+        <EventItem city={item.venue.city} country={item.venue.country} date={new Date (item.startDateTime).toLocaleDateString()} time={new Date (item.startDateTime).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})} />
       );
 
     return (
