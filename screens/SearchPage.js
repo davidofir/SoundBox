@@ -40,7 +40,7 @@ export default SearchPage = ({ navigation }) => {
     },[isArtist])
     useEffect(() => {
         if (isArtist) {
-            if(events.length>0){
+            if(events.length>0 || search.length == 0){
                 getArtistProfile();
             }else{
                 setResults([]);
@@ -56,6 +56,7 @@ export default SearchPage = ({ navigation }) => {
     }, [artistProfile])
     const onChangeSearch = (text) => {
 
+        if(search.length > 0){
         if (selectedSearchIndex == 0) {
             const newResults = data.filter(item => item.userName.includes(text));
             setIsArtist(false);
@@ -63,8 +64,10 @@ export default SearchPage = ({ navigation }) => {
         } else if(selectedSearchIndex == 1) {
             setIsArtist(true);
             getEventsByArtistName(search, "upcoming");
-
         }
+    }else{
+        setResults([]);
+    }
     };
 
     const onPressItem = (item) => {
