@@ -4,8 +4,13 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { TouchableWithoutFeedback, Keyboard} from 'react-native';
 
 
+
 const RatingPage = ({route}) => {
     
+    const artistName = route.params.paramArtistName
+    const songName = route.params.paramSongName
+    //const childPath = `review/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`
+
     const [defaultRating, setdefaultRating] = useState(2)
     const [maxRating, setmaxRating] = useState([1, 2, 3, 4, 5])
     
@@ -21,6 +26,31 @@ const RatingPage = ({route}) => {
         const message = `${defaultRating} stars \n ${data.result}`;
         alert(message);
     }
+    
+    /*
+    const SaveReview = async () => {
+        
+        const task = firebase
+            .storage()
+            .ref()
+            .child(childPath)
+            .put()
+
+        firebase.firestore()
+            .collection("artists")
+            .doc(firebase.auth().artistName)
+            .collection("userReviews")
+            .add({
+                
+                songName,
+                defaultRating,
+                message,
+                creation: firebase.firestore.FieldValue.serverTimestamp()
+
+            })
+
+    }
+    */
 
     const CustomRatingBar = () => {
         return (
@@ -54,8 +84,8 @@ const RatingPage = ({route}) => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <SafeAreaView style={styles.container}>
             <Text style={styles.textStyle}> Rate This Song </Text>
-            <Text style={styles.textStyleSong}> {route.params.paramSongName}</Text>
-            <Text style={styles.textStyleArtist}> {route.params.paramArtistName}</Text>
+            <Text style={styles.textStyleSong}> {songName}</Text>
+            <Text style={styles.textStyleArtist}> {artistName}</Text>
 
             <CustomRatingBar />
             <Text style={styles.textStyle}>
