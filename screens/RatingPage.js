@@ -1,38 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View, Image } from 'react-native';
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { TouchableWithoutFeedback, Keyboard} from 'react-native';
-import { getFirestore, collection, setDoc, doc } from "firebase/firestore";
+import { TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { authentication, db } from "../firebase";
 import { loggedInUser } from "./Register";
 
-const RatingPage = ({route}) => {
-    
+const RatingPage = ({ route }) => {
+
+    const [reviews, setReviews] = useState([]);
     const artistName = route.params.paramArtistName
     const songName = route.params.paramSongName
     const searchedArtistName = route.params.paramSearchedArtist
     const isSearched = route.params.paramSearched
     var finalArtistName = ""
-    
-    if (isSearched == 0){
-        finalArtistName =  artistName
+
+    if (isSearched == 0) {
+        finalArtistName = artistName
     } else {
         finalArtistName = searchedArtistName
     }
-    
+
     //const userRef = doc(db, "users", userId);
     var userId = authentication.currentUser.uid
     //test = isSearched
-  
+
     //firebase doc named after the artist the review is under
     const docRef = doc(db, "artists", finalArtistName, songName, userId)
 
+    useEffect(() => {
+
+        const userRef = doc(db, "users", userId);
+
+        getDoc(userRef)
+            .then((doc) => {
+                setReviews(doc.data().reviews);
+            })
+    }, [])
 
     //const childPath = `review/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`
 
     const [defaultRating, setdefaultRating] = useState(2)
     const [maxRating, setmaxRating] = useState([1, 2, 3, 4, 5])
-    
+
     const starImgFilled = 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true'
     const starImgCorner = 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true'
 
@@ -52,8 +62,8 @@ const RatingPage = ({route}) => {
     }
 
     //sending the review to be stored in firebase
-    function storeReview(message){
-        
+    function storeReview(message) {
+
         const data1 = {
 
             artistName: finalArtistName,
@@ -61,23 +71,28 @@ const RatingPage = ({route}) => {
             creationTime: new Date().toUTCString(),
             rating: defaultRating,
             review: message,
-    
+
         }
 
-        
+        reviews.push(data1);
+        const userRef = doc(db, "users", userId);
+        updateDoc(userRef, {
+            reviews: reviews
+        })
+
         setDoc(docRef, data1).then(() => {
             console.log("Document has been added")
         })
-        .catch(error => {
-            console.log(error);
-        })
+            .catch(error => {
+                console.log(error);
+            })
 
-        
+
     }
-    
-    
 
-    
+
+
+
 
     const CustomRatingBar = () => {
         return (
@@ -110,69 +125,69 @@ const RatingPage = ({route}) => {
     if (isSearched == 0) {
         return (
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-            <SafeAreaView style={styles.container}>
-                <Text style={styles.textStyle}> Rate This Song </Text>
-                <Text style={styles.textStyleSong}> {songName}</Text>
-                <Text style={styles.textStyleArtist}> {artistName}</Text>
-    
-                <CustomRatingBar />
-                <Text style={styles.textStyle}>
-                    {defaultRating + ' / ' + maxRating.length}
-                </Text>
-    
-                <TextInput
-                    style={styles.input}
-                    onChangeText={text => setText(text)}
-                    placeholder="Write a review (optional)"
-                    keyboardType="alphabetical"
-                    multiline = {true}
-                    
-                    
-                />
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.buttonStyle}
-                    onPress={getCensoredText}
-                >
-                    <Text style={{ color: 'white' }}>Save Review</Text>
-                </TouchableOpacity>
-            </SafeAreaView>
+                <SafeAreaView style={styles.container}>
+                    <Text style={styles.textStyle}> Rate This Song </Text>
+                    <Text style={styles.textStyleSong}> {songName}</Text>
+                    <Text style={styles.textStyleArtist}> {artistName}</Text>
+
+                    <CustomRatingBar />
+                    <Text style={styles.textStyle}>
+                        {defaultRating + ' / ' + maxRating.length}
+                    </Text>
+
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={text => setText(text)}
+                        placeholder="Write a review (optional)"
+                        keyboardType="alphabetical"
+                        multiline={true}
+
+
+                    />
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={styles.buttonStyle}
+                        onPress={getCensoredText}
+                    >
+                        <Text style={{ color: 'white' }}>Save Review</Text>
+                    </TouchableOpacity>
+                </SafeAreaView>
             </TouchableWithoutFeedback>
         );
     } else {
         return (
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-            <SafeAreaView style={styles.container}>
-                <Text style={styles.textStyle}> Rate This Song </Text>
-                <Text style={styles.textStyleSong}> {songName}</Text>
-                <Text style={styles.textStyleArtist}> {searchedArtistName}</Text>
-    
-                <CustomRatingBar />
-                <Text style={styles.textStyle}>
-                    {defaultRating + ' / ' + maxRating.length}
-                </Text>
-    
-                <TextInput
-                    style={styles.input}
-                    onChangeText={text => setText(text)}
-                    placeholder="Write a review (optional)"
-                    keyboardType="alphabetical"
-                    multiline = {true}
-                    
-                    
-                />
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.buttonStyle}
-                    onPress={getCensoredText}
-                >
-                    <Text style={{ color: 'white' }}>Save Review</Text>
-                </TouchableOpacity>
-            </SafeAreaView>
+                <SafeAreaView style={styles.container}>
+                    <Text style={styles.textStyle}> Rate This Song </Text>
+                    <Text style={styles.textStyleSong}> {songName}</Text>
+                    <Text style={styles.textStyleArtist}> {searchedArtistName}</Text>
+
+                    <CustomRatingBar />
+                    <Text style={styles.textStyle}>
+                        {defaultRating + ' / ' + maxRating.length}
+                    </Text>
+
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={text => setText(text)}
+                        placeholder="Write a review (optional)"
+                        keyboardType="alphabetical"
+                        multiline={true}
+
+
+                    />
+                    <TouchableOpacity
+                        activeOpacity={0.7}
+                        style={styles.buttonStyle}
+                        onPress={getCensoredText}
+                    >
+                        <Text style={{ color: 'white' }}>Save Review</Text>
+                    </TouchableOpacity>
+                </SafeAreaView>
             </TouchableWithoutFeedback>
         );
     }
-    
+
 
 };
 
@@ -183,13 +198,13 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff',
         alignItems: 'center',
-        
+
     },
     textStyle: {
         textAlign: 'top',
         fontSize: 23,
         marginTop: 20,
-        
+
     },
     textStyleSong: {
         fontSize: 29,
@@ -202,7 +217,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         alignItems: "baseline",
         fontWeight: "bold",
-        color:"lightslategrey"
+        color: "lightslategrey"
     },
     customRatingBarStyle: {
         justifyContent: "center",
