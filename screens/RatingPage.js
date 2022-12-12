@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View, Image } from 'react-native';
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { TouchableWithoutFeedback, Keyboard} from 'react-native';
-
-
+import { getFirestore, collection, setDoc, doc } from "firebase/firestore";
+import { authentication, db } from "../firebase";
 
 const RatingPage = ({route}) => {
     
@@ -12,6 +12,12 @@ const RatingPage = ({route}) => {
     const searchedArtistName = route.params.paramSearchedArtist
     const isSearched = route.params.paramSearched
     //test = isSearched
+  
+    //firebase collection named artists
+    const dbRef = collection(db, "artists")
+    //firebase doc named after the artist the review is under
+    const docRef = doc(db, "artists", artistName)
+
 
     //const childPath = `review/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`
 
@@ -24,37 +30,37 @@ const RatingPage = ({route}) => {
     //Profanity API
     const [text, setText] = useState('')
     const url = `https://www.purgomalum.com/service/json?text=${text}`
+
     async function getCensoredText() {
         const response = await fetch(url);
         const data = await response.json();
-        const message = `${defaultRating} stars \n ${data.result}`;
-        alert(message);
+        const message = data.result;
+        storeReview(message);
+    }
+
+    function storeReview(message){
+        
+        const data1 = {
+
+            artistName: artistName,
+            songName: songName,
+            creationTime: new Date().toUTCString(),
+            rating: defaultRating,
+            review: message,
+    
+        }
+
+        setDoc(docRef, data1).then(() => {
+            console.log("Document has been added")
+        })
+        .catch(error => {
+            console.log(error);
+        })
     }
     
-    /*
-    const SaveReview = async () => {
-        
-        const task = firebase
-            .storage()
-            .ref()
-            .child(childPath)
-            .put()
+    
 
-        firebase.firestore()
-            .collection("artists")
-            .doc(firebase.auth().artistName)
-            .collection("userReviews")
-            .add({
-                
-                songName,
-                defaultRating,
-                message,
-                creation: firebase.firestore.FieldValue.serverTimestamp()
-
-            })
-
-    }
-    */
+    
 
     const CustomRatingBar = () => {
         return (
