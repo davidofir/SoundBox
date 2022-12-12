@@ -5,11 +5,27 @@ import React, { useEffect, useState } from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
-import { authentication } from '../firebase';
+import { authentication, db } from '../firebase';
+import { doc, getDoc } from "firebase/firestore";
 
 const eventsRepo = new EventsRepository;
 export default SocialFeed = ({ navigation }) => {
     const [events, setEvents] = useState([]);
+    const [reviews, setReviews] = useState([]);
+
+    // Get the current user
+    var userId = authentication.currentUser.uid;
+
+    // Query Firestore database with current UID
+    useEffect(() => {
+
+        const userRef = doc(db, "users", userId);
+
+        getDoc(userRef)
+            .then((doc) => {
+                setReviews(doc.data().reviews);
+            })
+    }, [])
 
     return (
         <View>
@@ -54,14 +70,29 @@ export default SocialFeed = ({ navigation }) => {
                         <View style={styles.imageContainer} />
                     </View>
                 </ScrollView>
-                <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{ marginTop: 20 }}>
+                {/* <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{ marginTop: 20 }}>
                     <View>
                         <View style={styles.verticalImageContainer} />
                     </View>
                     <View>
                         <View style={styles.verticalImageContainer} />
                     </View>
-                </ScrollView>
+                </ScrollView> */}
+            </View>
+            <View style={styles.container2}>
+                <FlatList
+                    data={reviews}
+                    renderItem={({ item }) => (
+                        <View style={styles.item}>
+                            <Text style={styles.itemText}>
+                                Artist: {item.artistName}{"\n"}
+                                Review: {item.review}{"\n"}
+                                Rating: {item.rating}{"\n"}
+                                Song: {item.songName}
+                            </Text>
+                        </View>
+                    )}
+                />
             </View>
         </View>
     )
@@ -78,6 +109,29 @@ const styles = StyleSheet.create({
     },
     backgroundContainer: {
         backgroundColor: "white"
+    },
+    container2: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: "100%",
+        paddingTop: 5,
+    },
+    item: {
+        flexDirection: "row",
+        marginTop: 10,
+        padding: 10,
+        width: "100%",
+        backgroundColor: "#ddd",
+        borderRadius: 5,
+        alignItems: "center",
+    },
+    itemImage: {
+        width: 50,
+        height: 50,
+        marginRight: 10,
+    },
+    itemText: {
+        fontSize: 35
     },
     horizontalProfileContainer: {
         alignItems: 'center',
