@@ -4,6 +4,7 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { TouchableWithoutFeedback, Keyboard} from 'react-native';
 import { getFirestore, collection, setDoc, doc } from "firebase/firestore";
 import { authentication, db } from "../firebase";
+import { loggedInUser } from "./Register";
 
 const RatingPage = ({route}) => {
     
@@ -11,12 +12,21 @@ const RatingPage = ({route}) => {
     const songName = route.params.paramSongName
     const searchedArtistName = route.params.paramSearchedArtist
     const isSearched = route.params.paramSearched
+    var finalArtistName = ""
+    if (isSearched == 0){
+        finalArtistName =  artistName
+    } else {
+        finalArtistName = searchedArtistName
+    }
+    
+    //const userRef = doc(db, "users", userId);
+    var userId = authentication.currentUser.uid
     //test = isSearched
   
     //firebase collection named artists
-    const dbRef = collection(db, "artists")
+    //const dbRef = collection(db, "artists").doc(artistName)
     //firebase doc named after the artist the review is under
-    const docRef = doc(db, "artists", artistName)
+    const docRef = doc(db, "artists", finalArtistName, songName, userId)
 
 
     //const childPath = `review/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`
@@ -38,11 +48,12 @@ const RatingPage = ({route}) => {
         storeReview(message);
     }
 
+    //sending the review to be stored in firebase
     function storeReview(message){
         
         const data1 = {
 
-            artistName: artistName,
+            artistName: finalArtistName,
             songName: songName,
             creationTime: new Date().toUTCString(),
             rating: defaultRating,
@@ -50,12 +61,15 @@ const RatingPage = ({route}) => {
     
         }
 
+        
         setDoc(docRef, data1).then(() => {
             console.log("Document has been added")
         })
         .catch(error => {
             console.log(error);
         })
+
+        
     }
     
     

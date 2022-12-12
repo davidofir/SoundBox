@@ -14,6 +14,7 @@ const Separator = () => (
 );
 
 
+
 const Register = ({ navigation }) => {
     const [userName, setUser] = useState('');
     const [email, setEmail] = useState('');
