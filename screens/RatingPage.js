@@ -13,6 +13,7 @@ const RatingPage = ({route}) => {
     const searchedArtistName = route.params.paramSearchedArtist
     const isSearched = route.params.paramSearched
     var finalArtistName = ""
+    
     if (isSearched == 0){
         finalArtistName =  artistName
     } else {
@@ -23,8 +24,6 @@ const RatingPage = ({route}) => {
     var userId = authentication.currentUser.uid
     //test = isSearched
   
-    //firebase collection named artists
-    //const dbRef = collection(db, "artists").doc(artistName)
     //firebase doc named after the artist the review is under
     const docRef = doc(db, "artists", finalArtistName, songName, userId)
 
@@ -44,7 +43,11 @@ const RatingPage = ({route}) => {
     async function getCensoredText() {
         const response = await fetch(url);
         const data = await response.json();
-        const message = data.result;
+        var message = data.result;
+        //if they do not want to include a message
+        if (message == null) {
+            message = ""
+        }
         storeReview(message);
     }
 
