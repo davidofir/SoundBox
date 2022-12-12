@@ -9,6 +9,10 @@ const RatingPage = ({route}) => {
     
     const artistName = route.params.paramArtistName
     const songName = route.params.paramSongName
+    const searchedArtistName = route.params.paramSearchedArtist
+    const isSearched = route.params.paramSearched
+    //test = isSearched
+
     //const childPath = `review/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`
 
     const [defaultRating, setdefaultRating] = useState(2)
@@ -80,37 +84,72 @@ const RatingPage = ({route}) => {
             </View>
         )
     }
-    return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <SafeAreaView style={styles.container}>
-            <Text style={styles.textStyle}> Rate This Song </Text>
-            <Text style={styles.textStyleSong}> {songName}</Text>
-            <Text style={styles.textStyleArtist}> {artistName}</Text>
-
-            <CustomRatingBar />
-            <Text style={styles.textStyle}>
-                {defaultRating + ' / ' + maxRating.length}
-            </Text>
-
-            <TextInput
-                style={styles.input}
-                onChangeText={text => setText(text)}
-                placeholder="Write a review (optional)"
-                keyboardType="alphabetical"
-                multiline = {true}
-                
-                
-            />
-            <TouchableOpacity
-                activeOpacity={0.7}
-                style={styles.buttonStyle}
-                onPress={getCensoredText}
-            >
-                <Text style={{ color: 'white' }}>Save Review</Text>
-            </TouchableOpacity>
-        </SafeAreaView>
-        </TouchableWithoutFeedback>
-    );
+    if (isSearched == 0) {
+        return (
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <SafeAreaView style={styles.container}>
+                <Text style={styles.textStyle}> Rate This Song </Text>
+                <Text style={styles.textStyleSong}> {songName}</Text>
+                <Text style={styles.textStyleArtist}> {artistName}</Text>
+    
+                <CustomRatingBar />
+                <Text style={styles.textStyle}>
+                    {defaultRating + ' / ' + maxRating.length}
+                </Text>
+    
+                <TextInput
+                    style={styles.input}
+                    onChangeText={text => setText(text)}
+                    placeholder="Write a review (optional)"
+                    keyboardType="alphabetical"
+                    multiline = {true}
+                    
+                    
+                />
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={styles.buttonStyle}
+                    onPress={getCensoredText}
+                >
+                    <Text style={{ color: 'white' }}>Save Review</Text>
+                </TouchableOpacity>
+            </SafeAreaView>
+            </TouchableWithoutFeedback>
+        );
+    } else {
+        return (
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <SafeAreaView style={styles.container}>
+                <Text style={styles.textStyle}> Rate This Song </Text>
+                <Text style={styles.textStyleSong}> {songName}</Text>
+                <Text style={styles.textStyleArtist}> {searchedArtistName}</Text>
+    
+                <CustomRatingBar />
+                <Text style={styles.textStyle}>
+                    {defaultRating + ' / ' + maxRating.length}
+                </Text>
+    
+                <TextInput
+                    style={styles.input}
+                    onChangeText={text => setText(text)}
+                    placeholder="Write a review (optional)"
+                    keyboardType="alphabetical"
+                    multiline = {true}
+                    
+                    
+                />
+                <TouchableOpacity
+                    activeOpacity={0.7}
+                    style={styles.buttonStyle}
+                    onPress={getCensoredText}
+                >
+                    <Text style={{ color: 'white' }}>Save Review</Text>
+                </TouchableOpacity>
+            </SafeAreaView>
+            </TouchableWithoutFeedback>
+        );
+    }
+    
 
 };
 
