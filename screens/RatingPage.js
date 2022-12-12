@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View, Image } from 'react-native';
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { TouchableWithoutFeedback, Keyboard} from 'react-native';
-import { getFirestore, collection, setDoc, doc } from "firebase/firestore";
+import { TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { authentication, db } from "../firebase";
 import { loggedInUser } from "./Register";
 
@@ -14,26 +14,35 @@ const RatingPage = ({navigation, route}) => {
     const searchedArtistName = route.params.paramSearchedArtist
     const isSearched = route.params.paramSearched
     var finalArtistName = ""
-    
-    if (isSearched == 0){
-        finalArtistName =  artistName
+
+    if (isSearched == 0) {
+        finalArtistName = artistName
     } else {
         finalArtistName = searchedArtistName
     }
-    
+
     //const userRef = doc(db, "users", userId);
     var userId = authentication.currentUser.uid
     //test = isSearched
-  
+
     //firebase doc named after the artist the review is under
     const docRef = doc(db, "artists", finalArtistName, songName, userId)
 
+    useEffect(() => {
+
+        const userRef = doc(db, "users", userId);
+
+        getDoc(userRef)
+            .then((doc) => {
+                setReviews(doc.data().reviews);
+            })
+    }, [])
 
     //const childPath = `review/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`
 
     const [defaultRating, setdefaultRating] = useState(2)
     const [maxRating, setmaxRating] = useState([1, 2, 3, 4, 5])
-    
+
     const starImgFilled = 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true'
     const starImgCorner = 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true'
 
@@ -62,15 +71,16 @@ const RatingPage = ({navigation, route}) => {
             creationTime: new Date().toUTCString(),
             rating: defaultRating,
             review: message,
-    
+
         }
      
         setDoc(docRef, reviewData).then(() => {
             console.log("Document has been added")
         })
-        .catch(error => {
-            console.log(error);
-        })
+            .catch(error => {
+                console.log(error);
+            })
+
 
         navigation.navigate("Discover")
     }
@@ -78,7 +88,9 @@ const RatingPage = ({navigation, route}) => {
     
     
 
-    
+
+
+
 
     const CustomRatingBar = () => {
         return (
@@ -153,13 +165,13 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff',
         alignItems: 'center',
-        
+
     },
     textStyle: {
         textAlign: 'top',
         fontSize: 23,
         marginTop: 20,
-        
+
     },
     textStyleSong: {
         fontSize: 29,
@@ -172,7 +184,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         alignItems: "baseline",
         fontWeight: "bold",
-        color:"lightslategrey"
+        color: "lightslategrey"
     },
     customRatingBarStyle: {
         justifyContent: "center",

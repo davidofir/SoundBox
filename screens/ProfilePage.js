@@ -13,6 +13,7 @@ export default ProfilePage = ({ navigation }) => {
     const [username, setUser] = useState('');
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
+    const [reviews, setReviews] = useState([]);
 
     // Get the current user
     var userId = authentication.currentUser.uid;
@@ -27,6 +28,7 @@ export default ProfilePage = ({ navigation }) => {
                 setUser(doc.data().userName);
                 setFollowers(doc.data().followers);
                 setFollowing(doc.data().following);
+                setReviews(doc.data().reviews);
                 console.log(followers);
             })
     }, [])
@@ -60,15 +62,20 @@ export default ProfilePage = ({ navigation }) => {
             <View>
                 <Text style={[styles.text, { fontSize: 18, padding: 10, paddingBottom: 0 }]}>POSTS</Text>
             </View>
-            <View>
-                <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{ marginTop: 20 }}>
-                    <View>
-                        <View style={styles.verticalImageContainer} />
-                    </View>
-                    <View>
-                        <View style={styles.verticalImageContainer} />
-                    </View>
-                </ScrollView>
+            <View style={styles.container2}>
+                <FlatList
+                    data={reviews}
+                    renderItem={({ item }) => (
+                        <View style={styles.item}>
+                            <Text style={styles.itemText}>
+                                Artist: {item.artistName}{"\n"}
+                                Review: {item.review}{"\n"}
+                                Rating: {item.rating}{"\n"}
+                                Song: {item.songName}
+                            </Text>
+                        </View>
+                    )}
+                />
             </View>
         </View>
     )
@@ -85,6 +92,29 @@ const styles = StyleSheet.create({
     },
     backgroundContainer: {
         backgroundColor: "white"
+    },
+    container2: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: "100%",
+        paddingTop: 5,
+    },
+    item: {
+        flexDirection: "row",
+        marginTop: 10,
+        padding: 10,
+        width: "100%",
+        backgroundColor: "#ddd",
+        borderRadius: 5,
+        alignItems: "center",
+    },
+    itemImage: {
+        width: 50,
+        height: 50,
+        marginRight: 10,
+    },
+    itemText: {
+        fontSize: 35
     },
     horizontalProfileContainer: {
         flex: 2,

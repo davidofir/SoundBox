@@ -21,13 +21,14 @@ const Register = ({ navigation }) => {
     const [password, setPassword] = useState('');
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
+    const [reviews, setReviews] = useState([]);
 
     const RegisterAccount = () => {
         createUserWithEmailAndPassword(authentication, email, password)
             .then(async (userCredentials) => {
                 const user = userCredentials.user;
                 console.log("Registered in with:", user.email);
-                await setDoc(doc(db, "users", userCredentials.user.uid), { userName, followers, following })
+                await setDoc(doc(db, "users", userCredentials.user.uid), { userName, followers, following, reviews })
                     .then((re) => {
                         alert("Data has been saved");
                     })
