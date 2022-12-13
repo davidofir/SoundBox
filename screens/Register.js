@@ -8,6 +8,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { authentication, db } from "../firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { async } from "@firebase/util";
+import colors from "../constants/colors";
 
 const Separator = () => (
     <View style={styles.separator} />
@@ -101,7 +102,7 @@ const styles = StyleSheet.create({
         width: '90%',
     },
     input: {
-        backgroundColor: 'white',
+        backgroundColor: colors.secondary,
         paddingHorizontal: 15,
         paddingVertical: 10,
         borderRadius: 10,
@@ -113,30 +114,30 @@ const styles = StyleSheet.create({
         marginTop: 40
     },
     button: {
-        backgroundColor: '#0366fc',
+        backgroundColor: colors.primary,
         width: '100%',
         padding: 15,
         borderRadius: 10,
         alignItems: 'center',
     },
     buttonOutline: {
-        backgroundColor: 'white',
+        backgroundColor: colors.secondary,
         marginTop: 5,
-        borderColor: '#0366fc',
+        borderColor: colors.primary,
         borderWidth: 2,
     },
     buttonText: {
-        color: 'white',
+        color: colors.secondary,
         fontWeight: '700',
         fontSize: 16,
     },
     buttonOutlineText: {
-        color: '#0366fc',
+        color: colors.primary,
         fontWeight: '700',
         fontSize: 16,
     },
     header: {
-        color: '#0366fc',
+        color: colors.primary,
         fontWeight: '700',
         paddingBottom: 30,
         fontSize: 25,
