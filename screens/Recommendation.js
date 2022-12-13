@@ -18,8 +18,11 @@ import { authentication, db } from "../firebase";
 import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 
 
-const Recommendations = ({navigation, route}) => {
 
+
+const Recommendations = ({navigation, route}) => {
+    
+    
     const topArtists = []
     const topGenres = []
     const [reviews, setReviews] = useState([]);
@@ -29,6 +32,8 @@ const Recommendations = ({navigation, route}) => {
     var currentArtist = ""
     var artistIndex = ""
     var currentReview = 0
+   var favouriteArtist = ""
+    const test2 = favouriteArtist
     // Query Firestore database with current UID
 
     useEffect(() => {
@@ -45,8 +50,13 @@ const Recommendations = ({navigation, route}) => {
                 //get the array of reviews
                 reviewArray = doc.data().reviews
                 getTopUserArtists()
+
+                
             })
     }, [])
+
+
+
 
     function getTopUserArtists(){
 
@@ -102,27 +112,39 @@ const Recommendations = ({navigation, route}) => {
             
         }
         console.log(meanReviewList)
+        
+        //get the artist with the highest rating
+        favouriteArtist = meanReviewList.find((member => member.rating)).name
+       
+        
+
+        console.log("Favourite Artist: " + favouriteArtist) 
+        const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca"
+        const url = `http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${favouriteArtist}&api_key=${apiKey}&format=json`
+        console.log(url)
+
+
     }
+    
 
-    return (
-   
-            <View style={styles.container}>
-                <FlatList
-                    data={reviews}
-                    renderItem={({ item }) => (
-                        <View style={styles.item}>
-                            <Text style={styles.itemText}>
-                                Artist: {item.artistName}{"\n"}
-                                Review: {item.review}{"\n"}
-                                Rating: {item.rating}{"\n"}
-                                Song: {item.songName}
-                            </Text>
-                        </View>
-                    )}
-                />
-            </View>
+    function fetchSimilarArtists(){
+        
+        const url = `http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=cher&api_key=${apiKey}&format=json`
+    
+        
+        return fetch(url)
+        .then(response => response.json())
+      }
+    
 
-    )
+      return (
+      
+      <Text> View Console for reccomendation</Text>
+      
+      )
+
+
+    
 
 }
 
