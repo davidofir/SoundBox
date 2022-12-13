@@ -12,6 +12,7 @@ const eventsRepo = new EventsRepository;
 export default SocialFeed = ({ navigation }) => {
     const [events, setEvents] = useState([]);
     const [reviews, setReviews] = useState([]);
+    const [following, setFollowing] = useState([]);
 
     // Get the current user
     var userId = authentication.currentUser.uid;
@@ -23,8 +24,19 @@ export default SocialFeed = ({ navigation }) => {
 
         getDoc(userRef)
             .then((doc) => {
+                setFollowing(doc.data().following);
                 setReviews(doc.data().reviews);
             })
+    }, [])
+
+    useEffect(() => {
+        for (let i = 0; i < following.length; i++) {
+            const userRef2 = doc(db, "users", following[i]);
+            getDoc(userRef2)
+                .then((doc) => {
+                    reviews.push(doc.data().reviews);
+                })
+        }
     }, [])
 
     return (
