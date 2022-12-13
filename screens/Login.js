@@ -1,7 +1,7 @@
 // SearchBar.js
 // Test
 import React, { useEffect, useState } from "react";
-import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Alert, KeyboardAvoidingView } from "react-native";
+import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Alert, KeyboardAvoidingView, ImageBackground } from "react-native";
 import { Feather, Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -38,48 +38,66 @@ const Login = ({ navigation }) => {
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior="padding">
+            <ImageBackground source={require("../assets/bkg.png")} resizeMode="cover" style={styles.image}>
+                <Text style={styles.title}>SoundBox</Text>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        placeholder="Email"
+                        placeholderTextColor={"grey"}
+                        value={email}
+                        onChangeText={text => setEmail(text)}
+                        style={styles.input}
+                        autoCapitalize={false}
+                    />
+                    <TextInput
+                        placeholder="Password"
+                        placeholderTextColor={"grey"}
+                        value={password}
+                        onChangeText={text => setPassword(text)}
+                        style={styles.input}
+                        secureTextEntry
+                        autoCapitalize={false}
+                    />
+                </View>
 
-            <View style={styles.inputContainer}>
-                <TextInput
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={text => setEmail(text)}
-                    style={styles.input}
-                />
-                <TextInput
-                    placeholder="Password"
-                    value={password}
-                    onChangeText={text => setPassword(text)}
-                    style={styles.input}
-                    secureTextEntry
-                />
-            </View>
-
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                    onPress={SignIn}
-                    style={styles.button}
-                >
-                    <Text style={styles.buttonText}>Login</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => navigation.navigate("Register")}
-                    style={[styles.button, styles.buttonOutline]}
-                >
-                    <Text style={styles.buttonOutlineText}>Create Account</Text>
-                </TouchableOpacity>
-            </View>
-
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        onPress={SignIn}
+                        style={styles.button}
+                    >
+                        <Text style={styles.buttonText}>Login</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate("Register")}
+                        style={[styles.button, styles.buttonOutline]}
+                    >
+                        <Text style={styles.buttonOutlineText}>Create Account</Text>
+                    </TouchableOpacity>
+                </View>
+            </ImageBackground>
         </KeyboardAvoidingView>
     );
 };
 
 // styles
 const styles = StyleSheet.create({
+    title: {
+        color: "white",
+        fontWeight: '700',
+        fontSize: 50,
+        marginBottom: 20
+    },
+    image: {
+        justifyContent: "center",
+        alignItems: 'center',
+        width: "100%",
+        height: "100%",
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#15264d'
     },
     inputContainer: {
         width: '80%',
