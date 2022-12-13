@@ -52,6 +52,7 @@ const Register = ({ navigation }) => {
                 <Text style={styles.Text}>Username</Text>
                 <TextInput
                     placeholder="Username"
+                    placeholderTextColor={"grey"}
                     value={userName}
                     onChangeText={text => setUser(text)}
                     style={styles.input}
@@ -59,6 +60,7 @@ const Register = ({ navigation }) => {
                 <Text style={styles.Text}>Email</Text>
                 <TextInput
                     placeholder="Example@mail.com"
+                    placeholderTextColor={"grey"}
                     value={email}
                     onChangeText={text => setEmail(text)}
                     style={styles.input}
@@ -66,6 +68,7 @@ const Register = ({ navigation }) => {
                 <Text style={styles.Text}>Password</Text>
                 <TextInput
                     placeholder="Password"
+                    placeholderTextColor={"grey"}
                     value={password}
                     onChangeText={text => setPassword(text)}
                     style={styles.input}
