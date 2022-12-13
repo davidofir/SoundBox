@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback, Image } from 'react-native';
 import Colors from '../constants/colors';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react'
@@ -74,16 +74,16 @@ export default SocialFeed = ({ navigation }) => {
             <View style={{ marginTop: 10 }}>
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                     <View>
-                        <View style={styles.imageContainer} />
+                        <Image source={require("../assets/artists/jayz.png")} style={styles.imageContainer} />
                     </View>
                     <View>
-                        <View style={styles.imageContainer} />
+                        <Image source={require("../assets/artists/Yonce.png")} style={styles.imageContainer} />
                     </View>
                     <View>
-                        <View style={styles.imageContainer} />
+                        <Image source={require("../assets/artists/cee.png")} style={styles.imageContainer} />
                     </View>
                     <View>
-                        <View style={styles.imageContainer} />
+                        <Image source={require("../assets/artists/swift.png")} style={styles.imageContainer} />
                     </View>
                 </ScrollView>
                 {/* <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{ marginTop: 20 }}>
