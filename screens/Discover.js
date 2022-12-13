@@ -155,7 +155,7 @@ class App extends React.Component  {
          
           onChangeText={(text) => this.searchInput = text}
           placeholder="Search"
-          placeholderTextColor="silver"
+          placeholderTextColor="grey"
           style={styles.searchBar}
         />
         <Button
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
     paddingRight: 15,
     flexDirection: "column",
-    backgroundColor: '#000'
+    backgroundColor: '#fff'
   },
   cell: {
     flexDirection: 'row',
@@ -248,20 +248,20 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   whiteText:{
-    color: 'white',
+    color: 'black',
   },
   boldText:{
     fontWeight: 'bold'
   },
   heading: {
-    color: "white",
+    color: "black",
     fontWeight: 'bold',
     fontSize: 30,
     paddingBottom: 20,
     paddingTop: 30,
   },
   searchBar: {
-    backgroundColor: "white",
+    backgroundColor: "whitesmoke",
     height: 35,
     borderRadius: 20,
     paddingLeft: 10,

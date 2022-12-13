@@ -37,7 +37,7 @@ const Login = ({ navigation }) => {
 
 
     return (
-        <KeyboardAvoidingView style={styles.container} behavior="padding">
+        <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-500} behavior="padding">
             <ImageBackground source={require("../assets/bkg.png")} resizeMode="cover" style={styles.image}>
                 <Text style={styles.title}>SoundBox</Text>
                 <View style={styles.inputContainer}>
