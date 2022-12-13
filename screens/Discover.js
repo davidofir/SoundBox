@@ -133,11 +133,16 @@ class App extends React.Component  {
     })
   }
 
+  renderElement(){
+    if (global.flatlistSwitch == 0){
+      return <Text style={styles.heading  }>{"Popular Right Now"}</Text>
+    } 
+  }
 
   render() {
 
     const tableData = Array(50).fill('Hello, World!')
-
+    var Popular = "Popular Right Now"
     
 
       return ( 
@@ -159,12 +164,13 @@ class App extends React.Component  {
           style={styles.searchBar}
         />
         <Button
-          onPress={() => {            this.fetchSong()
+          onPress={() => { this.fetchSong()
             .then(json => { this.setState({tracks: json.results.trackmatches.track}) 
 
             })
           
           global.flatlistSwitch = 1
+          Popular = ""
           }
             
           }
@@ -172,7 +178,8 @@ class App extends React.Component  {
           />
 
           {/* Heading */}
-          <Text style={styles.heading  }>Popular Right Now</Text>
+          
+          {this.renderElement()}
     
           {/* Songs*/}
           <FlatList 
@@ -220,7 +227,7 @@ export default App;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
+    paddingTop: 15,
     paddingLeft: 15,
     paddingRight: 15,
     flexDirection: "column",
@@ -258,7 +265,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 30,
     paddingBottom: 20,
-    paddingTop: 30,
+    paddingTop: 20,
   },
   searchBar: {
     backgroundColor: "whitesmoke",

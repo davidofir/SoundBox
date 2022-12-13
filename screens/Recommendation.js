@@ -34,7 +34,7 @@ const Recommendations = ({navigation, route}) => {
             .then((doc) => {
                 
                 setReviews(doc.data().reviews);
-                console.log(reviews);
+                
             })
     }, [])
 
@@ -68,7 +68,7 @@ const Recommendations = ({navigation, route}) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 10,
+        padding: 5,
         backgroundColor: '#fff',
         alignItems: 'center',
 
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: 'center',
         marginTop: 30,
-        padding: 15,
+        padding: 10,
         backgroundColor: 'black',
         fontSize: 40,
         color: "white"
