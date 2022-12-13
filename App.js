@@ -17,7 +17,7 @@ import FollowersPage from './screens/FollowersPage';
 import FollowingPage from './screens/FollowingPage';
 import SearchPage from './screens/SearchPage';
 import UserPage from './screens/UserPage';
-
+import Recommendations from './screens/Recommendation';
 const Stack = createStackNavigator();
 export default function App() {
   return (
@@ -37,6 +37,7 @@ export default function App() {
         <Stack.Screen name="RatingPage" component={RatingPage} />
         <Stack.Screen name="Search" component={SearchPage} />
         <Stack.Screen name="UserPage" component={UserPage} />
+        <Stack.Screen name="Recommendations" component={Recommendations} />
       </Stack.Navigator>
     </NavigationContainer>
   );

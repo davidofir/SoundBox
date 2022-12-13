@@ -9,6 +9,7 @@ import { loggedInUser } from "./Register";
 
 const RatingPage = ({navigation, route}) => {
     
+    
     const artistName = route.params.paramArtistName
     const songName = route.params.paramSongName
     const searchedArtistName = route.params.paramSearchedArtist
@@ -145,7 +146,7 @@ const RatingPage = ({navigation, route}) => {
                 <TouchableOpacity
                     activeOpacity={0.7}
                     style={styles.buttonStyle}
-                    onPress={getCensoredText}
+                    onPress={() => {getCensoredText()}}
                 >
                     <Text style={{ color: 'white' }}>Save Review</Text>
                 </TouchableOpacity>
