@@ -155,6 +155,7 @@ class App extends React.Component  {
          
           onChangeText={(text) => this.searchInput = text}
           placeholder="Search"
+          placeholderTextColor="silver"
           style={styles.searchBar}
         />
         <Button
