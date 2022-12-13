@@ -10,14 +10,14 @@ import { loggedInUser } from "./Register";
 const RatingPage = ({ navigation, route }) => {
 
     const [reviews, setReviews] = useState([]);
-    const artistName = route.params.paramArtistName
+    const artistName1 = route.params.paramArtistName
     const songName = route.params.paramSongName
     const searchedArtistName = route.params.paramSearchedArtist
     const isSearched = route.params.paramSearched
     var finalArtistName = ""
 
     if (isSearched == 0) {
-        finalArtistName = artistName
+        finalArtistName = artistName1
     } else {
         finalArtistName = searchedArtistName
     }
