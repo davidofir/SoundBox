@@ -13,6 +13,7 @@ export default SocialFeed = ({ navigation }) => {
     const [events, setEvents] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [following, setFollowing] = useState([]);
+    var tempeviews = reviews;
 
     // Get the current user
     var userId = authentication.currentUser.uid;
@@ -34,10 +35,13 @@ export default SocialFeed = ({ navigation }) => {
             const userRef2 = doc(db, "users", following[i]);
             getDoc(userRef2)
                 .then((doc) => {
-                    reviews.push(doc.data().reviews);
+                    for (let i = 0; i < doc.data().reviews.length; i++) {
+                        tempeviews.push(doc.data().reviews[i]);
+                        setReviews(tempeviews);
+                    }
                 })
         }
-    }, [])
+    }, [reviews])
 
     return (
         <View>
