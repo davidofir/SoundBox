@@ -42,7 +42,7 @@ const Register = ({ navigation }) => {
     }
 
     return (
-        <KeyboardAvoidingView style={styles.container} behavior="padding">
+        <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-500} behavior="padding">
             <Text
                 style={styles.header}>
                 Register

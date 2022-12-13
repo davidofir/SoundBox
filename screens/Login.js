@@ -37,7 +37,7 @@ const Login = ({ navigation }) => {
 
 
     return (
-        <KeyboardAvoidingView KeyboardAvoidingView keyboardVerticalOffset={-500} behavior="padding" style={styles.container} behavior="padding">
+        <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-500} behavior="padding">
 
             <View style={styles.inputContainer}>
                 <TextInput
