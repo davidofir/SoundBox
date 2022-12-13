@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         marginRight: 10,
+        borderRadius:15
     },
     itemText: {
         fontSize: 18,
@@ -186,5 +187,5 @@ const styles = StyleSheet.create({
     segmentContainer: {
         backgroundColor: '#fff',
         alignItems: 'center',
-    }
+    },
 });
