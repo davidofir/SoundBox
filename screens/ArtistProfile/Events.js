@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect,useState } from 'react'
 import { StyleSheet, Text, View,FlatList } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import {REACT_APP_EVENTS_API_SECRET} from '@env'
 import EventItem from '../../components/EventItem';
 let artistName = "sum41";

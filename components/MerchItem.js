@@ -9,7 +9,7 @@ const MerchItem = props => (
                     uri:props.image
                 }}/>
                     <View style={styles.center}>
-                        <Text style={{textAlignVertical:"center",marginBottom:10,maxWidth:"65%"}}>{props.name}</Text>
+                        <Text style={{textAlignVertical:"center",marginBottom:10,maxWidth:200}}>{props.name}</Text>
                         <Text style={{textAlignVertical:"center"}}>{props.price}</Text>
                     </View>
                 </View>
