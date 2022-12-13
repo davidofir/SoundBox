@@ -91,14 +91,14 @@ export default SearchPage = ({ navigation }) => {
                     onTabPress={handleSearchIndexSelect}
                 />
             </View>
-            <View style={styles.searchContainer}>
+            <View style={styles.searchContainerArea}>
                 <View style={styles.searchContainerField}>
                     <View style={{ flex: 1 }}>
                         <TextInput
                             style={styles.searchInput}
                             value={search}
                             onChangeText={setSearch}
-                            placeholder={searchOptions[selectedSearchIndex]}
+                            placeholder={`Search ${searchOptions[selectedSearchIndex].toLocaleLowerCase()}`}
                         />
                     </View>
                     <View style={{ padding: 5 }}>
@@ -139,6 +139,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
     },
+    searchContainerArea:{
+        marginVertical:"10%"
+    },
     searchContainer: {
         width: '90%',
         marginTop: 20,
@@ -163,12 +166,14 @@ const styles = StyleSheet.create({
     },
     item: {
         flexDirection: 'row',
-        margin: 10,
         padding: 10,
+        marginVertical:10,
         width: '100%',
         backgroundColor: '#ddd',
-        borderRadius: 5,
+        borderRadius: 20,
         alignItems: 'center',
+        minWidth:"70%",
+
     },
     itemImage: {
         width: 50,
