@@ -1,8 +1,7 @@
 {
   "expo": {
     "slug": "soundbox",
-    "name": "soundbox",
-    "sdkVersion": "46.0.0"
+    "name": "soundbox"
   },
   "name": "soundbox"
 }

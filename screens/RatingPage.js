@@ -144,7 +144,7 @@ const RatingPage = ({ navigation, route }) => {
                     style={styles.input}
                     onChangeText={text => setText(text)}
                     placeholder="Write a review (optional)"
-                    keyboardType="alphabetical"
+                    keyboardType="default"
                     multiline={true}
 
 
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
 
     },
     textStyle: {
-        textAlign: 'top',
+        textAlign: 'center',
         fontSize: 23,
         marginTop: 20,
 
