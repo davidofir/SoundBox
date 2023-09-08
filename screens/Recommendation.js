@@ -17,9 +17,6 @@ import { TouchableHighlight } from 'react-native-gesture-handler';
 import { authentication, db } from "../firebase";
 import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 
-
-
-
 const Recommendations = ({navigation, route}) => {
     
     
@@ -58,10 +55,9 @@ const Recommendations = ({navigation, route}) => {
 
 
 
-    function getTopUserArtists(){
+    async function getTopUserArtists(){
 
 
-        
         //for each review
         var meanReviewList = []
         for (let i = 0; i < reviewCount; i++ ){
