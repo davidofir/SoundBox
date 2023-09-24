@@ -1,33 +1,48 @@
-import {REACT_APP_EVENTS_API_SECRET} from '@env'
+import { REACT_APP_EVENTS_API_SECRET } from '@env';
 
-const eventsURL = 'https://rest.bandsintown.com/artists'
+const eventsURL = 'https://rest.bandsintown.com/artists';
 let artistData = {};
 let data = [];
-let found = false;
-     export default async function GetEventsByArtistNameImpl(artistName,time) {
-      data = [];
 
-        const response = await fetch(`${eventsURL}/${artistName}/events?app_id=${process.env.REACT_APP_EVENTS_API_SECRET}&date=${time}`)
-        if (!response.ok) {
-          throw new Error('Data coud not be fetched!')
-        } else {
-          const resp = await response.json();
-          if(resp.length !== 0){
-          resp.map((item)=>{
-              data.push({
-                  startDateTime: item[Object.keys(item)[2]],
-                  venue:item.venue
-                })
-          })
-          artistData = resp[0].artist;
-        }
-        return data;
-      }
+export default async function GetEventsByArtistNameImpl(artistName, time) {
+    data = [];
+
+    // URL encode the artist's name
+    const encodedArtistName = encodeURIComponent(artistName);
+    
+    // Fetch the artist details
+    const response = await fetch(`${process.env.REACT_APP__SEATGEEK_API_BASEURL}/performers?q=${encodedArtistName}&client_id=${process.env.REACT_APP_SEATGEEK_API_SECRET}`);
+    const artistResp = await response.json();
+
+    if (!response.ok || !artistResp.performers || artistResp.performers.length === 0) {
+        throw new Error('Artist Could Not Be Found');
     }
-    export function GetArtistDetails(){
-      return {
+
+    const artistId = artistResp.performers[0].id;
+    
+    // Fetch the events for the artist
+    const eventResponse = await fetch(`${process.env.REACT_APP__SEATGEEK_API_BASEURL}/events?performers.id=${artistId}&client_id=${process.env.REACT_APP_SEATGEEK_API_SECRET}`);
+    const eventsData = await eventResponse.json();
+
+    if (!eventResponse.ok || !eventsData.events || eventsData.events.length === 0) {
+        throw new Error('No events were found for the artist');
+    }
+
+    eventsData.events.forEach((item) => {
+        data.push({
+            startDateTime: item['datetime_utc'],
+            venue: item.venue
+        });
+    });
+
+    artistData = artistResp.performers[0];
+
+    return data;
+}
+
+export function GetArtistDetails() {
+    return {
         artistName: artistData.name,
-        profilePic: artistData['thumb_url']
-      };
-    }
-
+        profilePic: artistData.image
+    };
+}
