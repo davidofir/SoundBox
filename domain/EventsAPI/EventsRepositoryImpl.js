@@ -1,6 +1,8 @@
-import { REACT_APP_EVENTS_API_SECRET } from '@env';
+import { REACT_APP_SEATGEEK_API_SECRET, REACT_APP_TICKETMASTER_API_SECRET } from '@env';
 
-const eventsURL = 'https://rest.bandsintown.com/artists';
+const seatgeekBaseURL = 'https://api.seatgeek.com/2';
+const ticketmasterBaseURL = 'https://app.ticketmaster.com/discovery/v2';  // This is an example, check the actual endpoint.
+
 let artistData = {};
 let data = [];
 
@@ -10,32 +12,43 @@ export default async function GetEventsByArtistNameImpl(artistName, time) {
     // URL encode the artist's name
     const encodedArtistName = encodeURIComponent(artistName);
     
-    // Fetch the artist details
-    const response = await fetch(`${process.env.REACT_APP__SEATGEEK_API_BASEURL}/performers?q=${encodedArtistName}&client_id=${process.env.REACT_APP_SEATGEEK_API_SECRET}`);
-    const artistResp = await response.json();
+    // Fetch the artist details from SeatGeek
+    const artistResponse = await fetch(`${seatgeekBaseURL}/performers?q=${encodedArtistName}&client_id=${REACT_APP_SEATGEEK_API_SECRET}`);
+    const artistResp = await artistResponse.json();
 
-    if (!response.ok || !artistResp.performers || artistResp.performers.length === 0) {
+    if (!artistResponse.ok || !artistResp.performers || artistResp.performers.length === 0) {
         throw new Error('Artist Could Not Be Found');
     }
+    artistData = artistResp.performers[0];
 
-    const artistId = artistResp.performers[0].id;
-    
-    // Fetch the events for the artist
-    const eventResponse = await fetch(`${process.env.REACT_APP__SEATGEEK_API_BASEURL}/events?performers.id=${artistId}&client_id=${process.env.REACT_APP_SEATGEEK_API_SECRET}`);
+    // Fetch the events for the artist from Ticketmaster
+    const eventResponse = await fetch(`${ticketmasterBaseURL}/events.json?keyword=${encodedArtistName}&apikey=${REACT_APP_TICKETMASTER_API_SECRET}`);
     const eventsData = await eventResponse.json();
 
-    if (!eventResponse.ok || !eventsData.events || eventsData.events.length === 0) {
+    if (!eventResponse.ok || !eventsData._embedded || !eventsData._embedded.events || eventsData._embedded.events.length === 0) {
         throw new Error('No events were found for the artist');
     }
-
-    eventsData.events.forEach((item) => {
-        data.push({
-            startDateTime: item['datetime_utc'],
-            venue: item.venue
-        });
+    const sortedEvents = eventsData._embedded.events.sort((a, b) => {
+        return new Date(a.dates.start.dateTime) - new Date(b.dates.start.dateTime);
     });
 
-    artistData = artistResp.performers[0];
+    // Assuming each event has a name, date, and venue. Modify according to the actual structure.
+    sortedEvents.forEach((item) => {
+        // Check if the item has the required nested objects
+        const dateTime = item.dates?.start?.dateTime;
+        const venueDetails = item._embedded?.venues?.[0];
+    
+        if (dateTime && venueDetails) {
+            data.push({
+                startDateTime: dateTime,
+                venue: {
+                    name: venueDetails.name,
+                    city: venueDetails.city?.name,
+                    country: venueDetails.country?.name
+                }
+            });
+        }
+    });
 
     return data;
 }
