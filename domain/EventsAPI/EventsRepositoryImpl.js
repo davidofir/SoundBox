@@ -1,7 +1,4 @@
-import { REACT_APP_SEATGEEK_API_SECRET, REACT_APP_TICKETMASTER_API_SECRET } from '@env';
-
-const seatgeekBaseURL = 'https://api.seatgeek.com/2';
-const ticketmasterBaseURL = 'https://app.ticketmaster.com/discovery/v2';  // This is an example, check the actual endpoint.
+import { REACT_APP_SEATGEEK_API_SECRET, REACT_APP_TICKETMASTER_API_SECRET,REACT_APP__SEATGEEK_API_BASEURL,REACT_APP_TICKETMASTER_API_BASE_URL } from '@env';
 
 let artistData = {};
 let data = [];
@@ -13,7 +10,7 @@ export default async function GetEventsByArtistNameImpl(artistName, time) {
     const encodedArtistName = encodeURIComponent(artistName);
     
     // Fetch the artist details from SeatGeek
-    const artistResponse = await fetch(`${seatgeekBaseURL}/performers?q=${encodedArtistName}&client_id=${REACT_APP_SEATGEEK_API_SECRET}`);
+    const artistResponse = await fetch(`${REACT_APP__SEATGEEK_API_BASEURL}/performers?q=${encodedArtistName}&client_id=${REACT_APP_SEATGEEK_API_SECRET}`);
     const artistResp = await artistResponse.json();
 
     if (!artistResponse.ok || !artistResp.performers || artistResp.performers.length === 0) {
@@ -22,7 +19,7 @@ export default async function GetEventsByArtistNameImpl(artistName, time) {
     artistData = artistResp.performers[0];
 
     // Fetch the events for the artist from Ticketmaster
-    const eventResponse = await fetch(`${ticketmasterBaseURL}/events.json?keyword=${encodedArtistName}&apikey=${REACT_APP_TICKETMASTER_API_SECRET}`);
+    const eventResponse = await fetch(`${REACT_APP_TICKETMASTER_API_BASE_URL}/events.json?keyword=${encodedArtistName}&apikey=${REACT_APP_TICKETMASTER_API_SECRET}`);
     const eventsData = await eventResponse.json();
 
     if (!eventResponse.ok || !eventsData._embedded || !eventsData._embedded.events || eventsData._embedded.events.length === 0) {
