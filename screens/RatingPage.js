@@ -44,6 +44,8 @@ const RatingPage = ({ navigation, route }) => {
     const [defaultRating, setdefaultRating] = useState(2)
     const [maxRating, setmaxRating] = useState([1, 2, 3, 4, 5])
 
+
+    //-------------MUST CHANGE--------------
     const starImgFilled = 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true'
     const starImgCorner = 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true'
 
