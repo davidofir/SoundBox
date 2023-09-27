@@ -47,7 +47,7 @@ const Login = ({ navigation }) => {
                         value={email}
                         onChangeText={text => setEmail(text)}
                         style={styles.input}
-                        autoCapitalize={false}
+
                     />
                     <TextInput
                         placeholder="Password"
@@ -56,7 +56,7 @@ const Login = ({ navigation }) => {
                         onChangeText={text => setPassword(text)}
                         style={styles.input}
                         secureTextEntry
-                        autoCapitalize={false}
+
                     />
                 </View>
 
