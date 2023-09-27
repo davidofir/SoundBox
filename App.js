@@ -8,7 +8,7 @@ import Homepage from './screens/Homepage';
 import ArtistProfile from './screens/ArtistProfile/ArtistProfile';
 import Store from './screens/ArtistProfile/Store';
 import Events from './screens/ArtistProfile/Events';
-import Login from './screens/Login';
+import Login from './screens/Login/Login';
 import Register from './screens/Register';
 import ProfilePage from './screens/ProfilePage';
 import RatingPage from './screens/RatingPage'

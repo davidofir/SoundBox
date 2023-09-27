@@ -5,8 +5,8 @@ import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Aler
 import { Feather, Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { authentication } from "../firebase";
-import colors from "../constants/colors";
+import { authentication } from "../../firebase";
+import colors from "../../constants/colors";
 
 const Separator = () => (
     <View style={styles.separator} />
@@ -38,7 +38,7 @@ const Login = ({ navigation }) => {
 
     return (
         <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-500} behavior="padding">
-            <ImageBackground source={require("../assets/bkg.png")} resizeMode="cover" style={styles.image}>
+            <ImageBackground source={require("../../assets/bkg.png")} resizeMode="cover" style={styles.image}>
                 <Text style={styles.title}>SoundBox</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
