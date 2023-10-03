@@ -1,116 +1,110 @@
-import React, { Component } from 'react';
-import { Feather, Entypo } from "@expo/vector-icons";
+import React from 'react';
 import {
   StyleSheet,
   TextInput,
   Text,
   View,
-  Keyboard,
   Button,
   FlatList,
   Image,
-  Alert,
   TouchableWithoutFeedback,
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
-class Cell extends React.Component {
-  constructor(props) {
-    super(props);
-    global.flatlistSwitch = 0;
-    this.state = {
-      loading: false,
-      error: null,
-      searchValue: "",
-    };
+// Create a ViewModel class to handle business logic
+class AppViewModel {
+  constructor() {
+    this.tracks = [];
+    this.searchInput = '';
+    this.flatlistSwitch = 0;
   }
 
-  render() {
-    if (global.flatlistSwitch === 0) {
-      return (
-        <TouchableWithoutFeedback>
-          <View style={styles.cell} onStartShouldSetResponder={() => true}>
-            <Image
-              style={styles.imageView}
-              source={{ uri: this.props.cellItem.image[3]['#text'] }}
-            />
-            <View style={styles.contentView}>
-              <Text style={[styles.whiteText, styles.boldText]}>
-                {this.props.cellItem.name}
-              </Text>
-              <Text style={styles.whiteText}>{this.props.cellItem.artist.name}</Text>
-            </View>
-            <View style={styles.accessoryView}>
-              <Text style={[styles.textCenter, styles.whiteText]}></Text>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      );
-    } else if (global.flatlistSwitch === 1) {
-      return (
-        <TouchableWithoutFeedback>
-          <View style={styles.cell} onStartShouldSetResponder={() => true}>
-            <Image
-              style={styles.imageView}
-              source={{ uri: this.props.cellItem.image[3]['#text'] }}
-            />
-            <View style={styles.contentView}>
-              <Text style={[styles.whiteText, styles.boldText]}>
-                {this.props.cellItem.name}
-              </Text>
-              <Text style={styles.whiteText}>{this.props.cellItem.artist}</Text>
-            </View>
-            <View style={styles.accessoryView}>
-              <Text style={[styles.textCenter, styles.whiteText]}></Text>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      );
-    }
-  }
-}
-
-class App extends React.Component {
-  searchInput = "";
-
-  fetchTopTracks() {
+  async fetchTopTracks() {
     const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca";
     const url = `http://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks&api_key=${apiKey}&format=json`;
 
-    return fetch(url).then((response) => response.json());
+    const response = await fetch(url);
+    const json = await response.json();
+    this.tracks = json.tracks.track;
   }
 
-  fetchSong() {
+  async fetchSong() {
     const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca";
     const url = `https://ws.audioscrobbler.com/2.0/?method=track.search&track=${this.searchInput}&api_key=${apiKey}&format=json`;
 
-    return fetch(url).then((response) => response.json());
+    const response = await fetch(url);
+    const json = await response.json();
+    this.tracks = json.results.trackmatches.track;
   }
 
-  getSearch() {
-    console.log(this.searchInput);
+  setSearchInput(text) {
+    this.searchInput = text;
   }
 
+  setFlatlistSwitch(value) {
+    this.flatlistSwitch = value;
+  }
+
+  getTracks() {
+    return this.tracks;
+  }
+}
+
+// Create a ViewModel instance
+const viewModel = new AppViewModel();
+
+class Cell extends React.Component {
+  render() {
+    const cellItem = this.props.cellItem;
+    const artistName = viewModel.flatlistSwitch === 1 ? cellItem.artist : cellItem.artist.name;
+
+    return (
+      <TouchableWithoutFeedback>
+        <View style={styles.cell} onStartShouldSetResponder={() => true}>
+          <Image
+            style={styles.imageView}
+            source={{ uri: cellItem.image[3]['#text'] }}
+          />
+          <View style={styles.contentView}>
+            <Text style={[styles.whiteText, styles.boldText]}>
+              {cellItem.name}
+            </Text>
+            <Text style={styles.whiteText}>{artistName}</Text>
+          </View>
+          <View style={styles.accessoryView}>
+            <Text style={[styles.textCenter, styles.whiteText]}></Text>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+}
+
+export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { tracks: [] };
 
-    // Fetch API data
-    this.fetchTopTracks().then((json) => {
-      this.setState({ tracks: json.tracks.track });
+    // Fetch API data using the ViewModel
+    viewModel.fetchTopTracks().then(() => {
+      this.setState({ tracks: viewModel.getTracks() });
     });
   }
 
+  componentWillUnmount() {
+    // Clear the state in componentWillUnmount
+    this.setState({ tracks: [] });
+    
+  }
+
+
   renderElement() {
-    if (global.flatlistSwitch === 0) {
+    if (viewModel.flatlistSwitch === 0) {
       return <Text style={styles.heading}>{"Popular Right Now"}</Text>;
     }
   }
 
   render() {
-    const tableData = Array(50).fill('Songs');
-    var Popular = "Popular Right Now";
-
     return (
       <View style={styles.container}>
         {/* Searchbar */}
@@ -118,18 +112,17 @@ class App extends React.Component {
           autoCapitalize="none"
           autoCorrect={false}
           clearButtonMode="always"
-          onChangeText={(text) => (this.searchInput = text)}
+          onChangeText={(text) => viewModel.setSearchInput(text)}
           placeholder="Search"
           placeholderTextColor="grey"
           style={styles.searchBar}
         />
         <Button
           onPress={() => {
-            this.fetchSong().then((json) => {
-              this.setState({ tracks: json.results.trackmatches.track });
+            viewModel.fetchSong().then(() => {
+              this.setState({ tracks: viewModel.getTracks() });
             });
-            global.flatlistSwitch = 1;
-            Popular = "";
+            viewModel.setFlatlistSwitch(1);
           }}
           title="Search"
         />
@@ -143,12 +136,12 @@ class App extends React.Component {
           renderItem={({ item }) => (
             <TouchableHighlight
               onPress={() => {
-                let artistName = global.flatlistSwitch === 1 ? item.artist : 0;
+                let artistName = viewModel.flatlistSwitch === 1 ? item.artist.toString() : 0;
                 this.props.navigation.navigate('RatingPage', {
                   paramArtistName: item.artist.name,
                   paramSongName: item.name,
-                  paramSearchedArtist: artistName,
-                  paramSearched: global.flatlistSwitch,
+                  paramSearchedArtist: artistName.toString(),
+                  paramSearched: viewModel.flatlistSwitch,
                 });
               }}>
               <Cell cellItem={item} />
@@ -160,8 +153,6 @@ class App extends React.Component {
     );
   }
 }
-
-export default App;
 
 const styles = StyleSheet.create({
   container: {

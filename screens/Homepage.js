@@ -9,12 +9,11 @@ export default Homepage = ({ navigation }) => {
     const SignOut = () => {
         signOut(authentication)
             .then((re) => {
-                console.log(re);
+                navigation.replace("Login");
             })
             .catch((re) => {
                 console.log(re);
-            })
-        navigation.replace("Login")
+            });
     }
 
     return (

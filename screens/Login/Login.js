@@ -5,17 +5,24 @@ import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Aler
 import { Feather, Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { authentication } from "../firebase";
-import colors from "../constants/colors";
+import { authentication } from "../../firebase";
+import colors from "../../constants/colors";
+import useLoginViewModel from './LoginViewModel'
 
 const Separator = () => (
     <View style={styles.separator} />
 );
 
 const Login = ({ navigation }) => {
+    /* Old changes
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    */
 
+    // New changes - use ViewModel
+    const { email, password, setEmail, setPassword, signIn } = useLoginViewModel(navigation);
+
+    /* Old changes
     useEffect(() => {
         const unsubscribe = authentication.onAuthStateChanged(user => {
             if (user) {
@@ -34,11 +41,12 @@ const Login = ({ navigation }) => {
             })
             .catch(error => alert(error.message))
     }
+    */
 
 
     return (
         <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-500} behavior="padding">
-            <ImageBackground source={require("../assets/bkg.png")} resizeMode="cover" style={styles.image}>
+            <ImageBackground source={require("../../assets/bkg.png")} resizeMode="cover" style={styles.image}>
                 <Text style={styles.title}>SoundBox</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
@@ -47,7 +55,7 @@ const Login = ({ navigation }) => {
                         value={email}
                         onChangeText={text => setEmail(text)}
                         style={styles.input}
-                        autoCapitalize={false}
+
                     />
                     <TextInput
                         placeholder="Password"
@@ -56,13 +64,13 @@ const Login = ({ navigation }) => {
                         onChangeText={text => setPassword(text)}
                         style={styles.input}
                         secureTextEntry
-                        autoCapitalize={false}
+
                     />
                 </View>
 
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
-                        onPress={SignIn}
+                        onPress={signIn}
                         style={styles.button}
                     >
                         <Text style={styles.buttonText}>Login</Text>

@@ -4,7 +4,7 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { authentication, db } from "../firebase";
-import { loggedInUser } from "./Register";
+import { loggedInUser } from "./Register/Register";
 
 
 const RatingPage = ({ navigation, route }) => {
@@ -44,6 +44,8 @@ const RatingPage = ({ navigation, route }) => {
     const [defaultRating, setdefaultRating] = useState(2)
     const [maxRating, setmaxRating] = useState([1, 2, 3, 4, 5])
 
+
+    //-------------MUST CHANGE--------------
     const starImgFilled = 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true'
     const starImgCorner = 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true'
 

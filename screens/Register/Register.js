@@ -5,10 +5,10 @@ import { StyleSheet, TextInput, View, Keyboard, Button, SafeAreaView, Text, Aler
 import { Feather, Entypo } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { authentication, db } from "../firebase";
+import { authentication, db } from "../../firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { async } from "@firebase/util";
-import colors from "../constants/colors";
+import colors from "../../constants/colors";
 
 const Separator = () => (
     <View style={styles.separator} />
