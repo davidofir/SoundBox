@@ -4,7 +4,7 @@ import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { authentication, db } from "../firebase";
-import { loggedInUser } from "./Register";
+import { loggedInUser } from "./Register/Register";
 
 
 const RatingPage = ({ navigation, route }) => {
