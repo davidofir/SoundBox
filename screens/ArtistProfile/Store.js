@@ -8,14 +8,14 @@ import useViewModel from './MerchViewModel';
 
 
 
-const merchRepo = new MerchRepositoryImpl;
+//const merchRepo = new MerchRepositoryImpl;
 
 
     
 export default Store =({route,navigation})=>{
 
     const {merch,getMerchByArtistName} = useViewModel();
-
+    console.log(merch)
     const [data,setData] = useState([]);
     useEffect(()=>{
         getMerchByArtistName(route.params.artistName);
