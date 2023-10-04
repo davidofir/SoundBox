@@ -1,226 +1,225 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View, Image } from 'react-native';
-import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { TouchableWithoutFeedback, Keyboard } from 'react-native';
-import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import { TouchableWithoutFeedback, Keyboard } from "react-native";
+import { doc, updateDoc } from "firebase/firestore";
 import { authentication, db } from "../firebase";
-import { loggedInUser } from "./Register/Register";
 
+class RatingModel {
+  constructor(userId) {
+    this.userId = userId;
+  }
+
+  async getUserReviews() {
+    const userRef = doc(db, "users", this.userId);
+    const docSnapshot = await getDoc(userRef);
+    const userData = docSnapshot.data();
+    return userData.reviews || [];
+  }
+
+  async addReview(reviewData) {
+    const userRef = doc(db, "users", this.userId);
+    await updateDoc(userRef, {
+      reviews: [...reviewData],
+    });
+  }
+}
+
+class RatingViewModel {
+  constructor(userId) {
+    this.model = new RatingModel(userId);
+    this.defaultRating = 2;
+    this.maxRating = [1, 2, 3, 4, 5];
+  }
+
+  async getUserReviews() {
+    return await this.model.getUserReviews();
+  }
+
+  async addReview(reviewData) {
+    await this.model.addReview(reviewData);
+  }
+
+  getDefaultRating() {
+    return this.defaultRating;
+  }
+
+  setDefaultRating(rating) {
+    this.defaultRating = rating;
+  }
+
+  getMaxRating() {
+    return this.maxRating;
+  }
+}
 
 const RatingPage = ({ navigation, route }) => {
+  const userId = authentication.currentUser.uid;
+  const viewModel = new RatingViewModel(userId);
 
-    const [reviews, setReviews] = useState([]);
-    const artistName1 = route.params.paramArtistName
-    const songName = route.params.paramSongName
-    const searchedArtistName = route.params.paramSearchedArtist
-    const isSearched = route.params.paramSearched
-    var finalArtistName = ""
+  const [reviews, setReviews] = useState([]);
+  const artistName1 = route.params.paramArtistName;
+  const songName = route.params.paramSongName;
+  const searchedArtistName = route.params.paramSearchedArtist;
+  const isSearched = route.params.paramSearched;
+  var finalArtistName = "";
 
-    if (isSearched == 0) {
-        finalArtistName = artistName1
-    } else {
-        finalArtistName = searchedArtistName
+  if (isSearched === 0) {
+    finalArtistName = artistName1;
+  } else {
+    finalArtistName = searchedArtistName;
+  }
+
+  const [defaultRating, setDefaultRating] = useState(viewModel.getDefaultRating());
+  const maxRating = viewModel.getMaxRating();
+  const [text, setText] = useState("");
+  const url = `https://www.purgomalum.com/service/json?text=${text}`;
+
+  useEffect(() => {
+    async function loadReviews() {
+      const userReviews = await viewModel.getUserReviews();
+      setReviews(userReviews);
     }
+    loadReviews();
+  }, []);
 
-    //const userRef = doc(db, "users", userId);
-    var userId = authentication.currentUser.uid
-    //test = isSearched
+  const getCensoredText = async () => {
+    const response = await fetch(url);
+    const data = await response.json();
+    var message = data.result || "";
+    storeReview(message);
+  };
 
-    //firebase doc named after the artist the review is under
-    const docRef = doc(db, "artists", finalArtistName, songName, userId)
+  const storeReview = async (message) => {
+    const reviewData = {
+      artistName: finalArtistName,
+      songName: songName,
+      creationTime: new Date().toUTCString(),
+      rating: defaultRating,
+      review: message,
+    };
 
-    useEffect(() => {
+    reviews.push(reviewData);
+    await viewModel.addReview(reviews);
 
-        const userRef = doc(db, "users", userId);
+    navigation.navigate("Discover");
+  };
 
-        getDoc(userRef)
-            .then((doc) => {
-                setReviews(doc.data().reviews);
-            })
-    }, [])
-
-    //const childPath = `review/${firebase.auth().currentUser.uid}/${Math.random().toString(36)}`
-
-    const [defaultRating, setdefaultRating] = useState(2)
-    const [maxRating, setmaxRating] = useState([1, 2, 3, 4, 5])
-
-
-    //-------------MUST CHANGE--------------
-    const starImgFilled = 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true'
-    const starImgCorner = 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true'
-
-    //Profanity API
-    const [text, setText] = useState('')
-    const url = `https://www.purgomalum.com/service/json?text=${text}`
-
-    async function getCensoredText() {
-        const response = await fetch(url);
-        const data = await response.json();
-        var message = data.result;
-        //if they do not want to include a message
-        if (message == null) {
-            message = ""
-        }
-        storeReview(message);
-    }
-
-    //sending the review to be stored in firebase
-    function storeReview(message) {
-
-        const reviewData = {
-
-            artistName: finalArtistName,
-            songName: songName,
-            creationTime: new Date().toUTCString(),
-            rating: defaultRating,
-            review: message,
-
-        }
-
-        reviews.push(reviewData);
-        const userRef = doc(db, "users", userId);
-        updateDoc(userRef, {
-            reviews: reviews
-        })
-
-        setDoc(docRef, reviewData).then(() => {
-            console.log("Document has been added")
-        })
-            .catch(error => {
-                console.log(error);
-            })
-
-
-        navigation.navigate("Discover")
-    }
-
-
-
-
-
-
-
-
-    const CustomRatingBar = () => {
-        return (
-            <View style={styles.customRatingBarStyle}>
-                {
-                    maxRating.map((item, key) => {
-                        return (
-                            <TouchableOpacity
-                                activeOpacity={0.7}
-                                key={item}
-                                onPress={() => setdefaultRating(item)}
-                            >
-                                <Image
-                                    style={styles.starImgStyle}
-                                    source={
-                                        item <= defaultRating
-                                            ? { uri: starImgFilled }
-                                            : { uri: starImgCorner }
-                                    }
-                                />
-
-                            </TouchableOpacity>
-                        )
-                    })
-                }
-
-            </View>
-        )
-    }
-
+  const CustomRatingBar = () => {
     return (
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-            <SafeAreaView style={styles.container}>
-                <Text style={styles.textStyle}> Rate This Song </Text>
-                <Text style={styles.textStyleSong}> {songName}</Text>
-                <Text style={styles.textStyleArtist}> {finalArtistName}</Text>
-
-                <CustomRatingBar />
-                <Text style={styles.textStyle}>
-                    {defaultRating + ' / ' + maxRating.length}
-                </Text>
-
-                <TextInput
-                    style={styles.input}
-                    onChangeText={text => setText(text)}
-                    placeholder="Write a review (optional)"
-                    keyboardType="default"
-                    multiline={true}
-
-
-                />
-                <TouchableOpacity
-                    activeOpacity={0.7}
-                    style={styles.buttonStyle}
-                    onPress={() => { getCensoredText() }}
-                >
-                    <Text style={{ color: 'white' }}>Save Review</Text>
-                </TouchableOpacity>
-            </SafeAreaView>
-        </TouchableWithoutFeedback>
+      <View style={styles.customRatingBarStyle}>
+        {maxRating.map((item, key) => {
+          return (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              key={item}
+              onPress={() => setDefaultRating(item)}
+            >
+              <Image
+                style={styles.starImgStyle}
+                source={
+                  item <= defaultRating
+                  //CHANGE IMAGE URL
+                    ? { uri: 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true' }
+                    : { uri: 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true' }
+                }
+              />
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     );
+  };
 
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.textStyle}> Rate This Song </Text>
+        <Text style={styles.textStyleSong}> {songName}</Text>
+        <Text style={styles.textStyleArtist}> {finalArtistName}</Text>
 
+        <CustomRatingBar />
+        <Text style={styles.textStyle}>
+          {defaultRating + " / " + maxRating.length}
+        </Text>
 
-
+        <TextInput
+          style={styles.input}
+          onChangeText={text => setText(text)}
+          placeholder="Write a review (optional)"
+          keyboardType="default"
+          multiline={true}
+        />
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.buttonStyle}
+          onPress={() => { getCensoredText() }}
+        >
+          <Text style={{ color: 'white' }}>Save Review</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
+  );
 };
 
+export default RatingPage;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 10,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-
-    },
-    textStyle: {
-        textAlign: 'center',
-        fontSize: 23,
-        marginTop: 20,
-
-    },
-    textStyleSong: {
-        fontSize: 29,
-        marginTop: 20,
-        alignItems: "baseline",
-        fontWeight: "bold"
-    },
-    textStyleArtist: {
-        fontSize: 23,
-        marginTop: 20,
-        alignItems: "baseline",
-        fontWeight: "bold",
-        color: "lightslategrey"
-    },
-    customRatingBarStyle: {
-        justifyContent: "center",
-        flexDirection: 'row',
-        marginTop: 30,
-    },
-    starImgStyle: {
-        width: 40,
-        height: 40,
-        resizeMode: "cover"
-    },
-    buttonStyle: {
-        justifyContent: "center",
-        alignItems: 'center',
-        marginTop: 30,
-        padding: 15,
-        backgroundColor: 'black',
-        fontSize: 40,
-        color: "white"
-    },
-    input: {
-        height: 150,
-        width: 300,
-        margin: 12,
-        borderWidth: 1,
-        padding: 10,
-    },
+  container: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+  },
+  textStyle: {
+    textAlign: 'center',
+    fontSize: 23,
+    marginTop: 20,
+  },
+  textStyleSong: {
+    fontSize: 29,
+    marginTop: 20,
+    alignItems: "baseline",
+    fontWeight: "bold"
+  },
+  textStyleArtist: {
+    fontSize: 23,
+    marginTop: 20,
+    alignItems: "baseline",
+    fontWeight: "bold",
+    color: "lightslategrey"
+  },
+  customRatingBarStyle: {
+    justifyContent: "center",
+    flexDirection: 'row',
+    marginTop: 30,
+  },
+  starImgStyle: {
+    width: 40,
+    height: 40,
+    resizeMode: "cover"
+  },
+  buttonStyle: {
+    justifyContent: "center",
+    alignItems: 'center',
+    marginTop: 30,
+    padding: 15,
+    backgroundColor: 'black',
+    fontSize: 40,
+    color: "white"
+  },
+  input: {
+    height: 150,
+    width: 300,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
 });
-
-export default RatingPage

@@ -11,12 +11,10 @@ import {
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
-// Create a ViewModel class to handle business logic
-class AppViewModel {
+// Model Class
+class TrackModel {
   constructor() {
     this.tracks = [];
-    this.searchInput = '';
-    this.flatlistSwitch = 0;
   }
 
   async fetchTopTracks() {
@@ -28,13 +26,34 @@ class AppViewModel {
     this.tracks = json.tracks.track;
   }
 
-  async fetchSong() {
+  async fetchSong(searchInput) {
     const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca";
-    const url = `https://ws.audioscrobbler.com/2.0/?method=track.search&track=${this.searchInput}&api_key=${apiKey}&format=json`;
+    const url = `https://ws.audioscrobbler.com/2.0/?method=track.search&track=${searchInput}&api_key=${apiKey}&format=json`;
 
     const response = await fetch(url);
     const json = await response.json();
     this.tracks = json.results.trackmatches.track;
+  }
+
+  getTracks() {
+    return this.tracks;
+  }
+}
+
+// ViewModel Class
+class AppViewModel {
+  constructor() {
+    this.trackModel = new TrackModel();
+    this.searchInput = '';
+    this.flatlistSwitch = 0;
+  }
+
+  async fetchTopTracks() {
+    await this.trackModel.fetchTopTracks();
+  }
+
+  async fetchSong() {
+    await this.trackModel.fetchSong(this.searchInput);
   }
 
   setSearchInput(text) {
@@ -46,13 +65,14 @@ class AppViewModel {
   }
 
   getTracks() {
-    return this.tracks;
+    return this.trackModel.getTracks();
   }
 }
 
 // Create a ViewModel instance
 const viewModel = new AppViewModel();
 
+// Cell Component
 class Cell extends React.Component {
   render() {
     const cellItem = this.props.cellItem;
@@ -80,6 +100,7 @@ class Cell extends React.Component {
   }
 }
 
+// Main App Component
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -94,9 +115,7 @@ export default class App extends React.Component {
   componentWillUnmount() {
     // Clear the state in componentWillUnmount
     this.setState({ tracks: [] });
-    
   }
-
 
   renderElement() {
     if (viewModel.flatlistSwitch === 0) {
