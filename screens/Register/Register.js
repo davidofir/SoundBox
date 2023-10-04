@@ -9,6 +9,7 @@ import { authentication, db } from "../../firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { async } from "@firebase/util";
 import colors from "../../constants/colors";
+import useRegisterViewModel from "./RegisterViewModel";
 
 const Separator = () => (
     <View style={styles.separator} />
@@ -17,13 +18,20 @@ const Separator = () => (
 
 
 const Register = ({ navigation }) => {
+
+    /* old changes
     const [userName, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
     const [reviews, setReviews] = useState([]);
+    */
 
+    // new changes - use ViewModel
+    const { userName, email, password, setUser, setEmail, setPassword, registerAccount } = useRegisterViewModel(navigation);
+
+    /* old changes
     const RegisterAccount = () => {
         createUserWithEmailAndPassword(authentication, email, password)
             .then(async (userCredentials) => {
@@ -40,6 +48,7 @@ const Register = ({ navigation }) => {
             .catch(error => alert(error.message));
         navigation.navigate("Login")
     }
+    */
 
     return (
         <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-500} behavior="padding">
@@ -78,17 +87,16 @@ const Register = ({ navigation }) => {
 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
-                    onPress={RegisterAccount}
+                    onPress={registerAccount}
                     style={[styles.button, styles.buttonOutline]}
                 >
                     <Text style={styles.buttonOutlineText}>Sign up</Text>
                 </TouchableOpacity>
             </View>
 
-            <Text
-                style={styles.footer}>
-                Already have an Account? Sign in
-            </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                <Text style={styles.footer}>Already have an Account? Sign in</Text>
+            </TouchableOpacity>
 
         </KeyboardAvoidingView>
     );
