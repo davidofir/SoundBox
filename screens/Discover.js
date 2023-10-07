@@ -9,7 +9,7 @@ import {
   Image,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { TouchableHighlight } from 'react-native-gesture-handler';
+import { TouchableHighlight, TouchableOpacity } from 'react-native-gesture-handler';
 
 // Model Class
 class TrackModel {
@@ -153,18 +153,20 @@ export default class App extends React.Component {
         <FlatList
           data={this.state.tracks}
           renderItem={({ item }) => (
-            <TouchableHighlight
+            <TouchableOpacity
               onPress={() => {
-                let artistName = viewModel.flatlistSwitch === 1 ? item.artist.toString() : 0;
+                let artistName =
+                  viewModel.flatlistSwitch === 1 ? item.artist.toString() : 0;
                 this.props.navigation.navigate('RatingPage', {
                   paramArtistName: item.artist.name,
                   paramSongName: item.name,
                   paramSearchedArtist: artistName.toString(),
                   paramSearched: viewModel.flatlistSwitch,
                 });
-              }}>
+              }}
+            >
               <Cell cellItem={item} />
-            </TouchableHighlight>
+            </TouchableOpacity>
           )}
           keyExtractor={(_, index) => index.toString()}
         />
