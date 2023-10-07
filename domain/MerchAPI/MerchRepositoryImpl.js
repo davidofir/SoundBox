@@ -1,9 +1,9 @@
-import {REACT_APP_STORE_API_URL} from '@env'
+import {REACT_APP_BACKEND_BASE_URL} from '@env'
 let data = [];
     export default async function GetMerchByArtistNameImpl(artistName) {
       data = [];
-      console.log(`fetching ${REACT_APP_STORE_API_URL}/topic/${artistName}`)
-        const response = await fetch(`${REACT_APP_STORE_API_URL}/topic/${artistName}`)
+      console.log(`fetching ${REACT_APP_BACKEND_BASE_URL}/topic/${artistName}`)
+        const response = await fetch(`${REACT_APP_BACKEND_BASE_URL}/topic/${artistName}`)
         if (!response.ok) {
           throw new Error('Data coud not be fetched!')
         } else {

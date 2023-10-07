@@ -1,7 +1,6 @@
 import { useState } from "react";
 import * as FirebaseRepository from "../../domain/FirebaseRepository/FirebaseRepository";
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
-
 const useRegisterViewModel = (navigation) => {
     const [userName, setUser] = useState("");
     const [email, setEmail] = useState("");

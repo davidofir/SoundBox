@@ -36,6 +36,9 @@ export default Homepage = ({ navigation }) => {
             <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={SignOut}>
                 <Text>Logout</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("Chat")}>
+                <Text>Chat</Text>
+                </TouchableOpacity>
         </View>)
 }
 const styles = StyleSheet.create({
