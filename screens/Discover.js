@@ -9,7 +9,7 @@ import {
   Image,
   TouchableWithoutFeedback,
 } from 'react-native';
-import { TouchableHighlight, TouchableOpacity } from 'react-native-gesture-handler';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 // Model Class
 class TrackModel {
@@ -50,10 +50,12 @@ class AppViewModel {
 
   async fetchTopTracks() {
     await this.trackModel.fetchTopTracks();
+    this.flatlistSwitch = 0
   }
 
   async fetchSong() {
     await this.trackModel.fetchSong(this.searchInput);
+    this.flatlistSwitch = 1
   }
 
   setSearchInput(text) {
@@ -76,7 +78,18 @@ const viewModel = new AppViewModel();
 class Cell extends React.Component {
   render() {
     const cellItem = this.props.cellItem;
-    const artistName = viewModel.flatlistSwitch === 1 ? cellItem.artist : cellItem.artist.name;
+    let artistName = cellItem.artist.name;
+
+    if (viewModel.flatlistSwitch === 1) {
+      if (cellItem.artist) {
+        if (typeof cellItem.artist === 'string') {
+          artistName = cellItem.artist;
+          
+        } else if (cellItem.artist.name) {
+          artistName = cellItem.artist.name;
+        }
+      }
+    }
 
     return (
       <TouchableWithoutFeedback>
@@ -100,6 +113,7 @@ class Cell extends React.Component {
   }
 }
 
+
 // Main App Component
 export default class App extends React.Component {
   constructor(props) {
@@ -114,11 +128,14 @@ export default class App extends React.Component {
 
   componentWillUnmount() {
     // Clear the state in componentWillUnmount
-    this.setState({ tracks: [] });
+    this.setState({ 
+      tracks: viewModel.fetchTopTracks,
+      searchInput: "",
+      });
   }
 
   renderElement() {
-    if (viewModel.flatlistSwitch === 0) {
+    if (viewModel.flatlistSwitch == 0) {
       return <Text style={styles.heading}>{"Popular Right Now"}</Text>;
     }
   }
@@ -136,31 +153,34 @@ export default class App extends React.Component {
           placeholderTextColor="grey"
           style={styles.searchBar}
         />
+        {/* Button */}
         <Button
           onPress={() => {
             viewModel.fetchSong().then(() => {
               this.setState({ tracks: viewModel.getTracks() });
             });
-            viewModel.setFlatlistSwitch(1);
+
           }}
           title="Search"
         />
-
+  
         {/* Heading */}
-        {this.renderElement()}
-
+        {viewModel.flatlistSwitch === 0 && (
+          <Text style={styles.heading}>Popular Right Now</Text>
+        )}
+  
         {/* Songs */}
         <FlatList
           data={this.state.tracks}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => {
-                let artistName =
-                  viewModel.flatlistSwitch === 1 ? item.artist.toString() : 0;
+                const artistName =
+                  viewModel.flatlistSwitch == 1 ? item.artist : item.artist.toString();
                 this.props.navigation.navigate('RatingPage', {
                   paramArtistName: item.artist.name,
                   paramSongName: item.name,
-                  paramSearchedArtist: artistName.toString(),
+                  paramSearchedArtist: artistName,
                   paramSearched: viewModel.flatlistSwitch,
                 });
               }}
@@ -225,3 +245,4 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
 });
+
