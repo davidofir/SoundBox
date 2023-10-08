@@ -1,4 +1,4 @@
-import { setDoc, doc } from "firebase/firestore";
+import { getDoc, setDoc, doc } from "firebase/firestore";
 import { db, authentication } from "../../firebase";
 import { signOut } from "firebase/auth";
 
@@ -12,4 +12,18 @@ const createUserDocument = async (userId, userData) => {
     }
 };
 
-export { createUserDocument };
+const getUserProfileData = async () => {
+    const userId = authentication.currentUser.uid;
+    const userRef = doc(db, "users", userId);
+
+    try {
+        const docSnapshot = await getDoc(userRef);
+        const userData = docSnapshot.data();
+        return userData;
+    } catch (error) {
+        console.error("Error fetching user data:", error);
+        throw error;
+    }
+};
+
+export { createUserDocument, getUserProfileData };

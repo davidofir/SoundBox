@@ -10,7 +10,7 @@ import Store from './screens/ArtistProfile/Store';
 import Events from './screens/ArtistProfile/Events';
 import Login from './screens/Login/Login';
 import Register from './screens/Register/Register';
-import ProfilePage from './screens/ProfilePage';
+import ProfilePage from './screens/AccountProfile/ProfilePage';
 import RatingPage from './screens/RatingPage'
 import SocialFeed from './screens/SocialFeed';
 import FollowersPage from './screens/FollowersPage';
@@ -22,26 +22,26 @@ import Chat from './screens/Chat';
 const Stack = createStackNavigator();
 export default function App() {
   return (
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName='Login'>
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Discover" component={Discover} />
-          <Stack.Screen name="Artist" component={ArtistProfile} />
-          <Stack.Screen name="Merch Store" component={Store} />
-          <Stack.Screen name="Upcoming Events" component={Events} />
-          <Stack.Screen name="Home" component={Homepage} />
-          <Stack.Screen name="Register" component={Register} />
-          <Stack.Screen name="Profile" component={ProfilePage} />
-          <Stack.Screen name="Social Feed" component={SocialFeed} />
-          <Stack.Screen name="Followers" component={FollowersPage} />
-          <Stack.Screen name="Following" component={FollowingPage} />
-          <Stack.Screen name="RatingPage" component={RatingPage} />
-          <Stack.Screen name="Search" component={SearchPage} />
-          <Stack.Screen name="UserPage" component={UserPage} />
-          <Stack.Screen name="Recommendations" component={Recommendations} />
-          <Stack.Screen name="Chat" component={Chat}/>
-        </Stack.Navigator>
-      </NavigationContainer>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName='Login'>
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Discover" component={Discover} />
+        <Stack.Screen name="Artist" component={ArtistProfile} />
+        <Stack.Screen name="Merch Store" component={Store} />
+        <Stack.Screen name="Upcoming Events" component={Events} />
+        <Stack.Screen name="Home" component={Homepage} />
+        <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="Profile" component={ProfilePage} />
+        <Stack.Screen name="Social Feed" component={SocialFeed} />
+        <Stack.Screen name="Followers" component={FollowersPage} />
+        <Stack.Screen name="Following" component={FollowingPage} />
+        <Stack.Screen name="RatingPage" component={RatingPage} />
+        <Stack.Screen name="Search" component={SearchPage} />
+        <Stack.Screen name="UserPage" component={UserPage} />
+        <Stack.Screen name="Recommendations" component={Recommendations} />
+        <Stack.Screen name="Chat" component={Chat} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 const styles = StyleSheet.create({
