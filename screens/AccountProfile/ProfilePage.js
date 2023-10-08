@@ -1,23 +1,33 @@
 import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback, Image } from 'react-native';
-import Colors from '../constants/colors';
+import Colors from '../../constants/colors';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
-import ButtonComponent from '../components/ButtonComponent';
-import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
-import { authentication, db } from "../firebase";
+import ButtonComponent from '../../components/ButtonComponent';
+import EventsRepository from '../../domain/EventsAPI/EventsRepositoryImpl';
+import { authentication, db } from "../../firebase";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import useAccountProfileViewModel from "./AccountProfileViewModel";
 
-const eventsRepo = new EventsRepository;
+//const eventsRepo = new EventsRepository;
 export default ProfilePage = ({ navigation }) => {
+
+    /* old changes
     const [username, setUser] = useState('');
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
     const [reviews, setReviews] = useState([]);
+    */
 
+    // new changes - using viewmodel
+    const { username, followers, following, reviews, navigateToFollowers, navigateToFollowing } = useAccountProfileViewModel(navigation);
+
+    /* old changes
     // Get the current user
     var userId = authentication.currentUser.uid;
+    */
 
+    /* old changes
     // Query Firestore database with current UID
     useEffect(() => {
 
@@ -32,6 +42,7 @@ export default ProfilePage = ({ navigation }) => {
                 console.log(followers);
             })
     }, [])
+    */
 
     return (
         <View>
@@ -39,7 +50,7 @@ export default ProfilePage = ({ navigation }) => {
                 <View style={styles.verticalProfileContainer}>
                     <View style={[styles.horizontalProfileContainer, { padding: 6 }]}>
                         <View style={styles.circle}>
-                            <Image source={require("../assets/defaultPic.png")} style={styles.circle} />
+                            <Image source={require("../../assets/defaultPic.png")} style={styles.circle} />
                         </View>
                         <Text>Username: {username}</Text>
                     </View>
@@ -51,11 +62,11 @@ export default ProfilePage = ({ navigation }) => {
                     </View>
                     <View style={[styles.statsBox, { borderColor: "#DFD8C8", borderLeftWidth: 1, borderRightWidth: 1 }]}>
                         <Text style={[styles.text, styles.subText]}>Followers</Text>
-                        <Text onPress={() => navigation.navigate("Followers", { followerArray: followers })} style={[styles.text, { fontSize: 24 }]}>{followers.length}</Text>
+                        <Text onPress={navigateToFollowers} style={[styles.text, { fontSize: 24 }]}>{followers.length}</Text>
                     </View>
                     <View style={styles.statsBox}>
                         <Text style={[styles.text, styles.subText]}>Following</Text>
-                        <Text onPress={() => navigation.navigate("Following", { followingArray: following })} style={[styles.text, { fontSize: 24 }]}>{following.length}</Text>
+                        <Text onPress={navigateToFollowing} style={[styles.text, { fontSize: 24 }]}>{following.length}</Text>
                     </View>
                 </View>
             </View>
