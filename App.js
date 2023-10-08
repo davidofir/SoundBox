@@ -13,8 +13,8 @@ import Register from './screens/Register/Register';
 import ProfilePage from './screens/AccountProfile/ProfilePage';
 import RatingPage from './screens/RatingPage'
 import SocialFeed from './screens/SocialFeed';
-import FollowersPage from './screens/FollowersPage';
-import FollowingPage from './screens/FollowingPage';
+import FollowersPage from './screens/AccountProfile/FollowersPage';
+import FollowingPage from './screens/AccountProfile/FollowingPage';
 import SearchPage from './screens/SearchPage';
 import UserPage from './screens/UserPage';
 import Recommendations from './screens/Recommendation';

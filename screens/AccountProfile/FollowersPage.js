@@ -1,13 +1,12 @@
 import { StyleSheet, Text, View, FlatList, TouchableWithoutFeedback, Image } from 'react-native';
-import Colors from '../constants/colors';
+import Colors from '../../constants/colors';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react'
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
-import ButtonComponent from '../components/ButtonComponent';
-import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
-import { authentication } from '../firebase';
+import ButtonComponent from '../../components/ButtonComponent';
+import EventsRepository from '../../domain/EventsAPI/EventsRepositoryImpl';
+import { authentication } from '../../firebase';
 
-const eventsRepo = new EventsRepository;
 export default FollowersPage = ({ navigation, route }) => {
     const [events, setEvents] = useState([]);
     const [followers, setFollowers] = useState([]);
@@ -29,7 +28,7 @@ export default FollowersPage = ({ navigation, route }) => {
                 data={followers}
                 renderItem={({ item }) => (
                     <View style={styles.item}>
-                        <Image source={require("../assets/defaultPic.png")} style={styles.itemImage} />
+                        <Image source={require("../../assets/defaultPic.png")} style={styles.itemImage} />
                         <Text style={styles.itemText}>User ID: {item}</Text>
                     </View>
                 )}
