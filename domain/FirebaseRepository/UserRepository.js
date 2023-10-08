@@ -26,4 +26,26 @@ const getUserProfileData = async () => {
     }
 };
 
-export { createUserDocument, getUserProfileData };
+const updateUserFollowers = async (userId, updatedFollowers) => {
+    try {
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+            followers: updatedFollowers,
+        });
+    } catch (error) {
+        console.error("Error updating user followers:", error);
+    }
+}
+
+const updateUserFollowing = async (userId, updatedFollowing) => {
+    try {
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+            following: updatedFollowing,
+        });
+    } catch (error) {
+        console.error("Error updating user following:", error);
+    }
+}
+
+export { createUserDocument, getUserProfileData, updateUserFollowers, updateUserFollowing };
