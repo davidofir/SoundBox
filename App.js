@@ -19,11 +19,9 @@ import SearchPage from './screens/SearchPage';
 import UserPage from './screens/UserPage';
 import Recommendations from './screens/Recommendation';
 import Chat from './screens/Chat';
-import { UserProvider } from './Contexts/UserContext';
 const Stack = createStackNavigator();
 export default function App() {
   return (
-    <UserProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName='Login'>
           <Stack.Screen name="Login" component={Login} />
@@ -44,7 +42,6 @@ export default function App() {
           <Stack.Screen name="Chat" component={Chat}/>
         </Stack.Navigator>
       </NavigationContainer>
-    </UserProvider>
   );
 }
 const styles = StyleSheet.create({

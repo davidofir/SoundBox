@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { io } from 'socket.io-client';
 import {REACT_APP_BACKEND_BASE_URL} from '@env'
-import { useUser } from '../Contexts/UserContext';
+import { authentication } from '../firebase';
 const socket = io(REACT_APP_BACKEND_BASE_URL);
 
 const ArtistChat = () => {
@@ -11,9 +11,7 @@ const ArtistChat = () => {
   const roomId = 'artist';
   const userId = 'user';
   const [userNum, setUserNum] = useState(0);
-  const {user,setUser} = useUser();
   useEffect(() => {
-    console.log(user)
     socket.on('connection', () => {
       console.log('Connected to server');
     });
@@ -27,7 +25,7 @@ const ArtistChat = () => {
     socket.on('user-connected', handleUserConnected);
     socket.on('user-disconnected', handleUserDisconnected);
 
-    socket.emit('join-room', roomId,user.uid);
+    socket.emit('join-room', roomId,authentication.currentUser.uid);
 
     return () => {
       socket.off('message', handleNewMessage);
@@ -52,11 +50,10 @@ const ArtistChat = () => {
   }
 
   function handleUserConnected() {
-    console.log(`${user.name} has joined the room`);
 
     const systemMessage = {
       _id: new Date().getTime(),
-      text: `${user.uid} has joined the room`,
+      text: `${authentication.currentUser.uid} has joined the room`,
       createdAt: new Date(),
       system: true,
     };
@@ -100,8 +97,8 @@ const ArtistChat = () => {
       messages={messages.slice()} // Reverse the order of messages
       onSend={onSend}
       user={{
-        _id: user.uid,
-        name: user.email,
+        _id: authentication.currentUser.uid,
+        name: authentication.currentUser.displayName,
       }}
     />
   );
