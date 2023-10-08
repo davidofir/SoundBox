@@ -7,7 +7,7 @@ import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
 import { authentication, db } from "../firebase";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
-
+import * as SecureStore from 'expo-secure-store';
 const eventsRepo = new EventsRepository;
 export default UserPage = ({ navigation, route }) => {
     const [username, setUser] = useState('');
@@ -17,11 +17,20 @@ export default UserPage = ({ navigation, route }) => {
     const [following, setFollowing] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [isFollow, setFollow] = useState(false);
+    
     const { item } = route.params;
 
     // Get the searched user
     var userId = item.id
-
+    async function generateRoom(user1, user2) {
+        const combinedId = [user1, user2].sort().join('-');
+        // Try getting the item from SecureStore
+        const existingRoom = await SecureStore.getItemAsync(combinedId);
+        if (!existingRoom) {
+            await SecureStore.setItemAsync(combinedId, 'exists');
+        }
+        return combinedId;
+    }
     // Get the current user
     var currId = authentication.currentUser.uid;
 
@@ -51,7 +60,13 @@ export default UserPage = ({ navigation, route }) => {
                 setUserFollowers(doc2.data().followers);
             })
     }, [])
-
+    async function handlePress() {
+        let roomId = await generateRoom(userId, currId);
+        console.log(roomId);
+        navigation.navigate("Chat", {
+            roomId: roomId
+        });
+    }
     // Unfollow user
     const Unfollow = () => {
         // Pass the whole followers list into an array
@@ -125,6 +140,16 @@ export default UserPage = ({ navigation, route }) => {
                             <Text style={styles.buttonText}>Follow</Text>
                         </TouchableOpacity>
                     )}
+                    
+                </View>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={()=>{
+                        handlePress();
+                    }
+                    }
+                    >
+                        <Text style={styles.buttonText}>Message</Text>
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.followContainer}>
                     <View style={styles.statsBox}>

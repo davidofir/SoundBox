@@ -63,7 +63,8 @@
     "react-native-web": "~0.19.6",
     "react-native-webview": "13.2.2",
     "react-test-renderer": "^18.0.0",
-    "socket.io-client": "^4.7.2"
+    "socket.io-client": "^4.7.2",
+    "expo-secure-store": "~12.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

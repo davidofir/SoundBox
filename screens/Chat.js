@@ -3,15 +3,17 @@ import { GiftedChat } from 'react-native-gifted-chat';
 import { io } from 'socket.io-client';
 import {REACT_APP_BACKEND_BASE_URL} from '@env'
 import { authentication } from '../firebase';
+import * as SecureStore from 'expo-secure-store';
 const socket = io(REACT_APP_BACKEND_BASE_URL);
 
-const ArtistChat = () => {
+const ArtistChat = ({route}) => {
   const [messages, setMessages] = useState([]);
   const [distinctUser, setDistinctUser] = useState('');
   const roomId = 'artist';
   const userId = 'user';
   const [userNum, setUserNum] = useState(0);
   useEffect(() => {
+    console.log(route.params.roomId)
     socket.on('connection', () => {
       console.log('Connected to server');
     });
@@ -25,7 +27,7 @@ const ArtistChat = () => {
     socket.on('user-connected', handleUserConnected);
     socket.on('user-disconnected', handleUserDisconnected);
 
-    socket.emit('join-room', roomId,authentication.currentUser.uid);
+    socket.emit('join-room', route.params.roomId,authentication.currentUser.uid);
 
     return () => {
       socket.off('message', handleNewMessage);
@@ -53,7 +55,7 @@ const ArtistChat = () => {
 
     const systemMessage = {
       _id: new Date().getTime(),
-      text: `${authentication.currentUser.uid} has joined the room`,
+      text: `user has joined the room`,
       createdAt: new Date(),
       system: true,
     };
@@ -66,7 +68,7 @@ const ArtistChat = () => {
 
     const systemMessage = {
       _id: new Date().getTime(),
-      text: `${distinctUser} has left the room`,
+      text: `user has left the room`,
       createdAt: new Date(),
       system: true,
     };
@@ -98,7 +100,7 @@ const ArtistChat = () => {
       onSend={onSend}
       user={{
         _id: authentication.currentUser.uid,
-        name: authentication.currentUser.displayName,
+        name: authentication.currentUser.email,
       }}
     />
   );
