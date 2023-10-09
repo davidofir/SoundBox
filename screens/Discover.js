@@ -39,6 +39,8 @@ class TrackModel {
 
   }
 
+
+
   getTracks() {
     return this.tracks;
   }
@@ -93,6 +95,14 @@ class Cell extends React.Component {
     this.fetchCoverArt();
   }
 
+  async componentDidUpdate(prevProps) {
+    // Check if the cellItem has changed (e.g., when searching for a new song)
+    if (prevProps.cellItem !== this.props.cellItem) {
+      this.fetchCoverArt(); // Fetch cover art for the new cellItem
+    }
+  }
+
+
   async fetchCoverArt() {
     const { cellItem } = this.props;
     const { name, artist } = cellItem;
@@ -109,8 +119,8 @@ class Cell extends React.Component {
     }
   }
 
-  render() {
-    const cellItem = this.props.cellItem;
+   render() {
+    const { cellItem } = this.props;
     let artistName = cellItem.artist.name;
 
     if (viewModel.flatlistSwitch === 1) {
@@ -123,12 +133,12 @@ class Cell extends React.Component {
       }
     }
 
-    const { coverArtUrl } = this.state;
+    const { coverArtUrl } = this.state; // Get coverArtUrl from component state
 
     return (
       <TouchableWithoutFeedback>
         <View style={styles.cell} onStartShouldSetResponder={() => true}>
-          {coverArtUrl && (
+          {coverArtUrl && ( // Use coverArtUrl from state to display the image
             <Image
               style={styles.imageView}
               source={{ uri: coverArtUrl }}
@@ -178,7 +188,7 @@ export default class App extends React.Component {
   async handleSearchButtonPress() {
     this.setState({ isSearching: true }); // Set searching state to true
     await viewModel.fetchSong().then(() => {
-      this.setState({ tracks: viewModel.getTracks(), isSearching: false }); // Update tracks and set searching state to false
+      this.setState({ tracks: viewModel.getTracks(), isSearching: false}); // Update tracks and set searching state to false
     });
   }
   
@@ -200,6 +210,7 @@ export default class App extends React.Component {
           onPress={() => {
             viewModel.fetchSong().then(() => {
               this.setState({ tracks: viewModel.getTracks() });
+              
             });
 
           }}
