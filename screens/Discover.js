@@ -10,12 +10,15 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { searchAndFetchSongCoverArt } from '../domain/SpotifyAPI/SpotifyAPI';
 
 // Model Class
 class TrackModel {
   constructor() {
     this.tracks = [];
   }
+
+  
 
   async fetchTopTracks() {
     const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca";
@@ -33,6 +36,7 @@ class TrackModel {
     const response = await fetch(url);
     const json = await response.json();
     this.tracks = json.results.trackmatches.track;
+
   }
 
   getTracks() {
@@ -56,6 +60,7 @@ class AppViewModel {
   async fetchSong() {
     await this.trackModel.fetchSong(this.searchInput);
     this.flatlistSwitch = 1
+
   }
 
   setSearchInput(text) {
@@ -76,6 +81,34 @@ const viewModel = new AppViewModel();
 
 // Cell Component
 class Cell extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      coverArtUrl: null,
+    };
+  }
+
+  componentDidMount() {
+    // Fetch and set the cover art URL when the component mounts.
+    this.fetchCoverArt();
+  }
+
+  async fetchCoverArt() {
+    const { cellItem } = this.props;
+    const { name, artist } = cellItem;
+    var artistNameImage = cellItem.artist.name
+    if(viewModel.flatlistSwitch == 1){
+      artistNameImage = cellItem.artist
+    }
+
+    try {
+      const imageUrl = await searchAndFetchSongCoverArt(name, artistNameImage);
+      this.setState({ coverArtUrl: imageUrl });
+    } catch (error) {
+      console.error('Error fetching cover art:', error);
+    }
+  }
+
   render() {
     const cellItem = this.props.cellItem;
     let artistName = cellItem.artist.name;
@@ -84,20 +117,23 @@ class Cell extends React.Component {
       if (cellItem.artist) {
         if (typeof cellItem.artist === 'string') {
           artistName = cellItem.artist;
-          
         } else if (cellItem.artist.name) {
           artistName = cellItem.artist.name;
         }
       }
     }
 
+    const { coverArtUrl } = this.state;
+
     return (
       <TouchableWithoutFeedback>
         <View style={styles.cell} onStartShouldSetResponder={() => true}>
-          <Image
-            style={styles.imageView}
-            source={{ uri: cellItem.image[3]['#text'] }}
-          />
+          {coverArtUrl && (
+            <Image
+              style={styles.imageView}
+              source={{ uri: coverArtUrl }}
+            />
+          )}
           <View style={styles.contentView}>
             <Text style={[styles.whiteText, styles.boldText]}>
               {cellItem.name}
@@ -112,7 +148,6 @@ class Cell extends React.Component {
     );
   }
 }
-
 
 // Main App Component
 export default class App extends React.Component {
@@ -140,6 +175,13 @@ export default class App extends React.Component {
     }
   }
 
+  async handleSearchButtonPress() {
+    this.setState({ isSearching: true }); // Set searching state to true
+    await viewModel.fetchSong().then(() => {
+      this.setState({ tracks: viewModel.getTracks(), isSearching: false }); // Update tracks and set searching state to false
+    });
+  }
+  
   render() {
     return (
       <View style={styles.container}>
@@ -245,4 +287,3 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
 });
-
