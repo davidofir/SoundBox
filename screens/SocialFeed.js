@@ -26,10 +26,13 @@ export default SocialFeed = ({ navigation }) => {
         getDoc(userRef)
             .then((doc) => {
                 setFollowing(doc.data().following);
+                /*old change
                 setReviews(doc.data().reviews);
+                */
             })
     }, [])
 
+    /* old change
     useEffect(() => {
         for (let i = 0; i < following.length; i++) {
             const userRef2 = doc(db, "users", following[i]);
@@ -42,6 +45,25 @@ export default SocialFeed = ({ navigation }) => {
                 })
         }
     }, [reviews])
+    */
+
+    // new change
+    useEffect(() => {
+        for (let i = 0; i < following.length; i++) {
+            const userRef2 = doc(db, "users", following[i]);
+            getDoc(userRef2)
+                .then((doc) => {
+                    for (let i = 0; i < doc.data().reviews.length; i++) {
+                        const userReviews = {
+                            ...doc.data().reviews[i],
+                            username: doc.data().userName,
+                        };
+                        tempeviews.push(userReviews);
+                    }
+                    setReviews([...tempeviews]);
+                })
+        }
+    }, [following])
 
     return (
         <View>
@@ -99,13 +121,17 @@ export default SocialFeed = ({ navigation }) => {
                 <FlatList
                     data={reviews}
                     renderItem={({ item }) => (
-                        <View style={styles.item}>
-                            <Text style={styles.itemText}>
-                                Artist: {item.artistName}{"\n"}
-                                Review: {item.review}{"\n"}
-                                Rating: {item.rating}{"\n"}
-                                Song: {item.songName}
-                            </Text>
+                        <View style={styles.postContainer}>
+                            <View style={styles.postHeader}>
+                                <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
+                                <Text style={styles.username}>{item.username}</Text>
+                            </View>
+                            <View style={styles.postContent}>
+                                <Text style={styles.artistName}>Artist: {item.artistName}</Text>
+                                <Text style={styles.reviewText}>Review: {item.review}</Text>
+                                <Text style={styles.ratingText}>Rating: {item.rating}</Text>
+                                <Text style={styles.songName}>Song: {item.songName}</Text>
+                            </View>
                         </View>
                     )}
                 />
@@ -193,5 +219,52 @@ const styles = StyleSheet.create({
         overflow: "hidden",
         marginVertical: 6,
         marginHorizontal: 10
-    }
+    },
+    postContainer: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        margin: 10,
+        padding: 10,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    postHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    profileImage: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginRight: 10,
+    },
+    username: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    postContent: {
+        marginTop: 10,
+    },
+    artistName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    reviewText: {
+        fontSize: 14,
+        marginTop: 5,
+    },
+    ratingText: {
+        fontSize: 14,
+        marginTop: 5,
+    },
+    songName: {
+        fontSize: 14,
+        marginTop: 5,
+    },
 })
