@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { TouchableWithoutFeedback, Keyboard } from "react-native";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { authentication, db } from "../firebase";
 
 class RatingModel {
@@ -69,7 +69,10 @@ const RatingPage = ({ navigation, route }) => {
   const songName = route.params.paramSongName;
   const searchedArtistName = route.params.paramSearchedArtist;
   const isSearched = route.params.paramSearched;
+  const songGenre = route.params.paramSongGenre
   var finalArtistName = "";
+ 
+
 
   if (isSearched === 0) {
     finalArtistName = artistName1;
@@ -104,6 +107,7 @@ const RatingPage = ({ navigation, route }) => {
       creationTime: new Date().toUTCString(),
       rating: defaultRating,
       review: message,
+      genre: songGenre,
     };
 
     reviews.push(reviewData);
@@ -126,7 +130,7 @@ const RatingPage = ({ navigation, route }) => {
                 style={styles.starImgStyle}
                 source={
                   item <= defaultRating
-                  //CHANGE IMAGE URL
+                  //MUST CHANGE IMAGE URL ________________________________________________________
                     ? { uri: 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true' }
                     : { uri: 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true' }
                 }

@@ -18,8 +18,6 @@ class TrackModel {
     this.tracks = [];
   }
 
-  
-
   async fetchTopTracks() {
     const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca";
     const url = `http://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks&api_key=${apiKey}&format=json`;
@@ -36,10 +34,28 @@ class TrackModel {
     const response = await fetch(url);
     const json = await response.json();
     this.tracks = json.results.trackmatches.track;
-
   }
 
+  async fetchGenre(songTitle, artistTitle) {
+    try {
+      const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca";
+      const url = `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${apiKey}&artist=${artistTitle}&track=${songTitle}&format=json`;
 
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data && data.track && data.track.toptags && data.track.toptags.tag) {
+        // Assuming the genre is in the first tag in the list
+        const genre = data.track.toptags.tag[0].name;
+        return genre;
+      } else {
+        return "Genre not found";
+      }
+    } catch (error) {
+      console.error("Error fetching genre:", error);
+      return "Error fetching genre";
+    }
+  }
 
   getTracks() {
     return this.tracks;
@@ -56,13 +72,12 @@ class AppViewModel {
 
   async fetchTopTracks() {
     await this.trackModel.fetchTopTracks();
-    this.flatlistSwitch = 0
+    this.flatlistSwitch = 0;
   }
 
   async fetchSong() {
     await this.trackModel.fetchSong(this.searchInput);
-    this.flatlistSwitch = 1
-
+    this.flatlistSwitch = 1;
   }
 
   setSearchInput(text) {
@@ -102,13 +117,12 @@ class Cell extends React.Component {
     }
   }
 
-
   async fetchCoverArt() {
     const { cellItem } = this.props;
     const { name, artist } = cellItem;
-    var artistNameImage = cellItem.artist.name
-    if(viewModel.flatlistSwitch == 1){
-      artistNameImage = cellItem.artist
+    var artistNameImage = cellItem.artist.name;
+    if (viewModel.flatlistSwitch === 1) {
+      artistNameImage = cellItem.artist;
     }
 
     try {
@@ -119,7 +133,7 @@ class Cell extends React.Component {
     }
   }
 
-   render() {
+  render() {
     const { cellItem } = this.props;
     let artistName = cellItem.artist.name;
 
@@ -133,12 +147,12 @@ class Cell extends React.Component {
       }
     }
 
-    const { coverArtUrl } = this.state; // Get coverArtUrl from component state
+    const { coverArtUrl } = this.state;
 
     return (
       <TouchableWithoutFeedback>
         <View style={styles.cell} onStartShouldSetResponder={() => true}>
-          {coverArtUrl && ( // Use coverArtUrl from state to display the image
+          {coverArtUrl && (
             <Image
               style={styles.imageView}
               source={{ uri: coverArtUrl }}
@@ -160,38 +174,40 @@ class Cell extends React.Component {
 }
 
 // Main App Component
-export default class App extends React.Component {
+class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { tracks: [] };
 
-    // Fetch API data using the ViewModel
     viewModel.fetchTopTracks().then(() => {
       this.setState({ tracks: viewModel.getTracks() });
     });
   }
 
   componentWillUnmount() {
-    // Clear the state in componentWillUnmount
-    this.setState({ 
+    this.setState({
       tracks: viewModel.fetchTopTracks,
       searchInput: "",
-      });
-  }
-
-  renderElement() {
-    if (viewModel.flatlistSwitch == 0) {
-      return <Text style={styles.heading}>{"Popular Right Now"}</Text>;
-    }
-  }
-
-  async handleSearchButtonPress() {
-    this.setState({ isSearching: true }); // Set searching state to true
-    await viewModel.fetchSong().then(() => {
-      this.setState({ tracks: viewModel.getTracks(), isSearching: false}); // Update tracks and set searching state to false
     });
   }
-  
+
+  async handleRowPress(item) {
+    const artistName =
+    viewModel.flatlistSwitch === 1 ? item.artist : item.artist.name.toString();
+
+    const genre = await viewModel.trackModel.fetchGenre(item.name, artistName);
+    console.log(`Genre for the track "${item.name}, ${artistName}": ${genre}`);
+
+
+    this.props.navigation.navigate('RatingPage', {
+      paramArtistName: item.artist.name,
+      paramSongName: item.name,
+      paramSearchedArtist: artistName,
+      paramSearched: viewModel.flatlistSwitch,
+      paramSongGenre: genre,
+    });
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -210,34 +226,21 @@ export default class App extends React.Component {
           onPress={() => {
             viewModel.fetchSong().then(() => {
               this.setState({ tracks: viewModel.getTracks() });
-              
             });
-
           }}
           title="Search"
         />
-  
+
         {/* Heading */}
         {viewModel.flatlistSwitch === 0 && (
           <Text style={styles.heading}>Popular Right Now</Text>
         )}
-  
+
         {/* Songs */}
         <FlatList
           data={this.state.tracks}
           renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => {
-                const artistName =
-                  viewModel.flatlistSwitch == 1 ? item.artist : item.artist.toString();
-                this.props.navigation.navigate('RatingPage', {
-                  paramArtistName: item.artist.name,
-                  paramSongName: item.name,
-                  paramSearchedArtist: artistName,
-                  paramSearched: viewModel.flatlistSwitch,
-                });
-              }}
-            >
+            <TouchableOpacity onPress={() => this.handleRowPress(item)}>
               <Cell cellItem={item} />
             </TouchableOpacity>
           )}
@@ -298,3 +301,5 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
 });
+
+export default App;

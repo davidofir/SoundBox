@@ -46,13 +46,24 @@ const Recommendations = ({navigation, route}) => {
                 reviewCount = doc.data().reviews.length
                 //get the array of reviews
                 reviewArray = doc.data().reviews
+                printReviews();
                 getTopUserArtists()
 
                 
             })
     }, [])
 
-
+    function printReviews() {
+        reviews.forEach((item, index) => {
+          console.log(`Review ${index}:`);
+          console.log(`Artist: ${item.artistName}`);
+          console.log(`Rating: ${item.rating}`);
+          console.log(`Review: ${item.review}`);
+          console.log(`Song: ${item.songName}`)
+          console.log('------------------');
+        });
+      }
+      
 
 
     async function getTopUserArtists(){

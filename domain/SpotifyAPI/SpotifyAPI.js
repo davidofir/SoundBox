@@ -1,9 +1,13 @@
 import axios from 'axios';
 import base64 from 'base-64';
 
+
 const clientId = '78446884c91b415489c2e419606a8f75';
 const clientSecret = '330da908bba34426ac4e05f220370032';
+const defaultImageUrl = require("../../assets/defaultSongImage.png");
 
+
+// Define the getAccessToken function here
 async function getAccessToken() {
   try {
     const credentials = `${clientId}:${clientSecret}`;
@@ -64,15 +68,17 @@ async function searchAndFetchSongCoverArt(songName, artistName) {
       });
 
       const album = albumResponse.data.album;
-      const coverArtUrl = album.images[0].url;
+      const coverArtUrl = album.images[0].url + `?timestamp=${Date.now()}`;
 
       return coverArtUrl;
     } else {
-      throw new Error('Song not found on Spotify.');
+      // Return the default image URL (local asset) if no cover art is found
+      return defaultImageUrl;
     }
   } catch (error) {
     console.error('Error fetching cover art:', error);
-    throw error;
+    // Return the default image URL (local asset) on error as well
+    return defaultImageUrl;
   }
 }
 
