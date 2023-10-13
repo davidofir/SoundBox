@@ -27,7 +27,7 @@ export default FollowersPage = ({ navigation, route }) => {
                 const userSnapshot = await getDoc(userRef);
                 if (userSnapshot.exists()) {
                     const userData = userSnapshot.data();
-                    followerData.push(userData);
+                    followerData.push({ ...userData, id: followerArray[i] });
                 }
             } catch (error) {
                 console.error("Error fetching user data:", error);
@@ -38,6 +38,10 @@ export default FollowersPage = ({ navigation, route }) => {
         setLoading(false); // Set loading to false once data is available.
     };
 
+    const onPressItem = (item) => {
+        navigation.navigate('UserPage', { item });
+    };
+
     return (
         <View style={styles.container}>
             {loading ? (
@@ -46,10 +50,12 @@ export default FollowersPage = ({ navigation, route }) => {
                 <FlatList
                     data={followerData}
                     renderItem={({ item }) => (
-                        <View style={styles.item}>
-                            <Image source={require("../../assets/defaultPic.png")} style={styles.itemImage} />
-                            <Text style={styles.itemText}>Username: {item?.userName || "Loading..."}</Text>
-                        </View>
+                        <TouchableOpacity onPress={() => onPressItem(item)}>
+                            <View style={styles.item}>
+                                <Image source={require("../../assets/defaultPic.png")} style={styles.itemImage} />
+                                <Text style={styles.itemText}>Username: {item?.userName || "Loading..."}</Text>
+                            </View>
+                        </TouchableOpacity>
                     )}
                 />
             )}
