@@ -7,7 +7,6 @@ export default function useChatViewModel(roomId) {
     const [messages, setMessages] = useState([]);
   
     useEffect(() => {
-      ChatRepository.initializeSocket();
       ChatRepository.joinRoom(roomId, authentication.currentUser.uid);
       ChatRepository.onNewMessage(handleNewMessage);
   
@@ -18,6 +17,9 @@ export default function useChatViewModel(roomId) {
     }, [roomId]);
   
     function handleNewMessage(message) {
+      // Debugging: Log the received message
+      console.log("Received:", message);
+  
       setMessages((previousMessages) => [message, ...previousMessages]);
     }
   

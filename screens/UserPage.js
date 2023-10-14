@@ -64,7 +64,8 @@ export default UserPage = ({ navigation, route }) => {
         let roomId = await generateRoom(userId, currId);
         console.log(roomId);
         navigation.navigate("Chat", {
-            roomId: roomId
+            roomId: roomId,
+            userName: username
         });
     }
     // Unfollow user
