@@ -48,6 +48,7 @@ const Recommendations = ({ navigation, route }) => {
       reviewArray = doc.data().reviews;
       printReviews();
       getTopUserArtists();
+      fetchRecommendedSongs();
     });
   }, []);
 
@@ -131,71 +132,83 @@ async function fetchSimilarArtists(artists) {
   }
 }
 
-  async function fetchRecommendedSongs() {
-    if (inputSong) {
-      const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; // Replace with your API key
-      const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${favouriteArtist}&track=${inputSong}&api_key=${apiKey}&format=json`;
+function getTopRatedReview(reviews) {
+  const maxRating = Math.max(...reviews.map(review => review.rating));
+  const topRatedReviews = reviews.filter(review => review.rating === maxRating);
+
+  // If there are multiple reviews with the highest rating, pick a random one.
+  const randomReview = topRatedReviews[Math.floor(Math.random() * topRatedReviews.length)];
   
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-  
-        const data = await response.json();
-  
-        if (data.similartracks && data.similartracks.track) {
-          setApiResponseSongs(data);
-        } else {
-          // Handle the case where the response does not contain the expected data structure
-          console.error('Invalid API response format for song recommendations');
-        }
-      } catch (error) {
-        console.error(error);
+  return randomReview;
+}
+
+async function fetchRecommendedSongs() {
+  const topReview = getTopRatedReview(reviews);
+  if (topReview) {
+    const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 
+    const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${topReview.artistName}&track=${topReview.songName}&api_key=${apiKey}&format=json`;
+    
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
+
+      const data = await response.json();
+      if (data.similartracks && data.similartracks.track) {
+        setApiResponseSongs(data);
+      } else {
+        console.error('Invalid API response format for song recommendations');
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
+}
   
 
-  return (
-    <View>
+return (
+  <View>
 
       <View>
-        <Text style={styles.header}>Recommended Artists</Text>
-        <FlatList
-          data={apiResponse && apiResponse.slice(0, 7)}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-              <Text style={styles.artistName}>{item}</Text>
-          )}
-        />
-      </View>
-      <View style={styles.songInputContainer}>
-        <Text style={styles.header}>Enter a Song:</Text>
-        <TextInput
-          style={styles.songInput}
-          value={inputSong}
-          onChangeText={(text) => setInputSong(text)}
-        />
-        <Button
-          title="Get Recommended Songs"
-          onPress={fetchRecommendedSongs}
-        />
-        {apiResponseSongs && (
-          <View>
-            <Text style={styles.header}>Recommended Songs</Text>
-            <FlatList
-              data={apiResponseSongs && apiResponseSongs.similartracks.track.slice(0, 7)}
+          <Text style={styles.header}>Recommended Artists For You</Text>
+          <FlatList
+              data={apiResponse && apiResponse.slice(0, 7)}
               keyExtractor={(item, index) => index.toString()}
               renderItem={({ item }) => (
-                <Text style={styles.artistName}>{item.name}</Text>
+                  <Text style={styles.artistName}>{item}</Text>
               )}
-            />
-          </View>
-        )}
+          />
       </View>
-    </View>
-  );
+
+      <View>
+          <Text style={styles.header}>Recommended Songs For You</Text>
+          {apiResponseSongs && (
+              <FlatList
+                  data={apiResponseSongs.similartracks.track.slice(0, 6)}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({ item }) => (
+                      <Text style={styles.artistName}>{item.name}</Text>
+                  )}
+              />
+          )}
+      </View>
+
+      <View style={styles.songInputContainer}>
+          {/* You can keep this section if you still want users to fetch songs for a specific input. If not, you can remove it. */}
+          <Text style={styles.header}>Enter a Song:</Text>
+          <TextInput
+              style={styles.songInput}
+              value={inputSong}
+              onChangeText={(text) => setInputSong(text)}
+          />
+          <Button
+              title="Get Recommended Songs"
+              onPress={fetchRecommendedSongs}
+          />
+      </View>
+  </View>
+);
 };
 
 const styles = StyleSheet.create({
