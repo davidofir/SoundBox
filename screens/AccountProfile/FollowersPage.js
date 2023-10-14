@@ -39,7 +39,7 @@ export default FollowersPage = ({ navigation, route }) => {
     };
 
     const onPressItem = (item) => {
-        navigation.navigate('UserPage', { item });
+        navigation.replace('UserPage', { item });
     };
 
     return (
