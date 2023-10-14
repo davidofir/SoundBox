@@ -18,7 +18,7 @@ import FollowingPage from './screens/AccountProfile/FollowingPage';
 import SearchPage from './screens/SearchPage';
 import UserPage from './screens/UserPage';
 import Recommendations from './screens/Recommendation';
-import Chat from './screens/Chat';
+import Chat from './screens/Chat/Chat';
 const Stack = createStackNavigator();
 export default function App() {
   return (
