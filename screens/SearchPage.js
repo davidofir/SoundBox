@@ -17,175 +17,188 @@ var data = [
     // ...
 ];
 
+
 export default SearchPage = ({ navigation }) => {
     const [selectedSearchIndex, setSelectedSearchIndex] = useState(0);
     const [search, setSearch] = useState('');
     const [results, setResults] = useState([]);
     const [isArtist, setIsArtist] = useState(false);
+    const [searchStatus, setSearchStatus] = useState('idle');
+  
     const { events, getEventsByArtistName, artistProfile, getArtistProfile } = useViewModel();
-    const searchOptions = ['Users', 'Artists']
-    useEffect(() => {
-        if(!isArtist){
-            const userRef = collection(db, "users");
-            getDocs(userRef)
-                .then((snapshot) => {
-                    let users = []
-                    snapshot.docs.forEach((doc) => {
-                        users.push({ ...doc.data(), id: doc.id })
-                    })
-                    data = users;
-                })
-        }
+    const searchOptions = ['Users', 'Artists'];
 
-    },[isArtist])
     useEffect(() => {
-        if (isArtist) {
-            if(events.length>0 || search.length == 0){
-                getArtistProfile();
-            }else{
-                setResults([]);
+      if (!isArtist) {
+        const userRef = collection(db, 'users');
+        getDocs(userRef).then((snapshot) => {
+          let users = [];
+          snapshot.docs.forEach((doc) => {
+            users.push({ ...doc.data(), id: doc.id });
+          });
+          data = users;
+        });
+      }
+    }, [isArtist]);
+
+    useEffect(() => {
+      if (isArtist) {
+        if (events.length > 0 || search.length === 0) {
+          getArtistProfile();
+        } else {
+          setResults([]);
+          setSearchStatus('not_found');
+        }
+      }
+    }, [events]);
+
+    useEffect(() => {
+      if (isArtist && events.length > 0) {
+        const newResults = [{ id: '123', text: artistProfile.artistName, image: artistProfile.profilePic }];
+        setResults(newResults);
+        setSearchStatus(newResults.length > 0 ? 'found' : 'not_found');
+      }
+    }, [artistProfile]);
+
+    const handleSearch = () => {
+        setSearchStatus('searching');
+        if (search.length > 0) {
+            if (selectedSearchIndex === 0) {
+                const newResults = data.filter((item) => item.userName.includes(search));
+                setIsArtist(false);
+                setResults(newResults);
+                setSearchStatus(newResults.length > 0 ? 'found' : 'not_found');
+            } else if (selectedSearchIndex === 1) {
+                setIsArtist(true);
+                getEventsByArtistName(search, 'upcoming');
             }
-
+        } else {
+            setSearchStatus('idle');
+            setResults([]);
         }
-    }, [events])
-    useEffect(() => {
-        if (isArtist && events.length > 0) {
-            setResults([{ id: "123", text: artistProfile.artistName, image: artistProfile.profilePic }])
-        }
-
-    }, [artistProfile])
-    const onChangeSearch = (text) => {
-
-        if(search.length > 0){
-        if (selectedSearchIndex == 0) {
-            const newResults = data.filter(item => item.userName.includes(text));
-            setIsArtist(false);
-            setResults(newResults);
-        } else if(selectedSearchIndex == 1) {
-            setIsArtist(true);
-            getEventsByArtistName(search, "upcoming");
-        }
-    }else{
-        setResults([]);
-    }
     };
 
     const onPressItem = (item) => {
-        if (!isArtist) {
-            navigation.navigate('UserPage', { item });
-        } else {
-            navigation.navigate("Artist", { artistProfile: artistProfile, events: events })
-        }
-
+      if (!isArtist) {
+        navigation.navigate('UserPage', { item });
+      } else {
+        navigation.navigate('Artist', { artistProfile: artistProfile, events: events });
+      }
     };
+
     const handleSearchIndexSelect = (index) => {
-        //handle tab selection for custom Tab Selection SegmentedControlTab
-        setSelectedSearchIndex(index);
+      setSelectedSearchIndex(index);
     };
-    return (
-        <View style={styles.container}>
-            <View style={styles.searchContainer}>
-                <SegmentedControlTab
-                    values={searchOptions}
-                    selectedIndex={selectedSearchIndex}
-                    onTabPress={handleSearchIndexSelect}
-                />
-            </View>
-            <View style={styles.searchContainerArea}>
-                <View style={styles.searchContainerField}>
-                    <View style={{ flex: 1 }}>
-                        <TextInput
-                            style={styles.searchInput}
-                            value={search}
-                            onChangeText={setSearch}
-                            placeholder={`Search ${searchOptions[selectedSearchIndex].toLocaleLowerCase()}`}
-                        />
-                    </View>
-                    <View style={{ padding: 5 }}>
-                        <TouchableOpacity onPress={() => onChangeSearch(search)}>
-                            <AntDesign name="search1" size={24} color="black" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </View>
-            {results.length > 0 && (
-                <View style={styles.searchResultContainer}>
-                    <Text style={styles.searchResultText}>
-                        {`${results.length} results found`}
-                    </Text>
-                </View>
-            )}
-            {results.length > 0 && (
-                <FlatList
-                    data={results}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity onPress={() => onPressItem(item)}>
-                            <View style={styles.item}>
-                                <Image source={isArtist ? { uri: item.image } : require("../assets/defaultPic.png")} style={styles.itemImage} />
-                                { isArtist ? <Text>{artistProfile.artistName}</Text> : <Text style={styles.itemText}>Username: {item.userName}</Text>}
-                            </View>
-                        </TouchableOpacity>
-                    )}
-                    keyExtractor={item => item.id}
-                />
-            )}
-        </View>
-    )
-}
 
+    return (
+      <View style={styles.container}>
+        <View style={styles.searchContainer}>
+          <SegmentedControlTab
+            values={searchOptions}
+            selectedIndex={selectedSearchIndex}
+            onTabPress={handleSearchIndexSelect}
+          />
+        </View>
+        <View style={styles.searchContainerArea}>
+          <View style={styles.searchContainerField}>
+            <View style={{ flex: 1 }}>
+              <TextInput
+                style={styles.searchInput}
+                value={search}
+                onChangeText={text => {
+                  setSearch(text);
+                  if (text.length === 0) {
+                    setSearchStatus('idle');
+                  }
+                }}
+                placeholder={`Search ${searchOptions[selectedSearchIndex].toLocaleLowerCase()}`}
+                onSubmitEditing={handleSearch}
+              />
+            </View>
+            <View style={{ padding: 5 }}>
+              <TouchableOpacity onPress={handleSearch}>
+                <AntDesign name="search1" size={24} color="black" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+        <View style={styles.searchResultContainer}>
+          {searchStatus === 'not_found' && search.length > 0 && (
+            <Text style={styles.searchResultText}>
+              {isArtist ? 'Artist not found' : 'User not found'}
+            </Text>
+          )}
+          {searchStatus === 'found' && (
+            <Text style={styles.searchResultText}>{`${results.length} results found`}</Text>
+          )}
+          {searchStatus === 'searching' && <Text style={styles.searchResultText}>Searching...</Text>}
+        </View>
+        {results.length > 0 && (
+          <FlatList
+            data={results}
+            renderItem={({ item }) => (
+              <TouchableOpacity onPress={() => onPressItem(item)}>
+                <View style={styles.item}>
+                  <Image source={isArtist ? { uri: item.image } : require('../assets/defaultPic.png')} style={styles.itemImage} />
+                  {isArtist ? <Text>{artistProfile.artistName}</Text> : <Text style={styles.itemText}>Username: {item.userName}</Text>}
+                </View>
+              </TouchableOpacity>
+            )}
+            keyExtractor={item => item.id}
+          />
+        )}
+      </View>
+    );
+};
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-    },
-    searchContainerArea:{
-        marginVertical:"10%"
+        backgroundColor: Colors.lightgrey,
     },
     searchContainer: {
-        width: '90%',
-        marginTop: 20,
+        padding: 10,
+        marginTop: StatusBar.currentHeight,
+    },
+    searchContainerArea: {
+        padding: 10,
     },
     searchContainerField: {
-        width: '90%',
-        flexDirection: "row"
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 15,
+        backgroundColor: 'white',
+        paddingLeft: 10,
+        paddingRight: 10,
+        elevation: 2,
     },
     searchInput: {
+        flex: 1,
         height: 40,
-        backgroundColor: '#ddd',
-        borderRadius: 5,
         padding: 10,
-        fontSize: 18,
     },
     searchResultContainer: {
-        marginTop: 20,
-        width: '90%',
+        padding: 10,
     },
     searchResultText: {
-        fontSize: 18,
+        fontSize: 14,
+        color: Colors.text,
     },
     item: {
         flexDirection: 'row',
-        padding: 10,
-        marginVertical:10,
-        width: '100%',
-        backgroundColor: '#ddd',
-        borderRadius: 20,
+        padding: 15,  // Increase padding
+        marginVertical: 8,  // Adjust the margin between items
+        backgroundColor: '#fff',  // Use a white or light gray background
+        borderRadius: 10,  // Rounded edges for a modern look
         alignItems: 'center',
-        minWidth:"70%",
-
+        shadowColor: "#000",
     },
     itemImage: {
         width: 50,
         height: 50,
+        borderRadius: 25,
         marginRight: 10,
-        borderRadius:15
     },
     itemText: {
-        fontSize: 18,
-    },
-    segmentContainer: {
-        backgroundColor: '#fff',
-        alignItems: 'center',
+        fontSize: 16,
     },
 });
