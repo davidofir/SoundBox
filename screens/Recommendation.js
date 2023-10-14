@@ -15,6 +15,7 @@ import {
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { authentication, db } from "../firebase";
 import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import axios from 'axios';
 
 
 
@@ -62,76 +63,56 @@ const Recommendations = ({ navigation, route }) => {
   }
 
   async function getTopUserArtists() {
-    // for each review
-    var meanReviewList = [];
-    for (let i = 0; i < reviewCount; i++) {
-      // get the current artist name
-      currentArtist = reviewArray[i].artistName;
-      currentReview = reviewArray[i].rating;
-      // load current review and put artist and rating into an array
+    const artistMap = new Map();
+    const lambda = 0.5; // Might need to adjust after further testing and more reviews are made
 
-      // value = true if the current artist is already in the list | else = false
-      var isAlreadyInList = meanReviewList.some(
-        (product) => product.name.includes(currentArtist)
-      );
+    // Build the map with aggregate ratings and counts.
+    reviewArray.forEach(review => {
+        const { artistName, rating } = review;
 
-      // check if the artist is already in the list
-      if (isAlreadyInList == true) {
-        // get the index of the artist
-        artistIndex = meanReviewList.findIndex(
-          (obj) => obj.name === currentArtist
-        );
+        if (artistMap.has(artistName)) {
+            const currentArtistData = artistMap.get(artistName);
+            artistMap.set(artistName, {
+                rating: currentArtistData.rating + rating,
+                count: currentArtistData.count + 1,
+            });
+        } else {
+            artistMap.set(artistName, {
+                rating: rating,
+                count: 1,
+            });
+        }
+    });
 
-        // add one to the count
-        meanReviewList[artistIndex].count++;
-        // add the review score to that total artist's score
-        meanReviewList[artistIndex].rating +=
-          currentReview;
-      } else {
-        // if the artist is not already in the list, add it
-        meanReviewList.push({
-          name: reviewArray[i].artistName,
-          rating: reviewArray[i].rating,
-          count: 1,
-        });
-      }
-    }
-    // console.log(meanReviewList);
+    // Convert Map to Array and calculate the mean and weighted score for each artist.
+    const meanReviewList = Array.from(artistMap.entries()).map(([name, data]) => {
+        const averageRating = data.rating / data.count;
+        return {
+            name: name,
+            rating: averageRating,
+            count: data.count,
+            weightedScore: averageRating + (lambda * data.count)
+        };
+    });
 
-    var finalListCount = meanReviewList.length;
-    var totalScore = 0;
-    // take the average of each of the reviews now in the list
-    for (let j = 0; j < finalListCount; j++) {
-      // get the current artist name
-
-      // for each of the reviews
-      // find the mean by dividing total score of reviews by the amount of reviews for that artist
-      totalScore = meanReviewList[j].rating / meanReviewList[j].count;
-
-      // put the total score back in the review array
-      meanReviewList[j].rating = totalScore;
-    }
-    console.log(meanReviewList);
-
-    // get the artist with the highest rating
-    favouriteArtist = meanReviewList.find(
-      (member) => member.rating
-    ).name;
+    // Find the artist with the highest weighted score.
+    favouriteArtist = meanReviewList.reduce((topArtist, currentArtist) => {
+        return (topArtist.weightedScore > currentArtist.weightedScore) ? topArtist : currentArtist;
+    }).name;
 
     fetchSimilarArtists();
-  }
+}
+
 
   async function fetchSimilarArtists() {
-    if (favouriteArtist) {
-      const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca';
-      const url = `http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${favouriteArtist}&api_key=${apiKey}&format=json`;
-
-      return fetch(url)
-        .then((response) => response.json())
-        .then((data) => setApiResponse(data)) // Store the API response in state
-        .catch((error) => console.error(error));
+    try {
+       const response = await axios.get(`http://192.168.1.133:8080/recommend?artist_name=${favouriteArtist}`);
+       console.log('Response:', response.data);
+       setApiResponse(response.data.recommended_artists);
+    } catch (error) {
+       console.error('Fetch error:', error);
     }
-  }
+ }
 
   async function fetchRecommendedSongs() {
     if (inputSong) {
@@ -165,10 +146,10 @@ const Recommendations = ({ navigation, route }) => {
       <View>
         <Text style={styles.header}>Recommended Artists</Text>
         <FlatList
-          data={apiResponse && apiResponse.similarartists.artist.slice(0, 7)}
+          data={apiResponse && apiResponse.slice(0, 7)}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
-            <Text style={styles.artistName}>{item.name}</Text>
+              <Text style={styles.artistName}>{item}</Text>
           )}
         />
       </View>

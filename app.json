@@ -1,7 +1,15 @@
 {
   "expo": {
     "slug": "soundbox",
-    "name": "soundbox"
+    "name": "soundbox",
+    "ios": {
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    }
+    
   },
   "name": "soundbox"
 }
