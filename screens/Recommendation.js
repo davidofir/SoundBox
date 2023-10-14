@@ -95,24 +95,41 @@ const Recommendations = ({ navigation, route }) => {
         };
     });
 
-    // Find the artist with the highest weighted score.
-    favouriteArtist = meanReviewList.reduce((topArtist, currentArtist) => {
-        return (topArtist.weightedScore > currentArtist.weightedScore) ? topArtist : currentArtist;
-    }).name;
+  // Find the top 2 artists with the highest weighted scores.
+  meanReviewList.sort((a, b) => b.weightedScore - a.weightedScore);
+  const topTwoArtists = meanReviewList.slice(0, 2).map(artist => artist.name);
 
-    fetchSimilarArtists();
+  fetchSimilarArtists(topTwoArtists);
 }
 
 
-  async function fetchSimilarArtists() {
-    try {
-       const response = await axios.get(`http://192.168.1.133:8080/recommend?artist_name=${favouriteArtist}`);
-       console.log('Response:', response.data);
-       setApiResponse(response.data.recommended_artists);
-    } catch (error) {
-       console.error('Fetch error:', error);
+async function fetchSimilarArtists(artists) {
+  try {
+    const artistResponses = await Promise.all(
+      artists.map(artist => axios.get(`http://192.168.1.133:8080/recommend?artist_name=${artist}`))
+    );
+
+    const combinedArtists = [];
+    const addedArtistsSet = new Set();
+
+    // Iterate over each API response
+    for (let response of artistResponses) {
+      // Iterate over each recommended artist
+      for (let artist of response.data.recommended_artists) {
+        // Check if we already added this artist or if we reached the limit of 6
+        if (!addedArtistsSet.has(artist) && combinedArtists.length < 6) {
+          combinedArtists.push(artist);
+          addedArtistsSet.add(artist);
+        }
+      }
     }
- }
+
+    setApiResponse(combinedArtists);
+
+  } catch (error) {
+    console.error('Fetch error:', error);
+  }
+}
 
   async function fetchRecommendedSongs() {
     if (inputSong) {
