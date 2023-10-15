@@ -8,9 +8,7 @@ import {
   Keyboard,
   Button,
   FlatList,
-  Image,
-  Alert,
-  TouchableWithoutFeedback,
+  ScrollView
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { authentication, db } from "../firebase";
@@ -33,7 +31,8 @@ const Recommendations = ({ navigation, route }) => {
   var favouriteArtist = '';
   const [apiResponse, setApiResponse] = useState(null); // Added state to store API response
   const [apiResponseSongs, setApiResponseSongs] = useState(null); // Added state to store song recommendations
-
+  const [inputArtist, setInputArtist] = useState('');
+  const [searchResults, setSearchResults] = useState(null);
   // Query Firestore database with current UID
 
   useEffect(() => {
@@ -46,11 +45,21 @@ const Recommendations = ({ navigation, route }) => {
       reviewCount = doc.data().reviews.length;
       // Get the array of reviews
       reviewArray = doc.data().reviews;
-      printReviews();
+      
       getTopUserArtists();
       fetchRecommendedSongs();
+      
+
+
     });
   }, []);
+
+  useEffect(() => {
+    if (reviews && reviews.length > 0) {
+      
+      fetchRecommendedSongs();
+    }
+  }, [reviews]);
 
   function printReviews() {
     reviews.forEach((item, index) => {
@@ -163,51 +172,79 @@ async function fetchRecommendedSongs() {
     } catch (error) {
       console.error(error);
     }
+    
   }
 }
+
+async function fetchRecommendedSongsForSearch(artist, song) {
+  const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 
+  const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${artist}&track=${song}&api_key=${apiKey}&format=json`;
   
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    if (data.similartracks && data.similartracks.track) {
+      setSearchResults(data); // Save the search results to the new state
+  } else {
+      console.error('Invalid API response format for song recommendations');
+  }
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 return (
-  <View>
+  <ScrollView style={{flex: 1}} contentContainerStyle={{padding: 5}}>
 
-      <View>
-          <Text style={styles.header}>Recommended Artists For You</Text>
-          <FlatList
-              data={apiResponse && apiResponse.slice(0, 7)}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                  <Text style={styles.artistName}>{item}</Text>
-              )}
-          />
-      </View>
+    <View>
+      <Text style={styles.header}>Recommended Artists For You</Text>
+      {apiResponse && apiResponse.slice(0, 7).map((item, index) => (
+        <Text key={index} style={styles.artistName}>{item}</Text>
+      ))}
+    </View>
 
-      <View>
-          <Text style={styles.header}>Recommended Songs For You</Text>
-          {apiResponseSongs && (
-              <FlatList
-                  data={apiResponseSongs.similartracks.track.slice(0, 6)}
-                  keyExtractor={(item, index) => index.toString()}
-                  renderItem={({ item }) => (
-                      <Text style={styles.artistName}>{item.name}</Text>
-                  )}
-              />
-          )}
-      </View>
+    <View>
+      <Text style={styles.header}>Recommended Songs For You</Text>
+      {apiResponseSongs && apiResponseSongs.similartracks.track.slice(0, 6).map((item, index) => (
+        <Text key={index} style={styles.artistName}>{item.name}</Text>
+      ))}
+    </View>
 
-      <View style={styles.songInputContainer}>
-          {/* You can keep this section if you still want users to fetch songs for a specific input. If not, you can remove it. */}
-          <Text style={styles.header}>Enter a Song:</Text>
-          <TextInput
-              style={styles.songInput}
-              value={inputSong}
-              onChangeText={(text) => setInputSong(text)}
-          />
-          <Button
-              title="Get Recommended Songs"
-              onPress={fetchRecommendedSongs}
-          />
-      </View>
-  </View>
+    <View style={styles.songInputContainer}>
+      <Text style={styles.header}>Search for a Song:</Text>
+      <Text>Artist:</Text>
+      <TextInput
+          style={styles.songInput}
+          value={inputArtist}
+          onChangeText={(text) => setInputArtist(text)}
+          placeholder="Enter artist name"
+      />
+      <Text>Song:</Text>
+      <TextInput
+          style={styles.songInput}
+          value={inputSong}
+          onChangeText={(text) => setInputSong(text)}
+          placeholder="Enter song name"
+      />
+      <Button
+          title="Get Recommended Songs"
+          onPress={() => fetchRecommendedSongsForSearch(inputArtist, inputSong)}
+      />
+      {searchResults && (
+        <View>
+          <Text style={styles.header}>Search Results:</Text>
+          {searchResults.similartracks.track.slice(0, 6).map((item, index) => (
+            <Text key={index} style={styles.artistName}>{item.name}</Text>
+          ))}
+        </View>
+      )}
+    </View>
+
+  </ScrollView>
 );
 };
 
