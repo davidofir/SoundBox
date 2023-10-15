@@ -61,6 +61,7 @@ const Recommendations = ({ navigation, route }) => {
     }
   }, [reviews]);
 
+/*
   function printReviews() {
     reviews.forEach((item, index) => {
       console.log(`Review ${index}:`);
@@ -71,6 +72,7 @@ const Recommendations = ({ navigation, route }) => {
       console.log('------------------');
     });
   }
+*/
 
   async function getTopUserArtists() {
     const artistMap = new Map();
@@ -197,20 +199,30 @@ async function fetchRecommendedSongsForSearch(artist, song) {
   }
 }
 
+const ArtistItem = ({ artistName }) => (
+  <View style={styles.artistItemContainer}>
+    <View style={styles.circle} />
+    <Text style={styles.artistName}>{artistName}</Text>
+  </View>
+);
+
 return (
   <ScrollView style={{flex: 1}} contentContainerStyle={{padding: 5}}>
 
     <View>
-      <Text style={styles.header}>Recommended Artists For You</Text>
-      {apiResponse && apiResponse.slice(0, 7).map((item, index) => (
-        <Text key={index} style={styles.artistName}>{item}</Text>
-      ))}
+      <Text style={styles.header}>Recommended Artists</Text>
+      <FlatList 
+          data={apiResponse && apiResponse.slice(0, 7)}
+          horizontal={true}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <ArtistItem artistName={item} />}
+      />
     </View>
 
     <View>
       <Text style={styles.header}>Recommended Songs For You</Text>
       {apiResponseSongs && apiResponseSongs.similartracks.track.slice(0, 6).map((item, index) => (
-        <Text key={index} style={styles.artistName}>{item.name}</Text>
+        <Text key={index} style={styles.ArtistName}>{item.name}</Text>
       ))}
     </View>
 
@@ -304,7 +316,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  artistName: {
+  SongName: {
     fontSize: 18,
     marginVertical: 5,
   },
@@ -317,6 +329,35 @@ const styles = StyleSheet.create({
     padding: 8,
     fontSize: 16,
     marginVertical: 10,
+  },
+  flatListContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'top', 
+  },
+  artistItemContainer: {
+    flex: 1,
+    flexDirection: 'row',  // change this to row
+    alignItems: 'center',  // vertically aligns both circle and text
+    justifyContent: 'flex-start',
+    padding: 5,
+    width: '100%',  // adjust as needed
+  },
+
+  circle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 5,  // space between the circle and the text
+    backgroundColor: 'lightgray'
+  },
+
+  artistName: {
+    fontSize: 14,
+    textAlign: 'left',
+    paddingHorizontal: 8,
+    flexShrink: 1,   // allows the text to shrink if needed
+    width: '70%',    // adjust this as needed based on your design
   },
 });
 
