@@ -208,7 +208,37 @@ const ArtistItem = ({ artistName }) => (
 
 return (
   <ScrollView style={{flex: 1}} contentContainerStyle={{padding: 5}}>
-
+<View style={styles.songInputContainer}>
+    <Text style={styles.topHeader}>Find Similar Songs</Text>
+    
+    <TextInput
+        style={styles.songInput}
+        value={inputSong}
+        onChangeText={(text) => setInputSong(text)}
+        placeholder="Song name"
+        placeholderTextColor="gray"
+    />
+    <TextInput
+        style={styles.songInput}
+        value={inputArtist}
+        onChangeText={(text) => setInputArtist(text)}
+        placeholder="Artist name"
+        placeholderTextColor="gray"
+    />
+  
+      <Button
+          title="Get Recommended Songs"
+          onPress={() => fetchRecommendedSongsForSearch(inputArtist, inputSong)}
+      />
+      {searchResults && (
+        <View>
+          <Text style={styles.header}>Search Results:</Text>
+          {searchResults.similartracks.track.slice(0, 6).map((item, index) => (
+            <Text key={index} style={styles.artistName}>{item.name}</Text>
+          ))}
+        </View>
+      )}
+    </View>
     <View>
       <Text style={styles.header}>Recommended Artists</Text>
       <FlatList 
@@ -226,35 +256,7 @@ return (
       ))}
     </View>
 
-    <View style={styles.songInputContainer}>
-      <Text style={styles.header}>Search for a Song:</Text>
-      <Text>Artist:</Text>
-      <TextInput
-          style={styles.songInput}
-          value={inputArtist}
-          onChangeText={(text) => setInputArtist(text)}
-          placeholder="Enter artist name"
-      />
-      <Text>Song:</Text>
-      <TextInput
-          style={styles.songInput}
-          value={inputSong}
-          onChangeText={(text) => setInputSong(text)}
-          placeholder="Enter song name"
-      />
-      <Button
-          title="Get Recommended Songs"
-          onPress={() => fetchRecommendedSongsForSearch(inputArtist, inputSong)}
-      />
-      {searchResults && (
-        <View>
-          <Text style={styles.header}>Search Results:</Text>
-          {searchResults.similartracks.track.slice(0, 6).map((item, index) => (
-            <Text key={index} style={styles.artistName}>{item.name}</Text>
-          ))}
-        </View>
-      )}
-    </View>
+   
 
   </ScrollView>
 );
@@ -311,10 +313,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
+  
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
+    marginTop: 25,
+  },
+  topHeader: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    marginTop: 0,
   },
   SongName: {
     fontSize: 18,
@@ -328,13 +338,16 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     padding: 8,
     fontSize: 16,
-    marginVertical: 10,
-  },
+    marginVertical: 5,
+    borderRadius: 15,  
+    
+},
   flatListContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'top', 
   },
+  
   artistItemContainer: {
     flex: 1,
     flexDirection: 'row',  // change this to row
