@@ -35,7 +35,20 @@ export default Store = ({ route, navigation }) => {
             </View>
         );
     }
-
+    if (Array.isArray(merch) && merch.length === 0) {
+        return (
+            <View style={styles.centered}>
+                <Text>No merch found</Text>
+            </View>
+        );
+    }
+    if (merch.error) {
+        return (
+            <View style={styles.centered}>
+                <Text>{merch.userMessage}</Text>
+            </View>
+        );
+    }
     return (
         <View style={styles.container}>
             <FlatList
