@@ -19,6 +19,7 @@ import SearchPage from './screens/SearchPage';
 import UserPage from './screens/UserPage';
 import Recommendations from './screens/Recommendation';
 import Chat from './screens/Chat/Chat';
+import EditAccountPage from './screens/AccountProfile/EditAccountPage';
 const Stack = createStackNavigator();
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
         <Stack.Screen name="UserPage" component={UserPage} />
         <Stack.Screen name="Recommendations" component={Recommendations} />
         <Stack.Screen name="Chat" component={Chat} />
+        <Stack.Screen name="EditAccount" component={EditAccountPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

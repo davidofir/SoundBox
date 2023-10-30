@@ -45,125 +45,110 @@ export default ProfilePage = ({ navigation }) => {
     */
 
     return (
-        <View>
-            <View style={styles.backgroundContainer}>
-                <View style={styles.verticalProfileContainer}>
-                    <View style={[styles.horizontalProfileContainer, { padding: 6 }]}>
-                        <View style={styles.circle}>
-                            <Image source={require("../../assets/defaultPic.png")} style={styles.circle} />
-                        </View>
-                        <Text>Username: {username}</Text>
-                    </View>
+        <View style={styles.container}>
+            <View style={styles.headerContainer}>
+                <Image source={require('../../assets/defaultPic.png')} style={styles.profileImage} />
+                <Text style={styles.username}>{username}</Text>
+                <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("EditAccount")}>
+                    <Text style={styles.editButtonText}>Edit Account</Text>
+                </TouchableOpacity>
+            </View>
+            <View style={styles.statsContainer}>
+                <View style={styles.statsBox}>
+                    <Text style={styles.statsValue}>0</Text>
+                    <Text style={styles.statsLabel}>Posts</Text>
                 </View>
-                <View style={styles.followContainer}>
-                    <View style={styles.statsBox}>
-                        <Text style={[styles.text, styles.subText]}>Posts</Text>
-                        <Text style={[styles.text, { fontSize: 24 }]}>0</Text>
-                    </View>
-                    <View style={[styles.statsBox, { borderColor: "#DFD8C8", borderLeftWidth: 1, borderRightWidth: 1 }]}>
-                        <Text style={[styles.text, styles.subText]}>Followers</Text>
-                        <Text onPress={navigateToFollowers} style={[styles.text, { fontSize: 24 }]}>{followers.length}</Text>
-                    </View>
-                    <View style={styles.statsBox}>
-                        <Text style={[styles.text, styles.subText]}>Following</Text>
-                        <Text onPress={navigateToFollowing} style={[styles.text, { fontSize: 24 }]}>{following.length}</Text>
-                    </View>
+                <View style={styles.statsBox}>
+                    <Text onPress={navigateToFollowers} style={styles.statsValue}>{followers.length}</Text>
+                    <Text style={styles.statsLabel}>Followers</Text>
+                </View>
+                <View style={styles.statsBox}>
+                    <Text onPress={navigateToFollowing} style={styles.statsValue}>{following.length}</Text>
+                    <Text style={styles.statsLabel}>Following</Text>
                 </View>
             </View>
-            <View>
-                <Text style={[styles.text, { fontSize: 18, padding: 10, paddingBottom: 0 }]}>POSTS</Text>
-            </View>
-            <View style={styles.container2}>
-                <FlatList
-                    data={reviews}
-                    renderItem={({ item }) => (
-                        <View style={styles.item}>
-                            <Text style={styles.itemText}>
-                                Artist: {item.artistName}{"\n"}
-                                Review: {item.review}{"\n"}
-                                Rating: {item.rating}{"\n"}
-                                Song: {item.songName}
-                            </Text>
-                        </View>
-                    )}
-                />
-            </View>
+            <FlatList
+                data={reviews}
+                renderItem={({ item }) => (
+                    <View style={styles.postItem}>
+                        <Text style={styles.artistName}>Artist: {item.artistName}</Text>
+                        <Text style={styles.reviewText}>Review: {item.review}</Text>
+                        <Text style={styles.ratingText}>Rating: {item.rating}</Text>
+                        <Text style={styles.songName}>Song: {item.songName}</Text>
+                    </View>
+                )}
+            />
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-    verticalProfileContainer: {
-        flexDirection: "row",
-        alignItems: 'flex-start',
-        margin: 10,
-        width: 'auto',
-        height: "auto"
-
+    container: {
+        flex: 1,
+        backgroundColor: 'white',
+        padding: 16,
     },
-    backgroundContainer: {
-        backgroundColor: "white"
-    },
-    container2: {
+    headerContainer: {
         alignItems: 'center',
-        justifyContent: 'center',
-        height: "100%",
-        paddingTop: 5,
+        marginBottom: 20,
     },
-    item: {
-        flexDirection: "row",
-        marginTop: 10,
-        padding: 10,
-        width: "100%",
-        backgroundColor: "#ddd",
-        borderRadius: 5,
-        alignItems: "center",
-    },
-    itemImage: {
-        width: 50,
-        height: 50,
-        marginRight: 10,
-    },
-    itemText: {
-        fontSize: 35
-    },
-    horizontalProfileContainer: {
-        flex: 2,
-        alignItems: 'center',
-        justifyContent: "flex-start",
-        marginLeft: 15,
-        flexDirection: "row"
-    },
-    circle: {
+    profileImage: {
         width: 100,
         height: 100,
-        backgroundColor: "black",
-        marginRight: 10,
-        borderRadius: 100,
+        borderRadius: 50,
     },
-    followContainer: {
-        flexDirection: "row",
-        alignSelf: "center",
-        marginTop: 15
+    username: {
+        fontSize: 18,
+        marginVertical: 10,
+    },
+    editButton: {
+        backgroundColor: '#3498db',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+    },
+    editButtonText: {
+        color: 'white',
+        fontSize: 16,
+    },
+    statsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        marginBottom: 20,
     },
     statsBox: {
-        alignItems: "center",
+        alignItems: 'center',
         flex: 1,
-        paddingBottom: 15
     },
-    subText: {
+    statsValue: {
+        fontSize: 24,
+        fontWeight: 'bold',
+    },
+    statsLabel: {
+        color: '#AEB5BC',
         fontSize: 12,
-        color: "#AEB5BC",
-        textTransform: "uppercase",
-        fontWeight: "500"
     },
-    verticalImageContainer: {
-        width: 370,
-        height: 250,
-        borderRadius: 12,
-        backgroundColor: "grey",
-        overflow: "hidden",
-        marginVertical: 6,
-        marginHorizontal: 10
-    }
+    postItem: {
+        marginBottom: 10,
+        padding: 16,
+        backgroundColor: '#f2f2f2',
+        borderRadius: 10,
+    },
+    artistName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    reviewText: {
+        fontSize: 14,
+        marginTop: 5,
+    },
+    ratingText: {
+        fontSize: 14,
+        marginTop: 5,
+    },
+    songName: {
+        fontSize: 14,
+        marginTop: 5,
+    },
 })
