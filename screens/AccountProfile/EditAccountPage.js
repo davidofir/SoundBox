@@ -27,12 +27,14 @@ export default EditAccountPage = ({ navigation }) => {
                 <Text style={styles.sectionTitle}>Username</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Full Name"
+                    placeholder={username}
+                    placeholderTextColor="black"
                 />
                 <Text style={styles.sectionTitle}>Email</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Bio"
+                    placeholder="Email"
+                    placeholderTextColor="black"
                 />
                 <TouchableOpacity style={styles.saveButton}>
                     <Text style={styles.saveButtonText}>Save Changes</Text>

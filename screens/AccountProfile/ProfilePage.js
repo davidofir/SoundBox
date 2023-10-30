@@ -55,7 +55,7 @@ export default ProfilePage = ({ navigation }) => {
             </View>
             <View style={styles.statsContainer}>
                 <View style={styles.statsBox}>
-                    <Text style={styles.statsValue}>0</Text>
+                    <Text style={styles.statsValue}>{reviews.length}</Text>
                     <Text style={styles.statsLabel}>Posts</Text>
                 </View>
                 <View style={styles.statsBox}>
