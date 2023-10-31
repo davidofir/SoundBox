@@ -130,9 +130,9 @@ const RatingPage = ({ navigation, route }) => {
                 style={styles.starImgStyle}
                 source={
                   item <= defaultRating
-                  //MUST CHANGE IMAGE URL ________________________________________________________
-                    ? { uri: 'https://github.com/tranhonghan/images/blob/main/star_filled.png?raw=true' }
-                    : { uri: 'https://github.com/tranhonghan/images/blob/main/star_corner.png?raw=true' }
+
+                    ? require('../assets/star_filled.png')
+                    : require('../assets/star_corner.png')
                 }
               />
             </TouchableOpacity>
@@ -141,7 +141,6 @@ const RatingPage = ({ navigation, route }) => {
       </View>
     );
   };
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.container}>

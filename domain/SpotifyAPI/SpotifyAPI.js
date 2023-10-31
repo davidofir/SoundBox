@@ -82,4 +82,8 @@ async function searchAndFetchSongCoverArt(songName, artistName) {
   }
 }
 
+async function searchAndFetchArtistImage(){
+  
+}
+
 export { searchAndFetchSongCoverArt };

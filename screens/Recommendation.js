@@ -49,8 +49,6 @@ const Recommendations = ({ navigation, route }) => {
       getTopUserArtists();
       fetchRecommendedSongs();
       
-
-
     });
   }, []);
 
