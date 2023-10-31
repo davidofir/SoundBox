@@ -12,7 +12,7 @@ import useAccountProfileViewModel from "./AccountProfileViewModel";
 export default EditAccountPage = ({ navigation }) => {
 
     // new changes - using viewmodel
-    const { username, followers, following, reviews, navigateToFollowers, navigateToFollowing } = useAccountProfileViewModel(navigation);
+    const { username, followers, following, reviews, userEmail, navigateToFollowers, navigateToFollowing } = useAccountProfileViewModel(navigation);
 
     return (
         <View style={styles.container}>
@@ -33,7 +33,7 @@ export default EditAccountPage = ({ navigation }) => {
                 <Text style={styles.sectionTitle}>Email</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Email"
+                    placeholder={userEmail}
                     placeholderTextColor="black"
                 />
                 <TouchableOpacity style={styles.saveButton}>

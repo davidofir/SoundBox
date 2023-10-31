@@ -8,16 +8,22 @@ const useProfileViewModel = (navigation) => {
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
     const [reviews, setReviews] = useState([]);
+    const [userEmail, setUserEmail] = useState("");
 
     useEffect(() => {
         const fetchUserProfileData = async () => {
             try {
                 const userData = await UserRepository.getUserProfileData();
+                const user = authentication.currentUser;
                 if (userData) {
                     setUsername(userData.userName);
                     setFollowers(userData.followers || []);
                     setFollowing(userData.following || []);
                     setReviews(userData.reviews || []);
+
+                    if (user) {
+                        setUserEmail(user.email);
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching user profile data:", error);
@@ -37,7 +43,7 @@ const useProfileViewModel = (navigation) => {
         navigation.navigate("Following", { followingArray: following })
     };
 
-    return { username, followers, following, reviews, navigateToFollowers, navigateToFollowing };
+    return { username, followers, following, reviews, userEmail, navigateToFollowers, navigateToFollowing };
 };
 
 export default useProfileViewModel;
