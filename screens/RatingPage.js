@@ -11,6 +11,8 @@ import {
 import { TouchableWithoutFeedback, Keyboard } from "react-native";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { authentication, db } from "../firebase";
+import { PanResponder } from 'react-native';
+import StarRating from 'react-native-star-rating-widget';
 
 class RatingModel {
   constructor(userId) {
@@ -36,7 +38,7 @@ class RatingViewModel {
   constructor(userId) {
     this.model = new RatingModel(userId);
     this.defaultRating = 2;
-    this.maxRating = [1, 2, 3, 4, 5];
+    this.maxRating = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
   }
 
   async getUserReviews() {
@@ -71,8 +73,6 @@ const RatingPage = ({ navigation, route }) => {
   const isSearched = route.params.paramSearched;
   const songGenre = route.params.paramSongGenre
   var finalArtistName = "";
- 
-
 
   if (isSearched === 0) {
     finalArtistName = artistName1;
@@ -93,6 +93,8 @@ const RatingPage = ({ navigation, route }) => {
     loadReviews();
   }, []);
 
+  const [rating, setRating] = useState(viewModel.getDefaultRating());
+
   const getCensoredText = async () => {
     const response = await fetch(url);
     const data = await response.json();
@@ -105,52 +107,33 @@ const RatingPage = ({ navigation, route }) => {
       artistName: finalArtistName,
       songName: songName,
       creationTime: new Date().toUTCString(),
-      rating: defaultRating,
+      rating: rating,
       review: message,
       genre: songGenre,
     };
 
-    reviews.push(reviewData);
-    await viewModel.addReview(reviews);
+    const updatedReviews = [...reviews, reviewData];
+    setReviews(updatedReviews);
+    await viewModel.addReview(updatedReviews);
 
     navigation.navigate("Discover");
   };
 
-  const CustomRatingBar = () => {
-    return (
-      <View style={styles.customRatingBarStyle}>
-        {maxRating.map((item, key) => {
-          return (
-            <TouchableOpacity
-              activeOpacity={0.7}
-              key={item}
-              onPress={() => setDefaultRating(item)}
-            >
-              <Image
-                style={styles.starImgStyle}
-                source={
-                  item <= defaultRating
 
-                    ? require('../assets/star_filled.png')
-                    : require('../assets/star_corner.png')
-                }
-              />
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    );
-  };
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.container}>
         <Text style={styles.textStyle}> Rate This Song </Text>
         <Text style={styles.textStyleSong}> {songName}</Text>
         <Text style={styles.textStyleArtist}> {finalArtistName}</Text>
-
-        <CustomRatingBar />
+        
+        <StarRating
+          rating={rating}
+          onChange={setRating}
+          starSize={50}
+        />
         <Text style={styles.textStyle}>
-          {defaultRating + " / " + maxRating.length}
+          {rating + " / " + maxRating.length / 2}
         </Text>
 
         <TextInput
