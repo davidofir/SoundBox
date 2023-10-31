@@ -12,6 +12,7 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { searchAndFetchSongCoverArt } from '../domain/SpotifyAPI/SpotifyAPI';
 
+const defaultCoverArt = require('../assets/defaultSongImage.png')
 // Model Class
 class TrackModel {
   constructor() {
@@ -133,6 +134,9 @@ class Cell extends React.Component {
     }
   }
 
+
+
+
   render() {
     const { cellItem } = this.props;
     let artistName = cellItem.artist.name;
@@ -151,13 +155,18 @@ class Cell extends React.Component {
 
     return (
       <TouchableWithoutFeedback>
-        <View style={styles.cell} onStartShouldSetResponder={() => true}>
-          {coverArtUrl && (
-            <Image
-              style={styles.imageView}
-              source={{ uri: coverArtUrl }}
-            />
-          )}
+      <View style={styles.cell} onStartShouldSetResponder={() => true}>
+        {coverArtUrl ? (
+          <Image
+            style={styles.imageView}
+            source={{ uri: coverArtUrl }}
+          />
+        ) : (
+          <Image
+            style={styles.imageView}
+            source={defaultCoverArt}
+          />
+        )}
           <View style={styles.contentView}>
             <Text style={[styles.whiteText, styles.boldText]}>
               {cellItem.name}

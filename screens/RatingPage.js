@@ -11,7 +11,8 @@ import {
 import { TouchableWithoutFeedback, Keyboard } from "react-native";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { authentication, db } from "../firebase";
-import { PanResponder } from 'react-native';
+
+//Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
 import StarRating from 'react-native-star-rating-widget';
 
 class RatingModel {
