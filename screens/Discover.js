@@ -126,9 +126,16 @@ class Cell extends React.Component {
       artistNameImage = cellItem.artist;
     }
 
+    this.setState({ coverArtUrl: null });
+
     try {
       const imageUrl = await searchAndFetchSongCoverArt(name, artistNameImage);
-      this.setState({ coverArtUrl: imageUrl });
+      if (imageUrl == 3){
+        this.setState({ coverArtUrl: null });
+      } else {
+        this.setState({ coverArtUrl: imageUrl });
+      }
+      
     } catch (error) {
       console.error('Error fetching cover art:', error);
     }
