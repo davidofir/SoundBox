@@ -1,11 +1,17 @@
 import axios from 'axios';
 import base64 from 'base-64';
+import axiosRateLimit from 'axios-rate-limit';
 
 
 const clientId = '78446884c91b415489c2e419606a8f75';
 const clientSecret = '330da908bba34426ac4e05f220370032';
 const defaultImageUrl = require("../../assets/defaultSongImage.png");
 
+// Create an instance of Axios with rate limiting
+const axiosInstance = axiosRateLimit(axios.create(), {
+  maxRequests: 10, // Set the maximum number of requests per second
+  perMilliseconds: 10, // Set the rate limit interval in milliseconds (1 request per second in this example)
+});
 
 // Define the getAccessToken function here
 async function getAccessToken() {
@@ -13,7 +19,7 @@ async function getAccessToken() {
     const credentials = `${clientId}:${clientSecret}`;
     const base64Credentials = base64.encode(credentials);
 
-    const response = await axios.post('https://accounts.spotify.com/api/token', null, {
+    const response = await axiosInstance.post('https://accounts.spotify.com/api/token', null, {
       params: {
         grant_type: 'client_credentials',
       },
@@ -47,7 +53,7 @@ async function searchAndFetchSongCoverArt(songName, artistName) {
       searchQuery = `track:${songName} artist:${artistName}`;
     }
 
-    const searchResponse = await axios.get('https://api.spotify.com/v1/search', {
+    const searchResponse = await axiosInstance.get('https://api.spotify.com/v1/search', {
       params: {
         q: searchQuery,
         type: 'track',
@@ -61,7 +67,7 @@ async function searchAndFetchSongCoverArt(songName, artistName) {
 
     if (track) {
       const trackId = track.id;
-      const albumResponse = await axios.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
+      const albumResponse = await axiosInstance.get(`https://api.spotify.com/v1/tracks/${trackId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

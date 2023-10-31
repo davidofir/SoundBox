@@ -73,7 +73,10 @@ const RatingPage = ({ navigation, route }) => {
   const searchedArtistName = route.params.paramSearchedArtist;
   const isSearched = route.params.paramSearched;
   const songGenre = route.params.paramSongGenre
+  const albumArt = route.params.paramCoverArtUrl
   var finalArtistName = "";
+
+  console.log(albumArt);
 
   if (isSearched === 0) {
     finalArtistName = artistName1;
@@ -127,7 +130,7 @@ const RatingPage = ({ navigation, route }) => {
         <Text style={styles.textStyle}> Rate This Song </Text>
         <Text style={styles.textStyleSong}> {songName}</Text>
         <Text style={styles.textStyleArtist}> {finalArtistName}</Text>
-        
+
         <StarRating
           rating={rating}
           onChange={setRating}
