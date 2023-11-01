@@ -54,7 +54,7 @@ export default SocialFeed = ({ navigation }) => {
             <ScrollView>
                 <View style={styles.horizontalProfileContainer}>
                     <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Artists</Text>
-                    <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 10 }]}>View all</Text>
+                    <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
                 </View>
                 <View>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -93,27 +93,23 @@ export default SocialFeed = ({ navigation }) => {
             {/* Social Media Navigation Bar */}
             <View style={styles.navigationContainer}>
                 <TouchableOpacity>
-                    <FontAwesome name="home" size={24} color="black" />
+                    <FontAwesome name="home" size={24} color="white" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => navigation.navigate("Search")}>
+                    <FontAwesome name="search" size={24} color="white" />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => navigation.navigate("Discover")}>
+                    <FontAwesome name="plus-square" size={24} color="white" />
                 </TouchableOpacity>
 
                 <TouchableOpacity>
-                    <FontAwesome name="search" size={24} color="black" />
-
+                    <FontAwesome name="heart" size={24} color="white" />
                 </TouchableOpacity>
 
-                <TouchableOpacity>
-                    <FontAwesome name="plus-square" size={24} color="black" />
-
-                </TouchableOpacity>
-
-                <TouchableOpacity>
-                    <FontAwesome name="heart" size={24} color="black" />
-
-                </TouchableOpacity>
-
-                <TouchableOpacity>
-                    <FontAwesome name="user" size={24} color="black" />
-
+                <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+                    <FontAwesome name="user" size={24} color="white" />
                 </TouchableOpacity>
             </View>
         </View >
@@ -123,17 +119,17 @@ export default SocialFeed = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: '#1f1f2e',
     },
     container2: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingTop: 15,
+        paddingTop: 10,
     },
     horizontalProfileContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        margin: 10,
+        margin: 5,
         width: 'auto',
         height: 'auto',
     },
@@ -141,12 +137,12 @@ const styles = StyleSheet.create({
         width: 120,
         height: 150,
         borderRadius: 12,
-        backgroundColor: "black",
-        overflow: "hidden",
+        backgroundColor: 'black',
+        overflow: 'hidden',
         marginHorizontal: 6,
     },
     postContainer: {
-        backgroundColor: 'white',
+        backgroundColor: '#3d3d59',
         borderRadius: 10,
         margin: 10,
         padding: 10,
@@ -166,6 +162,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 10,
     },
+    text: {
+        color: '#8c8c9c',
+    },
     profileImage: {
         width: 40,
         height: 40,
@@ -175,6 +174,7 @@ const styles = StyleSheet.create({
     username: {
         fontSize: 16,
         fontWeight: 'bold',
+        color: 'white',
     },
     postContent: {
         marginTop: 10,
@@ -182,25 +182,30 @@ const styles = StyleSheet.create({
     artistName: {
         fontSize: 16,
         fontWeight: 'bold',
+        color: 'white',
     },
     reviewText: {
         fontSize: 14,
         marginTop: 5,
+        color: 'white',
     },
     ratingText: {
         fontSize: 14,
         marginTop: 5,
+        color: 'white',
     },
     songName: {
         fontSize: 14,
         marginTop: 5,
+        color: 'white',
     },
     navigationContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        backgroundColor: 'white',
-        paddingVertical: 10,
+        backgroundColor: '#1f1f2e',
+        paddingBottom: 35,
+        paddingTop: 15,
         borderTopWidth: 1,
-        borderTopColor: '#ccc',
+        borderTopColor: '#29293d',
     },
 })
