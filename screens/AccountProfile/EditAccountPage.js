@@ -7,6 +7,7 @@ import ButtonComponent from '../../components/ButtonComponent';
 import EventsRepository from '../../domain/EventsAPI/EventsRepositoryImpl';
 import { authentication, db } from "../../firebase";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { updateEmail } from "firebase/auth";
 import useAccountProfileViewModel from "./AccountProfileViewModel";
 
 export default EditAccountPage = ({ navigation }) => {
@@ -19,18 +20,18 @@ export default EditAccountPage = ({ navigation }) => {
 
     const saveChanges = async () => {
         try {
-            // Update the username and email in the database.
+            // Update the username in the database.
             const userDocRef = doc(db, "users", authentication.currentUser.uid);
             await updateDoc(userDocRef, {
-                userName: newUsername,
+                userName: newUsername || username
             });
 
-            setNewUsername("");
-            setNewEmail("");
+            // Update the email in the database.
+            await updateEmail(authentication.currentUser, newEmail || userEmail);
 
             // Navigate back or perform any other action.
             // For example, you can navigate to the profile page.
-            //navigation.navigate("Profile");
+            navigation.replace("Profile");
         } catch (error) {
             console.error("Error saving changes:", error);
         }
@@ -57,6 +58,7 @@ export default EditAccountPage = ({ navigation }) => {
                     style={styles.input}
                     placeholder={userEmail}
                     placeholderTextColor="black"
+                    onChangeText={(text) => setNewEmail(text)}
                 />
                 <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
                     <Text style={styles.saveButtonText}>Save Changes</Text>
