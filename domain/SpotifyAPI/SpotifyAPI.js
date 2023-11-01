@@ -10,7 +10,7 @@ const defaultImageUrl = require("../../assets/defaultSongImage.png");
 // Create an instance of Axios with rate limiting
 const axiosInstance = axiosRateLimit(axios.create(), {
   maxRequests: 10, // Set the maximum number of requests per second
-  perMilliseconds: 10, // Set the rate limit interval in milliseconds (1 request per second in this example)
+  perMilliseconds: 100, // Set the rate limit interval in milliseconds (1 request per second in this example)
 });
 
 // Define the getAccessToken function here
