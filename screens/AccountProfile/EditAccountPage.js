@@ -6,7 +6,7 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../../components/ButtonComponent';
 import EventsRepository from '../../domain/EventsAPI/EventsRepositoryImpl';
 import { authentication, db } from "../../firebase";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import useAccountProfileViewModel from "./AccountProfileViewModel";
 
 export default EditAccountPage = ({ navigation }) => {
@@ -14,6 +14,27 @@ export default EditAccountPage = ({ navigation }) => {
     // new changes - using viewmodel
     const { username, followers, following, reviews, userEmail, navigateToFollowers, navigateToFollowing } = useAccountProfileViewModel(navigation);
 
+    const [newUsername, setNewUsername] = useState("");
+    const [newEmail, setNewEmail] = useState("");
+
+    const saveChanges = async () => {
+        try {
+            // Update the username and email in the database.
+            const userDocRef = doc(db, "users", authentication.currentUser.uid);
+            await updateDoc(userDocRef, {
+                userName: newUsername,
+            });
+
+            setNewUsername("");
+            setNewEmail("");
+
+            // Navigate back or perform any other action.
+            // For example, you can navigate to the profile page.
+            //navigation.navigate("Profile");
+        } catch (error) {
+            console.error("Error saving changes:", error);
+        }
+    }
     return (
         <View style={styles.container}>
             <View style={styles.profileHeader}>
@@ -29,6 +50,7 @@ export default EditAccountPage = ({ navigation }) => {
                     style={styles.input}
                     placeholder={username}
                     placeholderTextColor="black"
+                    onChangeText={(text) => setNewUsername(text)}
                 />
                 <Text style={styles.sectionTitle}>Email</Text>
                 <TextInput
@@ -36,7 +58,7 @@ export default EditAccountPage = ({ navigation }) => {
                     placeholder={userEmail}
                     placeholderTextColor="black"
                 />
-                <TouchableOpacity style={styles.saveButton}>
+                <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
                     <Text style={styles.saveButtonText}>Save Changes</Text>
                 </TouchableOpacity>
             </View>
