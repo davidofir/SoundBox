@@ -24,7 +24,7 @@ export default Homepage = ({ navigation }) => {
             <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("Profile")}>
                 <Text>Profile Page</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("Social Feed")}>
+            <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("Home")}>
                 <Text>Social Feed</Text>
             </TouchableOpacity>
             <TouchableOpacity style={{ marginRight: 8, padding: 10 }} onPress={() => navigation.navigate("Search")}>

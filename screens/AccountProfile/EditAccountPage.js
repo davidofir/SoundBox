@@ -7,7 +7,7 @@ import ButtonComponent from '../../components/ButtonComponent';
 import EventsRepository from '../../domain/EventsAPI/EventsRepositoryImpl';
 import { authentication, db } from "../../firebase";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
-import { updateEmail } from "firebase/auth";
+import { updateEmail, signOut } from "firebase/auth";
 import useAccountProfileViewModel from "./AccountProfileViewModel";
 
 export default EditAccountPage = ({ navigation }) => {
@@ -36,6 +36,20 @@ export default EditAccountPage = ({ navigation }) => {
             console.error("Error saving changes:", error);
         }
     }
+
+    const SignOut = () => {
+        signOut(authentication)
+            .then((re) => {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Login' }],
+                });
+            })
+            .catch((re) => {
+                console.log(re);
+            });
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.profileHeader}>
@@ -62,6 +76,9 @@ export default EditAccountPage = ({ navigation }) => {
                 />
                 <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
                     <Text style={styles.saveButtonText}>Save Changes</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.saveButton} onPress={SignOut}>
+                    <Text style={styles.saveButtonText}>Logout</Text>
                 </TouchableOpacity>
             </View>
         </View>

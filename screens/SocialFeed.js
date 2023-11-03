@@ -104,7 +104,7 @@ export default SocialFeed = ({ navigation }) => {
                     <FontAwesome name="plus-square" size={24} color="white" />
                 </TouchableOpacity>
 
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate("Recommendations")}>
                     <FontAwesome name="heart" size={24} color="white" />
                 </TouchableOpacity>
 
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         backgroundColor: '#1f1f2e',
-        paddingBottom: 35,
+        paddingBottom: 42,
         paddingTop: 15,
         borderTopWidth: 1,
         borderTopColor: '#29293d',
