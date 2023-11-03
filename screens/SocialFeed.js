@@ -56,7 +56,7 @@ export default SocialFeed = ({ navigation }) => {
                     <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Artists</Text>
                     <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
                 </View>
-                <View>
+                <View style={styles.artistContainer}>
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                         <View>
                             <Image source={require("../assets/artists/jayz.png")} style={styles.imageContainer} />
@@ -92,7 +92,7 @@ export default SocialFeed = ({ navigation }) => {
 
             {/* Social Media Navigation Bar */}
             <View style={styles.navigationContainer}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.replace("Home")}>
                     <FontAwesome name="home" size={24} color="white" />
                 </TouchableOpacity>
 
@@ -120,6 +120,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1f1f2e',
+    },
+    artistContainer: {
+        paddingLeft: 10,
     },
     container2: {
         alignItems: 'center',
