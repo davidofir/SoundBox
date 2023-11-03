@@ -64,14 +64,14 @@ export default EditAccountPage = ({ navigation }) => {
                 <TextInput
                     style={styles.input}
                     placeholder={username}
-                    placeholderTextColor="black"
+                    placeholderTextColor="#8c8c9c"
                     onChangeText={(text) => setNewUsername(text)}
                 />
                 <Text style={styles.sectionTitle}>Email</Text>
                 <TextInput
                     style={styles.input}
                     placeholder={userEmail}
-                    placeholderTextColor="black"
+                    placeholderTextColor="#8c8c9c"
                     onChangeText={(text) => setNewEmail(text)}
                 />
                 <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
@@ -88,7 +88,7 @@ export default EditAccountPage = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#1f1f2e',
     },
     profileHeader: {
         alignItems: 'center',
@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
     },
     username: {
+        color: 'white',
         fontSize: 20,
         fontWeight: 'bold',
         marginTop: 10,
@@ -108,6 +109,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     sectionTitle: {
+        color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
         paddingTop: 10
