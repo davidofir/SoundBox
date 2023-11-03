@@ -13,6 +13,8 @@ export default FollowingPage = ({ navigation, route }) => {
     const [followingData, setFollowingData] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const { username } = useAccountProfileViewModel(navigation);
+
     useEffect(() => {
         fetchFollowingData(route.params.followingArray); // Pass followerArray as an argument.
     }, [route.params.followingArray]);
@@ -39,13 +41,17 @@ export default FollowingPage = ({ navigation, route }) => {
     };
 
     const onPressItem = (item) => {
-        navigation.replace('UserPage', { item });
+        if (item.userName == username) {
+            navigation.replace('Profile', { item });
+        } else {
+            navigation.replace('UserPage', { item });
+        }
     };
 
     return (
         <View style={styles.container}>
             {loading ? (
-                <ActivityIndicator size="large" color="#000" style={styles.loadingIndicator} />
+                <ActivityIndicator size="large" color="#ccc" style={styles.loadingIndicator} />
             ) : (
                 <FlatList
                     data={followingData}
@@ -53,7 +59,7 @@ export default FollowingPage = ({ navigation, route }) => {
                         <TouchableOpacity onPress={() => onPressItem(item)}>
                             <View style={styles.item}>
                                 <Image source={require("../../assets/defaultPic.png")} style={styles.itemImage} />
-                                <Text style={styles.itemText}>Username: {item?.userName || "Loading..."}</Text>
+                                <Text style={styles.itemText}>{item?.userName || "Loading..."}</Text>
                             </View>
                         </TouchableOpacity>
                     )}
@@ -66,7 +72,7 @@ export default FollowingPage = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#1f1f2e',
     },
     loadingIndicator: {
         flex: 1,
@@ -78,7 +84,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 10,
         borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
+        borderBottomColor: '#29293d',
     },
     itemImage: {
         width: 50,
@@ -86,6 +92,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     itemText: {
+        color: 'white',
         fontSize: 16,
     },
 });
