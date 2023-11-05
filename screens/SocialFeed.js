@@ -84,6 +84,13 @@ export default SocialFeed = ({ navigation }) => {
                                 <Text style={styles.reviewText}>Review: {item.review}</Text>
                                 <Text style={styles.ratingText}>Rating: {item.rating}</Text>
                                 <Text style={styles.songName}>Song: {item.songName}</Text>
+
+                                <View style={styles.likeContainer}>
+                                    <TouchableOpacity>
+                                        <FontAwesome name="heart" size={20} color="red" style={styles.likeIcon} />
+                                    </TouchableOpacity>
+                                    <Text style={styles.likeText}>12</Text>
+                                </View>
                             </View>
                         </View>
                     ))}
@@ -210,5 +217,17 @@ const styles = StyleSheet.create({
         paddingTop: 15,
         borderTopWidth: 1,
         borderTopColor: '#29293d',
+    },
+    likeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    likeIcon: {
+        marginRight: 5,
+    },
+    likeText: {
+        fontSize: 14,
+        color: 'white',
     },
 })
