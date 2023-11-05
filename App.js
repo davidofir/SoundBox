@@ -24,16 +24,23 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='Login'>
+      <Stack.Navigator initialRouteName='Login'
+        screenOptions={{
+          headerStyle: { backgroundColor: '#1f1f2e' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontWeight: 'bold' },
+          headerShadowVisible: false,
+          headerBackTitleVisible: false,
+        }}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Discover" component={Discover} />
         <Stack.Screen name="Artist" component={ArtistProfile} />
         <Stack.Screen name="Merch Store" component={Store} />
         <Stack.Screen name="Upcoming Events" component={Events} />
-        <Stack.Screen name="Home" component={Homepage} />
+        <Stack.Screen name="Homepage" component={Homepage} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Profile" component={ProfilePage} />
-        <Stack.Screen name="Social Feed" component={SocialFeed} />
+        <Stack.Screen name="Home" component={SocialFeed} />
         <Stack.Screen name="Followers" component={FollowersPage} />
         <Stack.Screen name="Following" component={FollowingPage} />
         <Stack.Screen name="RatingPage" component={RatingPage} />

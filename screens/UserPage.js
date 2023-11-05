@@ -181,7 +181,7 @@ export default UserPage = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: '#1f1f2e',
         padding: 16,
     },
     headerContainer: {
@@ -193,6 +193,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
     },
     username: {
+        color: 'white',
         fontSize: 18,
         marginVertical: 10,
     },
@@ -228,6 +229,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     statsValue: {
+        color: 'white',
         fontSize: 24,
         fontWeight: 'bold',
     },
@@ -238,7 +240,7 @@ const styles = StyleSheet.create({
     postItem: {
         marginBottom: 10,
         padding: 16,
-        backgroundColor: '#f2f2f2',
+        backgroundColor: '#3d3d59',
         borderRadius: 10,
     },
     postText: {
@@ -248,18 +250,22 @@ const styles = StyleSheet.create({
         marginHorizontal: 6,
     },
     artistName: {
+        color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
     },
     reviewText: {
+        color: 'white',
         fontSize: 14,
         marginTop: 5,
     },
     ratingText: {
+        color: 'white',
         fontSize: 14,
         marginTop: 5,
     },
     songName: {
+        color: 'white',
         fontSize: 14,
         marginTop: 5,
     },
