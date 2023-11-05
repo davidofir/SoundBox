@@ -1,5 +1,5 @@
 import { useState } from "react";
-import * as FirebaseRepository from "../../domain/FirebaseRepository/FirebaseRepository";
+import * as FirebaseManager from "../../domain/FirebaseRepository/FirebaseManager";
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
 const useRegisterViewModel = (navigation) => {
     const [userName, setUser] = useState("");
@@ -8,7 +8,7 @@ const useRegisterViewModel = (navigation) => {
 
     const registerAccount = async () => {
         try {
-            const user = await FirebaseRepository.signUpWithEmailAndPassword(email, password);
+            const user = await FirebaseManager.signUpWithEmailAndPassword(email, password);
 
             // Save user data to Firestore
             const userData = {
