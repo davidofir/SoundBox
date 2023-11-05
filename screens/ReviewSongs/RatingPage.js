@@ -10,10 +10,12 @@ import {
 } from "react-native";
 import { TouchableWithoutFeedback, Keyboard } from "react-native";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { authentication, db } from "../firebase";
+import { authentication, db } from "../../firebase";
 
 //Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
 import StarRating from 'react-native-star-rating-widget';
+
+const defaultCoverArt = require('../../assets/defaultSongImage.png')
 
 class RatingModel {
   constructor(userId) {
@@ -73,10 +75,13 @@ const RatingPage = ({ navigation, route }) => {
   const searchedArtistName = route.params.paramSearchedArtist;
   const isSearched = route.params.paramSearched;
   const songGenre = route.params.paramSongGenre
-  const albumArt = route.params.paramCoverArtUrl
+  var albumArt = route.params.paramCoverArtUrl 
+  if( albumArt == 3){
+    albumArt = Image.resolveAssetSource(defaultCoverArt).uri;
+  }
   var finalArtistName = "";
 
-  console.log(albumArt);
+ 
 
   if (isSearched === 0) {
     finalArtistName = artistName1;
@@ -127,7 +132,11 @@ const RatingPage = ({ navigation, route }) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.textStyle}> Rate This Song </Text>
+
+        <Image
+          source={{ uri: albumArt }}
+          style={styles.albumArtStyle}
+        />
         <Text style={styles.textStyleSong}> {songName}</Text>
         <Text style={styles.textStyleArtist}> {finalArtistName}</Text>
 
@@ -175,13 +184,13 @@ const styles = StyleSheet.create({
   },
   textStyleSong: {
     fontSize: 29,
-    marginTop: 20,
+    marginTop: 0,
     alignItems: "baseline",
     fontWeight: "bold"
   },
   textStyleArtist: {
     fontSize: 23,
-    marginTop: 20,
+    marginTop: 0,
     alignItems: "baseline",
     fontWeight: "bold",
     color: "lightslategrey"
@@ -211,5 +220,11 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
+  },
+  albumArtStyle: {
+    width: 230, // Set the width as per your requirement
+    height: 230, // Set the height as per your requirement
+    resizeMode: 'contain', // This will ensure the image scales to fit within the dimensions and maintain its aspect ratio
+    marginVertical: 20, // Optional: Adds some vertical space above and below the image
   },
 });

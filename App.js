@@ -3,7 +3,7 @@ import * as React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import Discover from './screens/Discover'
+import Discover from './screens//Discover/Discover'
 import Homepage from './screens/Homepage';
 import ArtistProfile from './screens/ArtistProfile/ArtistProfile';
 import Store from './screens/ArtistProfile/Store';
@@ -11,7 +11,7 @@ import Events from './screens/ArtistProfile/Events';
 import Login from './screens/Login/Login';
 import Register from './screens/Register/Register';
 import ProfilePage from './screens/AccountProfile/ProfilePage';
-import RatingPage from './screens/RatingPage'
+import RatingPage from './screens/ReviewSongs/RatingPage'
 import SocialFeed from './screens/SocialFeed';
 import FollowersPage from './screens/AccountProfile/FollowersPage';
 import FollowingPage from './screens/AccountProfile/FollowingPage';
