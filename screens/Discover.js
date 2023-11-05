@@ -12,7 +12,7 @@ import {
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { searchAndFetchSongCoverArt } from '../domain/SpotifyAPI/SpotifyAPI';
 import { TrackModel } from '../domain/LastFM_API/LastFM_API';
-
+import { useState, useEffect, memo } from 'react';
 const defaultCoverArt = require('../assets/defaultSongImage.png')
 // Model Class
 
@@ -51,97 +51,56 @@ class AppViewModel {
 // Create a ViewModel instance
 const viewModel = new AppViewModel();
 
-// Cell Component
-class Cell extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      coverArtUrl: null,
-    };
-  }
+const Cell = memo(({ cellItem }) => {
+  const [coverArtUrl, setCoverArtUrl] = useState(null);
 
-  componentDidMount() {
-    // Fetch and set the cover art URL when the component mounts.
-    this.fetchCoverArt();
-  }
-
-  async componentDidUpdate(prevProps) {
-    // Check if the cellItem has changed (e.g., when searching for a new song)
-    if (prevProps.cellItem !== this.props.cellItem) {
-      this.fetchCoverArt(); // Fetch cover art for the new cellItem
-    }
-  }
-
-  async fetchCoverArt() {
-    const { cellItem } = this.props;
-    const { name, artist } = cellItem;
-    var artistNameImage = cellItem.artist.name;
+  const fetchCoverArt = async () => {
+    let artistNameImage = cellItem.artist.name;
     if (viewModel.flatlistSwitch === 1) {
       artistNameImage = cellItem.artist;
     }
 
-    this.setState({ coverArtUrl: null });
+    setCoverArtUrl(null); // Clear the previous image
 
     try {
-      const imageUrl = await searchAndFetchSongCoverArt(name, artistNameImage);
-      if (imageUrl == 3){
-        this.setState({ coverArtUrl: null });
-      } else {
-        this.setState({ coverArtUrl: imageUrl });
+      const imageUrl = await searchAndFetchSongCoverArt(cellItem.name, artistNameImage);
+      if (imageUrl !== 3){
+        setCoverArtUrl(imageUrl);
       }
-      
     } catch (error) {
       console.error('Error fetching cover art:', error);
     }
+  };
+
+  useEffect(() => {
+    fetchCoverArt();
+  }, [cellItem]); // Only re-run the effect if cellItem changes
+
+  let artistName = cellItem.artist.name;
+  if (viewModel.flatlistSwitch === 1 && cellItem.artist) {
+    artistName = typeof cellItem.artist === 'string' ? cellItem.artist : cellItem.artist.name;
   }
 
-
-
-
-  render() {
-    const { cellItem } = this.props;
-    let artistName = cellItem.artist.name;
-
-    if (viewModel.flatlistSwitch === 1) {
-      if (cellItem.artist) {
-        if (typeof cellItem.artist === 'string') {
-          artistName = cellItem.artist;
-        } else if (cellItem.artist.name) {
-          artistName = cellItem.artist.name;
-        }
-      }
-    }
-
-    const { coverArtUrl } = this.state;
-
-    return (
-      <TouchableWithoutFeedback>
+  return (
+    <TouchableWithoutFeedback>
       <View style={styles.cell} onStartShouldSetResponder={() => true}>
-        {coverArtUrl ? (
-          <Image
-            style={styles.imageView}
-            source={{ uri: coverArtUrl }}
-          />
-        ) : (
-          <Image
-            style={styles.imageView}
-            source={defaultCoverArt}
-          />
-        )}
-          <View style={styles.contentView}>
-            <Text style={[styles.whiteText, styles.boldText]}>
-              {cellItem.name}
-            </Text>
-            <Text style={styles.whiteText}>{artistName}</Text>
-          </View>
-          <View style={styles.accessoryView}>
-            <Text style={[styles.textCenter, styles.whiteText]}></Text>
-          </View>
+        <Image
+          style={styles.imageView}
+          source={coverArtUrl ? { uri: coverArtUrl } : defaultCoverArt}
+        />
+        <View style={styles.contentView}>
+          <Text style={[styles.whiteText, styles.boldText]}>
+            {cellItem.name}
+          </Text>
+          <Text style={styles.whiteText}>{artistName}</Text>
         </View>
-      </TouchableWithoutFeedback>
-    );
-  }
-}
+        <View style={styles.accessoryView}>
+          {/* Other components or content */}
+        </View>
+      </View>
+    </TouchableWithoutFeedback>
+  );
+});
 
 // Main App Component
 class App extends React.Component {
