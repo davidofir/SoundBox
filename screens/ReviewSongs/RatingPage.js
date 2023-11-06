@@ -187,7 +187,7 @@ const closeModal = () => {
           <Text style={styles.buttonTextStyle}>Review This Song</Text>
         </TouchableOpacity>
 
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        
         {/* Modal Definition */}
         <Modal
           animationType="none" // we are using Animated for the modal animation
@@ -195,6 +195,7 @@ const closeModal = () => {
           visible={modalVisible}
           onRequestClose={closeModal}
         >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <Animated.View
           style={[
             styles.modalView,
@@ -265,14 +266,18 @@ const closeModal = () => {
           
 
         </Animated.View>
-      </Modal>
+        
+
         </TouchableWithoutFeedback>
+        
+      </Modal>
+        
       
       
       </SafeAreaView>
       
     </TouchableWithoutFeedback>
-        <Toast ref={(ref) => Toast.setRef(ref)} />
+    <Toast /> 
         </>
     
   );
