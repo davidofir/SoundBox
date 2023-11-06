@@ -146,6 +146,7 @@ const closeModal = () => {
       rating: rating,
       review: message,
       genre: songGenre,
+      likes: []
     };
 
     const updatedReviews = [...reviews, reviewData];
