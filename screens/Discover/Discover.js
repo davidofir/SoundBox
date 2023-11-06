@@ -10,12 +10,10 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { searchAndFetchSongCoverArt } from '../domain/SpotifyAPI/SpotifyAPI';
-import { TrackModel } from '../domain/LastFM_API/LastFM_API';
+import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
+import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 import { useState, useEffect, memo } from 'react';
-const defaultCoverArt = require('../assets/defaultSongImage.png')
-// Model Class
-
+const defaultCoverArt = require('../../assets/defaultSongImage.png')
 
 // ViewModel Class
 class AppViewModel {
@@ -128,7 +126,6 @@ class App extends React.Component {
     const genre = await viewModel.trackModel.fetchGenre(item.name, artistName);
     console.log(`Genre for the track "${item.name}, ${artistName}": ${genre}`);
 
-
     this.props.navigation.navigate('RatingPage', {
       paramArtistName: item.artist.name,
       paramSongName: item.name,
@@ -155,9 +152,12 @@ class App extends React.Component {
         {/* Button */}
         <Button
           onPress={() => {
-            viewModel.fetchSong().then(() => {
-              this.setState({ tracks: viewModel.getTracks() });
-            });
+            const input = viewModel.searchInput; // Access the searchInput from the viewModel
+            if (input && input.trim() !== "") { // Check if the input is not empty or just whitespace
+              viewModel.fetchSong().then(() => {
+                this.setState({ tracks: viewModel.getTracks() });
+              });
+            }
           }}
           title="Search"
         />
