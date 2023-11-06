@@ -1,8 +1,9 @@
 import { io } from 'socket.io-client';
-import {REACT_APP_BACKEND_BASE_URL} from '@env';
+import environment from '../../environment'
 
-const socket = io(REACT_APP_BACKEND_BASE_URL);
+import { REACT_APP_BACKEND_BASE_URL } from '@env';
 
+const socket = io(environment.backendBaseUrl);
 
 export function joinRoom(roomId, userId) {
   socket.emit('join-room', roomId, userId);
@@ -18,4 +19,21 @@ export function onNewMessage(callback) {
 
 export function cleanupListeners() {
   socket.off('message');
+}
+export async function getPastMessages(roomId) {
+  try {
+      const response = await fetch(`${environment.backendBaseUrl}/getPastMessages/${roomId}`);
+      
+      if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error('Error fetching messages for room ' + roomId + '. Server says: ' + errorData.message);
+      }
+
+      const messages = await response.json();
+      console.log(messages);
+      return messages;
+  } catch (error) {
+      console.error('Error fetching messages:', error.message);
+      throw error;
+  }
 }
