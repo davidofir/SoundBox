@@ -76,6 +76,46 @@ export default SocialFeed = ({ navigation }) => {
         })
     }
 
+    const Post = ({ item, userId, LikePost, UnlikePost }) => {
+        const [liked, setLiked] = useState(item.likes.includes(userId));
+
+        const handleLike = () => {
+            if (liked) {
+                UnlikePost(item);
+            } else {
+                LikePost(item);
+            }
+            setLiked(!liked);
+        };
+
+        return (
+            <View style={styles.postContainer}>
+                <View style={styles.postHeader}>
+                    <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
+                    <Text style={styles.username}>{item.username}</Text>
+                </View>
+                <View style={styles.postContent}>
+                    <Text style={styles.artistName}>Artist: {item.artistName}</Text>
+                    <Text style={styles.reviewText}>Review: {item.review}</Text>
+                    <Text style={styles.ratingText}>Rating: {item.rating}</Text>
+                    <Text style={styles.songName}>Song: {item.songName}</Text>
+
+                    <View style={styles.likeContainer}>
+                        <TouchableOpacity onPress={handleLike}>
+                            <FontAwesome
+                                name="heart"
+                                size={20}
+                                color={liked ? 'red' : 'white'}
+                                style={styles.likeIcon}
+                            />
+                        </TouchableOpacity>
+                        <Text style={styles.likeText}>{item.likes.length}</Text>
+                    </View>
+                </View>
+            </View>
+        );
+    };
+
     return (
         < View style={styles.container} >
             <ScrollView>
@@ -101,42 +141,13 @@ export default SocialFeed = ({ navigation }) => {
                 </View>
                 <View style={styles.container2}>
                     {reviews.map((item, index) => (
-                        <View style={styles.postContainer} key={index}>
-                            <View style={styles.postHeader}>
-                                <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
-                                <Text style={styles.username}>{item.username}</Text>
-                            </View>
-                            <View style={styles.postContent}>
-                                <Text style={styles.artistName}>Artist: {item.artistName}</Text>
-                                <Text style={styles.reviewText}>Review: {item.review}</Text>
-                                <Text style={styles.ratingText}>Rating: {item.rating}</Text>
-                                <Text style={styles.songName}>Song: {item.songName}</Text>
-
-                                <View style={styles.likeContainer}>
-                                    {item.likes.includes(userId) ?
-                                        (<TouchableOpacity onPress={() => UnlikePost(item)}>
-                                            <FontAwesome
-                                                name="heart"
-                                                size={20}
-                                                color='red'
-                                                style={styles.likeIcon}
-                                            />
-                                        </TouchableOpacity>
-                                        ) : (
-                                            <TouchableOpacity onPress={() => LikePost(item)}>
-                                                <FontAwesome
-                                                    name="heart"
-                                                    size={20}
-                                                    color='white'
-                                                    style={styles.likeIcon}
-                                                />
-                                            </TouchableOpacity>
-                                        )}
-
-                                    <Text style={styles.likeText}>{item.likes.length}</Text>
-                                </View>
-                            </View>
-                        </View>
+                        <Post
+                            key={index}
+                            item={item}
+                            userId={userId}
+                            LikePost={LikePost}
+                            UnlikePost={UnlikePost}
+                        />
                     ))}
                 </View>
             </ScrollView>
