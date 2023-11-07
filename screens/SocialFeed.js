@@ -6,7 +6,7 @@ import { FontAwesome } from '@expo/vector-icons'; // Import the FontAwesome icon
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
 import * as UserRepository from "../domain/FirebaseRepository/UserRepository";
 import { authentication, db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const eventsRepo = new EventsRepository;
 export default SocialFeed = ({ navigation }) => {
@@ -53,53 +53,27 @@ export default SocialFeed = ({ navigation }) => {
     }, [following])
 
     const LikePost = (item) => {
+        var tempLikes = item.likes;
 
-        /*
-        if (!item.likes.includes(userId)) {
-            // Update the likes list in Firebase
-            const userRef = doc(db, 'users', item.uid);
+        tempLikes.push(userId)
 
-            // Find the specific review in user's reviews
-            getDoc(userRef)
-                .then((doc) => {
-                    const tempReviews = doc.data().reviews;
-
-                    for (let i = 0; i < tempReviews.length; i++) {
-                        if (tempReviews[i].id == item.id) {
-                            tempReviews[i].likes.push(userId)
-                            updateDoc(userRef, {
-                                reviews: tempReviews
-                            })
-                        }
-                    }
-                })
-        }
-        */
+        // Update the likes list in Firebase
+        const reviewDoc = doc(db, 'reviews', item.id);
+        updateDoc(reviewDoc, {
+            likes: tempLikes
+        })
     }
 
-    const UnlikePost = () => {
+    const UnlikePost = (item) => {
+        var tempLikes = item.likes;
 
-        /*
-        if (!item.likes.includes(userId)) {
-            // Update the likes list in Firebase
-            const userRef = doc(db, 'users', item.uid);
+        tempLikes.splice(tempLikes.indexOf(userId), 1);
 
-            // Find the specific review in user's reviews
-            getDoc(userRef)
-                .then((doc) => {
-                    const tempReviews = doc.data().reviews;
-
-                    for (let i = 0; i < tempReviews.length; i++) {
-                        if (tempReviews[i].id == item.id) {
-                            tempReviews[i].likes.splice(tempReviews.indexOf(userId), 1);
-                            updateDoc(userRef, {
-                                reviews: tempReviews
-                            })
-                        }
-                    }
-                })
-        }
-        */
+        // Update the likes list in Firebase
+        const reviewDoc = doc(db, 'reviews', item.id);
+        updateDoc(reviewDoc, {
+            likes: tempLikes
+        })
     }
 
     return (
@@ -140,7 +114,7 @@ export default SocialFeed = ({ navigation }) => {
 
                                 <View style={styles.likeContainer}>
                                     {item.likes.includes(userId) ?
-                                        (<TouchableOpacity onPress={() => LikePost(item)}>
+                                        (<TouchableOpacity onPress={() => UnlikePost(item)}>
                                             <FontAwesome
                                                 name="heart"
                                                 size={20}
@@ -149,7 +123,7 @@ export default SocialFeed = ({ navigation }) => {
                                             />
                                         </TouchableOpacity>
                                         ) : (
-                                            <TouchableOpacity onPress={() => UnlikePost(item)}>
+                                            <TouchableOpacity onPress={() => LikePost(item)}>
                                                 <FontAwesome
                                                     name="heart"
                                                     size={20}
@@ -159,7 +133,7 @@ export default SocialFeed = ({ navigation }) => {
                                             </TouchableOpacity>
                                         )}
 
-                                    <Text style={styles.likeText}>12</Text>
+                                    <Text style={styles.likeText}>{item.likes.length}</Text>
                                 </View>
                             </View>
                         </View>
