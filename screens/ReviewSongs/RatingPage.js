@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from "react-native";
 import { TouchableWithoutFeedback, Keyboard } from "react-native";
-import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion, query, where, getDocs } from "firebase/firestore";
 import { authentication, db } from "../../firebase";
 import { Modal, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -142,7 +142,7 @@ const closeModal = () => {
     // Generating a new document inside the 'reviews' collection
     // Firestore will automatically create a unique ID for this document
     const reviewRef = doc(collection(db, "reviews"));
-  
+    var reviewUUID = reviewRef.id
     const reviewData = {
       id: reviewRef.id, // Firestore generated unique ID
       userId: userId, 
@@ -155,19 +155,38 @@ const closeModal = () => {
       likes: []
     };
   
-    // Save the review data to the new document in the 'reviews' collection
+    // Save the review data to the new document in the 'reviews' collection.
     await setDoc(reviewRef, reviewData);
-  
-    // If you also want to keep track of each user's reviews, you can update the user's document
-    // This is optional and based on whether you need a reference to the reviews in the user's document
+
+    // Reference the 'artists' collection and the specific artist's document.
+    const artistDocRef = doc(db, "artists", finalArtistName);
+ 
+    // Reference the specific song's document.
+    const songDocRef = doc(artistDocRef, "songs", songName);
+
+    // Check if the song already exists.
+    const songDocSnapshot = await getDoc(songDocRef);
+    if (!songDocSnapshot.exists()) {
+      // If the song does not exist, create a new song document with the first review ID.
+      await setDoc(songDocRef, {
+        reviewIds: [reviewUUID] // Use the ID from the reviewRef.
+      });
+    } else {
+      // If the song exists, add the review ID to the song's document.
+      await updateDoc(songDocRef, {
+        reviewIds: arrayUnion(reviewRef.id)
+      });
+    }
+
+    // Optionally update the user's document with the new review ID.
     const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
-      reviewIds: arrayUnion(reviewRef.id) // Only do this if you need to keep a list of reviewIds in the user's document
+      reviewIds: arrayUnion(reviewRef.id)
     });
-  
-    // Add the new review to the local state if you're managing it on the client-side
+
+    // Add the new review to the local state if you're managing it on the client-side.
     setReviews(prevReviews => [...prevReviews, reviewData]);
-  
+
     // Close modal and show toast notification
     closeModal();
     showToast('Success!', 'Review Successfully Posted');
@@ -296,8 +315,8 @@ const closeModal = () => {
       </SafeAreaView>
       
     </TouchableWithoutFeedback>
-    <Toast /> 
-        </>
+  <Toast /> 
+</>
     
   );
 };
