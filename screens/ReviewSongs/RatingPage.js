@@ -29,6 +29,13 @@ const RatingModel = {
     return docSnapshot.data()?.reviews || [];
   },
 
+  async getUserData(userId) {
+    const userRef = doc(db, "users", userId);
+    const docSnapshot = await getDoc(userRef);
+    const userData = docSnapshot.data();
+    return userData.userName
+  },
+
   async addReview(userId, reviewData) {
     const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
@@ -49,7 +56,7 @@ const RatingPage = ({ navigation, route }) => {
     paramSearchedArtist: searchedArtistName
   } = route.params;
   const finalArtistName = isSearched === 1 ? artistName : searchedArtistName;
-  
+
   const defaultCoverArtUri = Image.resolveAssetSource(defaultCoverArt).uri;
   const albumArt = coverArtUrl === 3 ? defaultCoverArtUri : coverArtUrl;
 
@@ -90,7 +97,7 @@ const RatingPage = ({ navigation, route }) => {
       setModalVisible(false); // hide the modal after animation
     });
   };
- 
+
   //profanity filter
   const getCensoredTextAndStore = async () => {
 
@@ -102,8 +109,8 @@ const RatingPage = ({ navigation, route }) => {
   };
 
   const storeReview = async (message) => {
-    try{
-      
+    try {
+
       setIsLoading(true); // Start loading
 
       // Generating a new document inside the 'reviews' collection
@@ -112,22 +119,23 @@ const RatingPage = ({ navigation, route }) => {
       var reviewUUID = reviewRef.id
       const reviewData = {
         id: reviewRef.id, // Firestore generated unique ID
-        userId: userId, 
+        userId: userId,
+        username: await RatingModel.getUserData(userId),
         artistName: finalArtistName,
         songName: songName,
-        creationTime: new Date().toISOString(), 
+        creationTime: new Date().toISOString(),
         rating: rating,
         review: message,
         genre: songGenre,
-        likes: []
+        likes: [],
       };
-    
+
       // Save the review data to the new document in the 'reviews' collection.
       await setDoc(reviewRef, reviewData);
 
       // Reference the 'artists' collection and the specific artist's document.
       const artistDocRef = doc(db, "artists", finalArtistName);
-  
+
       // Reference the specific song's document.
       const songDocRef = doc(artistDocRef, "songs", songName);
 
@@ -156,14 +164,14 @@ const RatingPage = ({ navigation, route }) => {
       showToast('Success!', 'Review Successfully Posted');
 
     } catch (error) {
-      
+
       console.error("Failed to store review:", error);
       showToast('Error', 'Failed to post review');
     } finally {
       setIsLoading(false); // Stop loading regardless of outcome
     }
   };
-  
+
   // Make sure showToast is defined or use the Toast.show() method you have
   const showToast = (title, message) => {
     Toast.show({
@@ -184,12 +192,12 @@ const RatingPage = ({ navigation, route }) => {
           <Image source={{ uri: albumArt }} style={styles.albumArtStyle} />
           <Text style={styles.textStyleSong}>{songName}</Text>
           <Text style={styles.textStyleArtist}>{finalArtistName}</Text>
-  
+
           {/* Trigger button for the modal */}
           <TouchableOpacity onPress={openModal} style={styles.buttonStyle}>
             <Text style={styles.buttonTextStyle}>Review This Song</Text>
           </TouchableOpacity>
-  
+
           {/* Modal Definition */}
           <Modal
             animationType="none" // we are using Animated for the modal animation
@@ -228,7 +236,7 @@ const RatingPage = ({ navigation, route }) => {
                     <Text style={styles.modalSaveButtonText}>Save</Text>
                   </TouchableOpacity>
                 </View>
-  
+
                 {/* Modal content */}
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   {/* Album Art */}
@@ -260,7 +268,7 @@ const RatingPage = ({ navigation, route }) => {
       <Toast />
     </>
   );
-  
+
 };
 export default RatingPage;
 
@@ -277,7 +285,7 @@ const styles = StyleSheet.create({
     marginTop: 0,
     marginBottom: 15,
   },
-  
+
   textStyleSong: {
     fontSize: 29,
     marginTop: 0,
@@ -317,7 +325,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0, // start from bottom
     width: '100%', // cover full screen width
-    height: "100%", 
+    height: "100%",
     backgroundColor: 'white',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
@@ -325,24 +333,24 @@ const styles = StyleSheet.create({
 
   },
   modalCancelButtonText: {
-    color: 'gray', 
+    color: 'gray',
     fontSize: 16,
     fontWeight: 'bold',
   },
   modalSaveButtonText: {
-    color: '#00ab66', 
+    color: '#00ab66',
     fontSize: 16,
     fontWeight: 'bold',
   },
   modalHeaderText: {
-    color: 'black', 
-    fontSize: 20, 
-    fontWeight: 'bold', 
+    color: 'black',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   modalAlbumArt: {
-    width: 100, 
+    width: 100,
     height: 100,
-    resizeMode: 'contain', 
+    resizeMode: 'contain',
 
     marginHorizontal: 10,
     marginVertical: 20,
@@ -379,10 +387,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   albumArtStyle: {
-    width: 230, 
-    height: 230, 
+    width: 230,
+    height: 230,
     resizeMode: 'contain', //the image scales to fit within the dimensions and maintain its aspect ratio
-    marginVertical: 20, 
+    marginVertical: 20,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -401,6 +409,6 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     marginVertical: 20,
-    alignItems: 'center', 
+    alignItems: 'center',
   },
 });
