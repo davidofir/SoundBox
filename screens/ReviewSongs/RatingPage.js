@@ -8,135 +8,93 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Modal,
+  Animated,
+  ActivityIndicator,
 } from "react-native";
-import { TouchableWithoutFeedback, Keyboard } from "react-native";
-import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion } from "firebase/firestore";
 import { authentication, db } from "../../firebase";
-import { Modal, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { ActivityIndicator } from 'react-native';
+import defaultCoverArt from '../../assets/defaultSongImage.png';
+import StarRating from 'react-native-star-rating-widget'; //Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
 
-//Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
-import StarRating from 'react-native-star-rating-widget';
 
-const defaultCoverArt = require('../../assets/defaultSongImage.png')
+const RatingModel = {
 
-class RatingModel {
-  constructor(userId) {
-    this.userId = userId;
-  }
-
-  async getUserReviews() {
-    const userRef = doc(db, "users", this.userId);
+  async getUserReviews(userId) {
+    const userRef = doc(db, "users", userId);
     const docSnapshot = await getDoc(userRef);
-    const userData = docSnapshot.data();
-    return userData.reviews || [];
-  }
+    return docSnapshot.data()?.reviews || [];
+  },
 
-  async addReview(reviewData) {
-    const userRef = doc(db, "users", this.userId);
+  async addReview(userId, reviewData) {
+    const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
-      reviews: [...reviewData],
+      reviews: arrayUnion(reviewData),
     });
-  }
-}
-
-class RatingViewModel {
-  constructor(userId) {
-    this.model = new RatingModel(userId);
-    this.defaultRating = 0;
-    this.maxRating = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
-  }
-
-  async getUserReviews() {
-    return await this.model.getUserReviews();
-  }
-
-  async addReview(reviewData) {
-    await this.model.addReview(reviewData);
-  }
-
-  getDefaultRating() {
-    return this.defaultRating;
-  }
-
-  setDefaultRating(rating) {
-    this.defaultRating = rating;
-  }
-
-  getMaxRating() {
-    return this.maxRating;
-  }
-}
+  },
+};
 
 const RatingPage = ({ navigation, route }) => {
   const userId = authentication.currentUser.uid;
-  const viewModel = new RatingViewModel(userId);
-
   const [reviews, setReviews] = useState([]);
-  const artistName1 = route.params.paramArtistName;
-  const songName = route.params.paramSongName;
-  const searchedArtistName = route.params.paramSearchedArtist;
-  const isSearched = route.params.paramSearched;
-  const songGenre = route.params.paramSongGenre
-  var albumArt = route.params.paramCoverArtUrl 
-  if( albumArt == 3){
-    albumArt = Image.resolveAssetSource(defaultCoverArt).uri;
-  }
-  var finalArtistName = "";
+  const {
+    paramSongName: songName,
+    paramSearched: isSearched,
+    paramSongGenre: songGenre,
+    paramCoverArtUrl: coverArtUrl,
+    paramArtistName: artistName,
+    paramSearchedArtist: searchedArtistName
+  } = route.params;
+  const finalArtistName = isSearched === 1 ? artistName : searchedArtistName;
+  
+  const defaultCoverArtUri = Image.resolveAssetSource(defaultCoverArt).uri;
+  const albumArt = coverArtUrl === 3 ? defaultCoverArtUri : coverArtUrl;
 
-  //Loading wheel
   const [isLoading, setIsLoading] = useState(false);
-
-
-  // State for modal visibility and animation
-const [modalVisible, setModalVisible] = useState(false);
-const [modalY] = useState(new Animated.Value(300)); // initial position off screen
-const windowHeight = Dimensions.get('window').height;
-// Function to handle opening the modal
-const openModal = () => {
-  setModalVisible(true);
-  Animated.timing(modalY, {
-    toValue: windowHeight * 0.1, // animate to top
-    duration: 500, // in milliseconds
-    useNativeDriver: false,
-  }).start();
-};
-
-// Function to handle closing the modal
-const closeModal = () => {
-  Animated.timing(modalY, {
-    toValue: windowHeight, // animate back to bottom
-    duration: 500, // in milliseconds
-    useNativeDriver: false,
-  }).start(() => {
-    setModalVisible(false); // hide the modal after animation
-  });
-};
- 
-
-  if (isSearched === 0) {
-    finalArtistName = artistName1;
-  } else {
-    finalArtistName = searchedArtistName;
-  }
-
-  const [defaultRating, setDefaultRating] = useState(viewModel.getDefaultRating());
-  const maxRating = viewModel.getMaxRating();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalY] = useState(new Animated.Value(Dimensions.get('window').height));
+  const [defaultRating, setDefaultRating] = useState(0);
+  const maxRating = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
   const [text, setText] = useState("");
-  const url = `https://www.purgomalum.com/service/json?text=${text}`;
+  const [rating, setRating] = useState(0);
+  const windowHeight = Dimensions.get('window').height;
 
   useEffect(() => {
-    async function loadReviews() {
-      const userReviews = await viewModel.getUserReviews();
+    const loadReviews = async () => {
+      const userReviews = await RatingModel.getUserReviews(userId);
       setReviews(userReviews);
-    }
+    };
     loadReviews();
   }, []);
 
-  const [rating, setRating] = useState(viewModel.getDefaultRating());
+  // Function to handle opening the modal
+  const openModal = () => {
+    setModalVisible(true);
+    Animated.timing(modalY, {
+      toValue: windowHeight * 0.1, // animate to top
+      duration: 500, // in milliseconds
+      useNativeDriver: false,
+    }).start();
+  };
 
+  // Function to handle closing the modal
+  const closeModal = () => {
+    Animated.timing(modalY, {
+      toValue: windowHeight, // animate back to bottom
+      duration: 500, // in milliseconds
+      useNativeDriver: false,
+    }).start(() => {
+      setModalVisible(false); // hide the modal after animation
+    });
+  };
+ 
+  //profanity filter
   const getCensoredTextAndStore = async () => {
+
+    const url = `https://www.purgomalum.com/service/json?text=${text}`;
     const response = await fetch(url);
     const data = await response.json();
     var message = data.result || "";
@@ -144,7 +102,6 @@ const closeModal = () => {
   };
 
   const storeReview = async (message) => {
-
     try{
       
       setIsLoading(true); // Start loading
@@ -188,25 +145,23 @@ const closeModal = () => {
         });
       }
 
-      // Optionally update the user's document with the new review ID.
+      // update the user's document with the new review ID.
       const userRef = doc(db, "users", userId);
       await updateDoc(userRef, {
         reviewIds: arrayUnion(reviewRef.id)
       });
 
-      // Add the new review to the local state if you're managing it on the client-side.
-      setReviews(prevReviews => [...prevReviews, reviewData]);
-
       // Close modal and show toast notification
       closeModal();
       showToast('Success!', 'Review Successfully Posted');
+
     } catch (error) {
+      
       console.error("Failed to store review:", error);
       showToast('Error', 'Failed to post review');
     } finally {
       setIsLoading(false); // Stop loading regardless of outcome
     }
-    
   };
   
   // Make sure showToast is defined or use the Toast.show() method you have
@@ -216,7 +171,7 @@ const closeModal = () => {
       position: 'bottom',
       text1: title,
       text2: message,
-      visibilityTime: 4000,
+      visibilityTime: 6000,
       autoHide: true,
       bottomOffset: 40,
     });
@@ -224,117 +179,89 @@ const closeModal = () => {
 
   return (
     <>
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={styles.container}>
-
-        <Image
-          source={{ uri: albumArt }}
-          style={styles.albumArtStyle}
-        />
-        <Text style={styles.textStyleSong}> {songName}</Text>
-        <Text style={styles.textStyleArtist}> {finalArtistName}</Text>
-
-        {/* Trigger button for the modal */}
-        <TouchableOpacity
-          onPress={openModal}
-          style={styles.buttonStyle}
-        >
-          <Text style={styles.buttonTextStyle}>Review This Song</Text>
-        </TouchableOpacity>
-
-        
-        {/* Modal Definition */}
-        <Modal
-          animationType="none" // we are using Animated for the modal animation
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={closeModal}
-        >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <Animated.View
-          style={[
-            styles.modalView,
-            {
-              // Use the interpolate function to translate the Y position
-              transform: [
-                {
-                  translateY: modalY.interpolate({
-                    inputRange: [0, 300],
-                    outputRange: [0, 300],
-                  }),
-                },
-              ],
-            },
-          ]}
-        >
-          
-
-        {/* Modal header with buttons */}
-        <View style={styles.modalHeader}>
-          <TouchableOpacity onPress={closeModal} style={styles.modalHeaderButton}>
-            <Text style={styles.modalCancelButtonText}>Cancel</Text>
-          </TouchableOpacity>
-          {isLoading ? (
-            <ActivityIndicator size="medium" color="#040f13" />
-          ) : (
-            <Text style={styles.modalHeaderText}>Reviewing:</Text>
-          )}
-          <TouchableOpacity onPress={getCensoredTextAndStore} style={styles.modalHeaderButton}>
-            <Text style={styles.modalSaveButtonText}>Save</Text>
-          </TouchableOpacity>
-        </View>
-
-          {/* modal content */}
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            {/* Album Art */}
-            <Image
-              source={{ uri: albumArt }}
-              style={styles.modalAlbumArt}
-            />
-            {/* Text Container for song and artist names */}
-            <View style={{ flexDirection: 'column', justifyContent: 'center', flex: 1 }}> 
-              {/* Song name */}
-              <Text style={styles.modalStyleSong}> 
-                {songName}
-              </Text>
-              {/* Artist name */}
-              <Text style={styles.modalStyleArtist}>
-                {finalArtistName}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.modalContent}>
-            <StarRating
-              rating={rating}
-              onChange={setRating}
-              starSize={50}
-            
-            />
-            <Text style={styles.textStyle}>
-              {rating + " / " + maxRating.length / 2}
-            </Text>
-
-
-            <TextInput
-              style={styles.input}
-              onChangeText={text => setText(text)}
-              placeholder="Write a review (optional)"
-              keyboardType="default"
-              multiline={true}
-            />
-          </View>
-        </Animated.View>
-        </TouchableWithoutFeedback>
-      </Modal>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
-  <Toast /> 
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <SafeAreaView style={styles.container}>
+          <Image source={{ uri: albumArt }} style={styles.albumArtStyle} />
+          <Text style={styles.textStyleSong}>{songName}</Text>
+          <Text style={styles.textStyleArtist}>{finalArtistName}</Text>
   
-</>
-    
+          {/* Trigger button for the modal */}
+          <TouchableOpacity onPress={openModal} style={styles.buttonStyle}>
+            <Text style={styles.buttonTextStyle}>Review This Song</Text>
+          </TouchableOpacity>
+  
+          {/* Modal Definition */}
+          <Modal
+            animationType="none" // we are using Animated for the modal animation
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={closeModal}
+          >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <Animated.View
+                style={[
+                  styles.modalView,
+                  {
+                    // Use the interpolate function to translate the Y position
+                    transform: [
+                      {
+                        translateY: modalY.interpolate({
+                          inputRange: [0, 300],
+                          outputRange: [0, 300],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                {/* Modal header with buttons */}
+                <View style={styles.modalHeader}>
+                  <TouchableOpacity onPress={closeModal} style={styles.modalHeaderButton}>
+                    <Text style={styles.modalCancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
+                  {isLoading ? (
+                    <ActivityIndicator size="medium" color="#040f13" />
+                  ) : (
+                    <Text style={styles.modalHeaderText}>Reviewing:</Text>
+                  )}
+                  <TouchableOpacity onPress={getCensoredTextAndStore} style={styles.modalHeaderButton}>
+                    <Text style={styles.modalSaveButtonText}>Save</Text>
+                  </TouchableOpacity>
+                </View>
+  
+                {/* Modal content */}
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {/* Album Art */}
+                  <Image source={{ uri: albumArt }} style={styles.modalAlbumArt} />
+                  {/* Text Container for song and artist names */}
+                  <View style={{ flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
+                    {/* Song name */}
+                    <Text style={styles.modalStyleSong}>{songName}</Text>
+                    {/* Artist name */}
+                    <Text style={styles.modalStyleArtist}>{finalArtistName}</Text>
+                  </View>
+                </View>
+                <View style={styles.modalContent}>
+                  <StarRating rating={rating} onChange={setRating} starSize={50} />
+                  <Text style={styles.textStyle}>{rating + " / " + maxRating.length / 2}</Text>
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={setText}
+                    placeholder="Write a review (optional)"
+                    keyboardType="default"
+                    multiline={true}
+                  />
+                </View>
+              </Animated.View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
+      <Toast />
+    </>
   );
+  
 };
-
 export default RatingPage;
 
 const styles = StyleSheet.create({
@@ -387,7 +314,6 @@ const styles = StyleSheet.create({
     color: "white"
   },
   modalView: {
-    // modal styling,
     position: 'absolute',
     bottom: 0, // start from bottom
     width: '100%', // cover full screen width
@@ -396,28 +322,27 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     paddingVertical: 10
-    // Add shadow or elevation based on your preference
-  },
 
+  },
   modalCancelButtonText: {
-    color: 'gray', // Changed to green to match your screenshot
+    color: 'gray', 
     fontSize: 16,
     fontWeight: 'bold',
   },
   modalSaveButtonText: {
-    color: '#00ab66', // Changed to green to match your screenshot
+    color: '#00ab66', 
     fontSize: 16,
     fontWeight: 'bold',
   },
   modalHeaderText: {
-    color: 'black', // Changed to white to match your screenshot
-    fontSize: 20, // Adjust the font size as needed
-    fontWeight: 'bold', // If you want the text to be bold
+    color: 'black', 
+    fontSize: 20, 
+    fontWeight: 'bold', 
   },
   modalAlbumArt: {
-    width: 100, // Set the width as per your requirement
-    height: 100, // Set the height as per your requirement
-    resizeMode: 'contain', // This will ensure the image scales to fit within the dimensions and maintain its aspect ratio
+    width: 100, 
+    height: 100,
+    resizeMode: 'contain', 
 
     marginHorizontal: 10,
     marginVertical: 20,
@@ -454,10 +379,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   albumArtStyle: {
-    width: 230, // Set the width as per your requirement
-    height: 230, // Set the height as per your requirement
-    resizeMode: 'contain', // This will ensure the image scales to fit within the dimensions and maintain its aspect ratio
-    marginVertical: 20, // Optional: Adds some vertical space above and below the image
+    width: 230, 
+    height: 230, 
+    resizeMode: 'contain', //the image scales to fit within the dimensions and maintain its aspect ratio
+    marginVertical: 20, 
   },
   modalHeader: {
     flexDirection: 'row',
@@ -476,7 +401,6 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     marginVertical: 20,
-    alignItems: 'center', // This centers children horizontally in the container
+    alignItems: 'center', 
   },
-
 });
