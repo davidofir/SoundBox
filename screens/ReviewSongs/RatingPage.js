@@ -10,7 +10,7 @@ import {
   Dimensions,
 } from "react-native";
 import { TouchableWithoutFeedback, Keyboard } from "react-native";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion } from "firebase/firestore";
 import { authentication, db } from "../../firebase";
 import { Modal, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -139,34 +139,52 @@ const closeModal = () => {
   };
 
   const storeReview = async (message) => {
+    // Generating a new document inside the 'reviews' collection
+    // Firestore will automatically create a unique ID for this document
+    const reviewRef = doc(collection(db, "reviews"));
+  
     const reviewData = {
+      id: reviewRef.id, // Firestore generated unique ID
+      userId: userId, 
       artistName: finalArtistName,
       songName: songName,
-      creationTime: new Date().toUTCString(),
+      creationTime: new Date().toISOString(), 
       rating: rating,
       review: message,
       genre: songGenre,
       likes: []
     };
-
-    const updatedReviews = [...reviews, reviewData];
-    setReviews(updatedReviews);
-    await viewModel.addReview(updatedReviews);
-
+  
+    // Save the review data to the new document in the 'reviews' collection
+    await setDoc(reviewRef, reviewData);
+  
+    // If you also want to keep track of each user's reviews, you can update the user's document
+    // This is optional and based on whether you need a reference to the reviews in the user's document
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      reviewIds: arrayUnion(reviewRef.id) // Only do this if you need to keep a list of reviewIds in the user's document
+    });
+  
+    // Add the new review to the local state if you're managing it on the client-side
+    setReviews(prevReviews => [...prevReviews, reviewData]);
+  
+    // Close modal and show toast notification
     closeModal();
-
+    showToast('Success!', 'Review Successfully Posted');
+  };
+  
+  // Make sure showToast is defined or use the Toast.show() method you have
+  const showToast = (title, message) => {
     Toast.show({
-      type: 'success', // 'success | 'error' | 'info'
+      type: 'success',
       position: 'bottom',
-      text1: 'Success!',
-      text2: 'Review Successfully Posted',
+      text1: title,
+      text2: message,
       visibilityTime: 4000,
       autoHide: true,
-      bottomOffset: 40, // distance from the bottom of the screen
+      bottomOffset: 40,
     });
-    
   };
-
 
   return (
     <>
