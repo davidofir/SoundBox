@@ -14,6 +14,7 @@ import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion, query, where, g
 import { authentication, db } from "../../firebase";
 import { Modal, Animated } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { ActivityIndicator } from 'react-native';
 
 //Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
 import StarRating from 'react-native-star-rating-widget';
@@ -84,6 +85,10 @@ const RatingPage = ({ navigation, route }) => {
   }
   var finalArtistName = "";
 
+  //Loading wheel
+  const [isLoading, setIsLoading] = useState(false);
+
+
   // State for modal visibility and animation
 const [modalVisible, setModalVisible] = useState(false);
 const [modalY] = useState(new Animated.Value(300)); // initial position off screen
@@ -139,57 +144,69 @@ const closeModal = () => {
   };
 
   const storeReview = async (message) => {
-    // Generating a new document inside the 'reviews' collection
-    // Firestore will automatically create a unique ID for this document
-    const reviewRef = doc(collection(db, "reviews"));
-    var reviewUUID = reviewRef.id
-    const reviewData = {
-      id: reviewRef.id, // Firestore generated unique ID
-      userId: userId, 
-      artistName: finalArtistName,
-      songName: songName,
-      creationTime: new Date().toISOString(), 
-      rating: rating,
-      review: message,
-      genre: songGenre,
-      likes: []
-    };
+
+    try{
+      
+      setIsLoading(true); // Start loading
+
+      // Generating a new document inside the 'reviews' collection
+      // Firestore will automatically create a unique ID for this document
+      const reviewRef = doc(collection(db, "reviews"));
+      var reviewUUID = reviewRef.id
+      const reviewData = {
+        id: reviewRef.id, // Firestore generated unique ID
+        userId: userId, 
+        artistName: finalArtistName,
+        songName: songName,
+        creationTime: new Date().toISOString(), 
+        rating: rating,
+        review: message,
+        genre: songGenre,
+        likes: []
+      };
+    
+      // Save the review data to the new document in the 'reviews' collection.
+      await setDoc(reviewRef, reviewData);
+
+      // Reference the 'artists' collection and the specific artist's document.
+      const artistDocRef = doc(db, "artists", finalArtistName);
   
-    // Save the review data to the new document in the 'reviews' collection.
-    await setDoc(reviewRef, reviewData);
+      // Reference the specific song's document.
+      const songDocRef = doc(artistDocRef, "songs", songName);
 
-    // Reference the 'artists' collection and the specific artist's document.
-    const artistDocRef = doc(db, "artists", finalArtistName);
- 
-    // Reference the specific song's document.
-    const songDocRef = doc(artistDocRef, "songs", songName);
+      // Check if the song already exists.
+      const songDocSnapshot = await getDoc(songDocRef);
+      if (!songDocSnapshot.exists()) {
+        // If the song does not exist, create a new song document with the first review ID.
+        await setDoc(songDocRef, {
+          reviewIds: [reviewUUID] // Use the ID from the reviewRef.
+        });
+      } else {
+        // If the song exists, add the review ID to the song's document.
+        await updateDoc(songDocRef, {
+          reviewIds: arrayUnion(reviewRef.id)
+        });
+      }
 
-    // Check if the song already exists.
-    const songDocSnapshot = await getDoc(songDocRef);
-    if (!songDocSnapshot.exists()) {
-      // If the song does not exist, create a new song document with the first review ID.
-      await setDoc(songDocRef, {
-        reviewIds: [reviewUUID] // Use the ID from the reviewRef.
-      });
-    } else {
-      // If the song exists, add the review ID to the song's document.
-      await updateDoc(songDocRef, {
+      // Optionally update the user's document with the new review ID.
+      const userRef = doc(db, "users", userId);
+      await updateDoc(userRef, {
         reviewIds: arrayUnion(reviewRef.id)
       });
+
+      // Add the new review to the local state if you're managing it on the client-side.
+      setReviews(prevReviews => [...prevReviews, reviewData]);
+
+      // Close modal and show toast notification
+      closeModal();
+      showToast('Success!', 'Review Successfully Posted');
+    } catch (error) {
+      console.error("Failed to store review:", error);
+      showToast('Error', 'Failed to post review');
+    } finally {
+      setIsLoading(false); // Stop loading regardless of outcome
     }
-
-    // Optionally update the user's document with the new review ID.
-    const userRef = doc(db, "users", userId);
-    await updateDoc(userRef, {
-      reviewIds: arrayUnion(reviewRef.id)
-    });
-
-    // Add the new review to the local state if you're managing it on the client-side.
-    setReviews(prevReviews => [...prevReviews, reviewData]);
-
-    // Close modal and show toast notification
-    closeModal();
-    showToast('Success!', 'Review Successfully Posted');
+    
   };
   
   // Make sure showToast is defined or use the Toast.show() method you have
@@ -250,13 +267,18 @@ const closeModal = () => {
             },
           ]}
         >
+          
 
         {/* Modal header with buttons */}
         <View style={styles.modalHeader}>
           <TouchableOpacity onPress={closeModal} style={styles.modalHeaderButton}>
             <Text style={styles.modalCancelButtonText}>Cancel</Text>
           </TouchableOpacity>
-          <Text style={styles.modalHeaderText}>Reviewing:</Text>
+          {isLoading ? (
+            <ActivityIndicator size="medium" color="#040f13" />
+          ) : (
+            <Text style={styles.modalHeaderText}>Reviewing:</Text>
+          )}
           <TouchableOpacity onPress={getCensoredTextAndStore} style={styles.modalHeaderButton}>
             <Text style={styles.modalSaveButtonText}>Save</Text>
           </TouchableOpacity>
@@ -301,21 +323,13 @@ const closeModal = () => {
               multiline={true}
             />
           </View>
-          
-
         </Animated.View>
-        
-
         </TouchableWithoutFeedback>
-        
       </Modal>
-        
-      
-      
       </SafeAreaView>
-      
     </TouchableWithoutFeedback>
   <Toast /> 
+  
 </>
     
   );
