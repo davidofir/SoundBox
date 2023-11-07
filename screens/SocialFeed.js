@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { FontAwesome } from '@expo/vector-icons'; // Import the FontAwesome icons
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
+import * as UserRepository from "../domain/FirebaseRepository/UserRepository";
 import { authentication, db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
@@ -12,7 +13,6 @@ export default SocialFeed = ({ navigation }) => {
     const [events, setEvents] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [following, setFollowing] = useState([]);
-    var tempeviews = reviews;
 
     // Get the current user
     var userId = authentication.currentUser.uid;
@@ -33,21 +33,74 @@ export default SocialFeed = ({ navigation }) => {
 
     // new change
     useEffect(() => {
-        for (let i = 0; i < following.length; i++) {
-            const userRef2 = doc(db, "users", following[i]);
-            getDoc(userRef2)
+        const fetchReviews = async () => {
+            const tempReviews = [];
+
+            for (let i = 0; i < following.length; i++) {
+                const userRef2 = doc(db, "users", following[i]);
+                const userDoc = await getDoc(userRef2);
+
+                if (userDoc.data().reviewIds.length !== 0) {
+                    const userReviews = await UserRepository.getUserReviewData(following[i]);
+                    tempReviews.push(...userReviews);
+                }
+            }
+
+            setReviews(tempReviews);
+        };
+
+        fetchReviews();
+    }, [following])
+
+    const LikePost = (item) => {
+
+        /*
+        if (!item.likes.includes(userId)) {
+            // Update the likes list in Firebase
+            const userRef = doc(db, 'users', item.uid);
+
+            // Find the specific review in user's reviews
+            getDoc(userRef)
                 .then((doc) => {
-                    for (let i = 0; i < doc.data().reviews.length; i++) {
-                        const userReviews = {
-                            ...doc.data().reviews[i],
-                            username: doc.data().userName,
-                        };
-                        tempeviews.push(userReviews);
+                    const tempReviews = doc.data().reviews;
+
+                    for (let i = 0; i < tempReviews.length; i++) {
+                        if (tempReviews[i].id == item.id) {
+                            tempReviews[i].likes.push(userId)
+                            updateDoc(userRef, {
+                                reviews: tempReviews
+                            })
+                        }
                     }
-                    setReviews([...tempeviews]);
                 })
         }
-    }, [following])
+        */
+    }
+
+    const UnlikePost = () => {
+
+        /*
+        if (!item.likes.includes(userId)) {
+            // Update the likes list in Firebase
+            const userRef = doc(db, 'users', item.uid);
+
+            // Find the specific review in user's reviews
+            getDoc(userRef)
+                .then((doc) => {
+                    const tempReviews = doc.data().reviews;
+
+                    for (let i = 0; i < tempReviews.length; i++) {
+                        if (tempReviews[i].id == item.id) {
+                            tempReviews[i].likes.splice(tempReviews.indexOf(userId), 1);
+                            updateDoc(userRef, {
+                                reviews: tempReviews
+                            })
+                        }
+                    }
+                })
+        }
+        */
+    }
 
     return (
         < View style={styles.container} >
@@ -86,9 +139,26 @@ export default SocialFeed = ({ navigation }) => {
                                 <Text style={styles.songName}>Song: {item.songName}</Text>
 
                                 <View style={styles.likeContainer}>
-                                    <TouchableOpacity>
-                                        <FontAwesome name="heart" size={20} color="red" style={styles.likeIcon} />
-                                    </TouchableOpacity>
+                                    {item.likes.includes(userId) ?
+                                        (<TouchableOpacity onPress={() => LikePost(item)}>
+                                            <FontAwesome
+                                                name="heart"
+                                                size={20}
+                                                color='red'
+                                                style={styles.likeIcon}
+                                            />
+                                        </TouchableOpacity>
+                                        ) : (
+                                            <TouchableOpacity onPress={() => UnlikePost(item)}>
+                                                <FontAwesome
+                                                    name="heart"
+                                                    size={20}
+                                                    color='white'
+                                                    style={styles.likeIcon}
+                                                />
+                                            </TouchableOpacity>
+                                        )}
+
                                     <Text style={styles.likeText}>12</Text>
                                 </View>
                             </View>

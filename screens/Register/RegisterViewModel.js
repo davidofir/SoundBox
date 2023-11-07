@@ -15,7 +15,7 @@ const useRegisterViewModel = (navigation) => {
                 userName,
                 followers: [],
                 following: [],
-                reviews: [],
+                reviewIds: [],
             };
 
             await UserRepository.createUserDocument(user.uid, userData);

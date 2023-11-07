@@ -13,13 +13,14 @@ const useProfileViewModel = (navigation) => {
     useEffect(() => {
         const fetchUserProfileData = async () => {
             try {
-                const userData = await UserRepository.getUserProfileData();
                 const user = authentication.currentUser;
+                const userData = await UserRepository.getUserProfileData();
+                const reviewData = await UserRepository.getUserReviewData(user.uid);
                 if (userData) {
                     setUsername(userData.userName);
                     setFollowers(userData.followers || []);
                     setFollowing(userData.following || []);
-                    setReviews(userData.reviews || []);
+                    setReviews(reviewData || []);
 
                     if (user) {
                         setUserEmail(user.email);
