@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { FontAwesome } from '@expo/vector-icons'; // Import the FontAwesome icons
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
 import * as UserRepository from "../domain/FirebaseRepository/UserRepository";
 import { authentication, db } from '../firebase';
@@ -102,14 +102,21 @@ export default SocialFeed = ({ navigation }) => {
 
                     <View style={styles.likeContainer}>
                         <TouchableOpacity onPress={handleLike}>
-                            <FontAwesome
-                                name="heart"
+                            <Ionicons
+                                name={liked ? 'heart' : 'heart-outline'}
                                 size={20}
                                 color={liked ? 'red' : 'white'}
                                 style={styles.likeIcon}
                             />
                         </TouchableOpacity>
                         <Text style={styles.likeText}>{item.likes.length}</Text>
+                        <TouchableOpacity>
+                            <Ionicons
+                                name="chatbox-outline"
+                                size={20}
+                                color="white"
+                                style={styles.commentIcon} />
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
@@ -284,5 +291,8 @@ const styles = StyleSheet.create({
     likeText: {
         fontSize: 14,
         color: 'white',
+    },
+    commentIcon: {
+        marginLeft: 10,
     },
 })
