@@ -9,7 +9,7 @@ import Toast from 'react-native-toast-message';
 import defaultCoverArt from '../../assets/defaultSongImage.png';
 import StarRating from 'react-native-star-rating-widget'; //Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
 import SongReviewsPage from "./SongReviewsPage";
-import {storeReviewData, RatingModel} from "./ReviewStorage";
+import {storeReviewData, RatingModel, getSongReviews} from "./ReviewStorage";
 
 const RatingPage = ({ navigation, route }) => {
   const userId = authentication.currentUser.uid;
@@ -29,10 +29,12 @@ const RatingPage = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalY] = useState(new Animated.Value(Dimensions.get('window').height));
-  const maxRating = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
   const [text, setText] = useState("");
   const [rating, setRating] = useState(0);
   const windowHeight = Dimensions.get('window').height;
+
+  const [avgRating, setAvgRating] = useState(0); 
+  const [numberOfReviews, setNumberOfReviews] = useState(0); 
 
   //Set the title of the page
   useLayoutEffect(() => {
@@ -42,8 +44,29 @@ const RatingPage = ({ navigation, route }) => {
   }, [navigation]);
 
   useEffect(() => {
-
+        fetchStarRatingAverage()
   }, []);
+
+  const fetchStarRatingAverage = async () => {
+    try {
+        const fetchedReviews = await getSongReviews(songName, artistName);
+        if (fetchedReviews.length != 0){
+          // Summing up the ratings
+          const totalRating = fetchedReviews.reduce((acc, review) => acc + review.rating, 0);
+
+          const average = totalRating / fetchedReviews.length;
+          setAvgRating(Number(average.toFixed(2))); 
+          setNumberOfReviews(fetchedReviews.length);
+
+        } else {
+          setAvgRating(0)
+          setNumberOfReviews(fetchedReviews.length);
+        }
+        
+    } catch (error) {
+        console.error('Error fetching reviews:', error);
+    } 
+};
 
   // Function to handle opening the modal
   const openModal = () => {
@@ -132,8 +155,8 @@ const RatingPage = ({ navigation, route }) => {
               artistName: artistName,
             })}
             >
-              <Text style={styles.reviewText}>View Reviews</Text>
-              <Text style={styles.rating}>Avg Rating: 2 stars</Text>
+              <Text style={styles.reviewText}>View Reviews ({numberOfReviews})</Text>
+              <Text style={styles.rating}>Average Rating: {avgRating}★'s</Text>
               
             </TouchableOpacity>
           </View>
@@ -191,7 +214,7 @@ const RatingPage = ({ navigation, route }) => {
                 </View>
                 <View style={styles.modalContent}>
                   <StarRating rating={rating} onChange={setRating} starSize={50} />
-                  <Text style={styles.textStyle}>{rating + " / " + maxRating.length / 2}</Text>
+                  <Text style={styles.textStyle}>{rating + " / 5"}</Text>
                   <TextInput
                     style={styles.input}
                     onChangeText={setText}
