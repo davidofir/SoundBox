@@ -124,7 +124,7 @@ class App extends React.Component {
     const coverArtUrl = await searchAndFetchSongCoverArt(item.name, artistName);
 
     const genre = await viewModel.trackModel.fetchGenre(item.name, artistName);
-    console.log(`Genre for the track "${item.name}, ${artistName}": ${genre}`);
+    //console.log(`Genre for the track "${item.name}, ${artistName}": ${genre}`);
 
     this.props.navigation.navigate('RatingPage', {
       paramArtistName: item.artist.name,

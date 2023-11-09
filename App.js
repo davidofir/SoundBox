@@ -20,6 +20,7 @@ import UserPage from './screens/UserPage';
 import Recommendations from './screens/Recommendation';
 import Chat from './screens/Chat/Chat';
 import EditAccountPage from './screens/AccountProfile/EditAccountPage';
+import SongReviewsPage from './screens/ReviewSongs/SongReviewsPage';
 const Stack = createStackNavigator();
 export default function App() {
   return (
@@ -49,6 +50,7 @@ export default function App() {
         <Stack.Screen name="Recommendations" component={Recommendations} />
         <Stack.Screen name="Chat" component={Chat} />
         <Stack.Screen name="EditAccount" component={EditAccountPage} />
+        <Stack.Screen name="SongReviewsPage" component={SongReviewsPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

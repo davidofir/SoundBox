@@ -1,31 +1,20 @@
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TextInput,
-  TouchableOpacity,
-  Dimensions,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Modal,
-  Animated,
-  ActivityIndicator,
+  SafeAreaView, StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Dimensions, 
+  TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator,
 } from "react-native";
-import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion, getDocs } from "firebase/firestore";
 import { authentication, db } from "../../firebase";
 import Toast from 'react-native-toast-message';
 import defaultCoverArt from '../../assets/defaultSongImage.png';
 import StarRating from 'react-native-star-rating-widget'; //Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
-
+import SongReviewsPage from "./SongReviewsPage";
 
 const RatingModel = {
 
   async getUserReviews(userId) {
     const userRef = doc(db, "users", userId);
-    const docSnapshot = await getDoc(userRef);
+    const docSnapshot = await getDoc(userRef);  
     return docSnapshot.data()?.reviews || [];
   },
 
@@ -72,6 +61,7 @@ const RatingPage = ({ navigation, route }) => {
 
   // Function to handle opening the modal
   const openModal = () => {
+
     setModalVisible(true);
     Animated.timing(modalY, {
       toValue: windowHeight * 0.1, // animate to top
@@ -156,7 +146,6 @@ const RatingPage = ({ navigation, route }) => {
       showToast('Success!', 'Review Successfully Posted');
 
     } catch (error) {
-      
       console.error("Failed to store review:", error);
       showToast('Error', 'Failed to post review');
     } finally {
@@ -164,7 +153,7 @@ const RatingPage = ({ navigation, route }) => {
     }
   };
   
-  // Make sure showToast is defined or use the Toast.show() method you have
+  
   const showToast = (title, message) => {
     Toast.show({
       type: 'success',
@@ -189,7 +178,24 @@ const RatingPage = ({ navigation, route }) => {
           <TouchableOpacity onPress={openModal} style={styles.buttonStyle}>
             <Text style={styles.buttonTextStyle}>Review This Song</Text>
           </TouchableOpacity>
-  
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>View Your Review</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+            style={styles.button}
+            onPress={() => navigation.navigate("SongReviewsPage", {
+              songName: songName,
+              artistName: artistName,
+            })}
+            >
+              <Text style={styles.reviewText}>View Reviews</Text>
+              <Text style={styles.rating}>Avg Rating: 2 stars</Text>
+              
+            </TouchableOpacity>
+          </View>
+
           {/* Modal Definition */}
           <Modal
             animationType="none" // we are using Animated for the modal animation
@@ -402,5 +408,38 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: 20,
     alignItems: 'center', 
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    borderRadius: 4,
+    marginHorizontal: 10,
+    marginTop: 20,
+  },
+  button: {
+    padding: 10,
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    margin: 5, // This adds space between the buttons
+    borderWidth: 1, // Adjust as needed
+    borderColor: '#000',
+    borderRadius: 15, // This should be enough to create a rounded look
+  },
+  reviewContainer: {
+    flexDirection: 'row', // Make sure the container allows for the items to be side by side
+    padding: 10,
+    justifyContent: 'space-between', // This will add space between the buttons
+    alignItems: 'center',
+  },
+  buttonText: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  reviewText: {
+    fontWeight: 'bold',
+  },
+  rating: {
+    marginTop: 4,
   },
 });
