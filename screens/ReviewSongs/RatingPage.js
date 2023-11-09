@@ -35,7 +35,8 @@ const RatingPage = ({ navigation, route }) => {
 
   const [avgRating, setAvgRating] = useState(0); 
   const [numberOfReviews, setNumberOfReviews] = useState(0); 
-
+  const [usersReview, setUsersReview] = useState(null);
+  const [usersStarRating, setUsersStarRating] = useState(0);
   //Set the title of the page
   useLayoutEffect(() => {
       navigation.setOptions({
@@ -43,31 +44,48 @@ const RatingPage = ({ navigation, route }) => {
       });
   }, [navigation]);
 
+
   useEffect(() => {
-        fetchStarRatingAverage()
+        prepareReviewButtons();
   }, []);
 
-  const fetchStarRatingAverage = async () => {
+  const prepareReviewButtons = async () => {
+    const fetchedReviews = await getSongReviews(songName, artistName);
+    fetchStarRatingAverage(fetchedReviews);
+    fetchUserReview(fetchedReviews);
+  }
+
+  const fetchStarRatingAverage = (fetchedReviews) => {
     try {
-        const fetchedReviews = await getSongReviews(songName, artistName);
         if (fetchedReviews.length != 0){
           // Summing up the ratings
           const totalRating = fetchedReviews.reduce((acc, review) => acc + review.rating, 0);
-
           const average = totalRating / fetchedReviews.length;
           setAvgRating(Number(average.toFixed(2))); 
           setNumberOfReviews(fetchedReviews.length);
-
         } else {
           setAvgRating(0)
           setNumberOfReviews(fetchedReviews.length);
         }
-        
     } catch (error) {
         console.error('Error fetching reviews:', error);
     } 
 };
 
+  const fetchUserReview = (fetchedReviews) => {
+    const userReview = fetchedReviews.find(review => review.userId === userId);
+
+    if (userReview) {
+      // Found the user's review
+      
+      setUsersReview(userReview); // Set the found review in state
+      setUsersStarRating(userReview.rating)
+
+    } else {
+      setUsersReview(null); // Set state to null if no review is found
+      setUsersStarRating(0)
+    }
+  }
   // Function to handle opening the modal
   const openModal = () => {
 
