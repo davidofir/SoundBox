@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../components/ButtonComponent';
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
+import * as UserRepository from "../domain/FirebaseRepository/UserRepository";
 import { authentication, db } from "../firebase";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import * as SecureStore from 'expo-secure-store';
@@ -36,30 +37,34 @@ export default UserPage = ({ navigation, route }) => {
 
     // Query Firestore database with current UID
     useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userDoc = await getDoc(doc(db, "users", userId));
+                const userDoc2 = await getDoc(doc(db, "users", currId));
+                const reviewData = await UserRepository.getUserReviewData(userId);
 
-        const userRef = doc(db, "users", userId);
-        const userRef2 = doc(db, "users", currId);
+                setUser(userDoc.data().userName);
+                setFollowers(userDoc.data().followers);
+                setFollowing(userDoc.data().following);
 
-        getDoc(userRef)
-            .then((doc) => {
-                setUser(doc.data().userName);
-                setFollowers(doc.data().followers);
-                setFollowing(doc.data().following);
-                setReviews(doc.data().reviews);
+                setUserFollowing(userDoc2.data().following);
+                setUserFollowers(userDoc2.data().followers);
 
-                if (doc.data().followers.includes(currId) == true) {
+                if (userDoc.data().followers.includes(currId)) {
                     setFollow(true);
                 } else {
                     setFollow(false);
                 }
-            })
 
-        getDoc(userRef2)
-            .then((doc2) => {
-                setUserFollowing(doc2.data().following);
-                setUserFollowers(doc2.data().followers);
-            })
-    }, [])
+                setReviews(reviewData);
+            } catch (error) {
+                console.error("Error fetching user profile data:", error);
+            }
+        };
+
+        fetchUserData();
+    }, [userId, currId]);
+
     async function handlePress() {
         let roomId = await generateRoom(userId, currId);
         console.log(roomId);
@@ -118,7 +123,7 @@ export default UserPage = ({ navigation, route }) => {
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <Image source={require('../assets/defaultPic.png')} style={styles.profileImage} />
-                <Text style={styles.username}>{username}</Text>
+                <Text style={styles.username}>{username || 'Loading...'}</Text>
             </View>
             <View style={styles.buttonContainer}>
                 <View style={styles.buttonWrapper}>

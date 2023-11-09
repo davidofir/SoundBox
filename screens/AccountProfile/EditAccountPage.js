@@ -10,10 +10,11 @@ import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { updateEmail, signOut } from "firebase/auth";
 import useAccountProfileViewModel from "./AccountProfileViewModel";
 
-export default EditAccountPage = ({ navigation }) => {
+export default EditAccountPage = ({ navigation, route }) => {
 
     // new changes - using viewmodel
-    const { username, followers, following, reviews, userEmail, navigateToFollowers, navigateToFollowing } = useAccountProfileViewModel(navigation);
+    const item = route.params.username;
+    const { username, userEmail } = useAccountProfileViewModel(navigation);
 
     const [newUsername, setNewUsername] = useState("");
     const [newEmail, setNewEmail] = useState("");
@@ -57,7 +58,7 @@ export default EditAccountPage = ({ navigation }) => {
                     source={require('../../assets/defaultPic.png')}
                     style={styles.profileImage}
                 />
-                <Text style={styles.username}>{username}</Text>
+                <Text style={styles.username}>{item}</Text>
             </View>
             <View style={styles.editForm}>
                 <Text style={styles.sectionTitle}>Username</Text>

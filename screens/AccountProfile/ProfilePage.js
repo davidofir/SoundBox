@@ -48,8 +48,8 @@ export default ProfilePage = ({ navigation }) => {
         <View style={styles.container}>
             <View style={styles.headerContainer}>
                 <Image source={require('../../assets/defaultPic.png')} style={styles.profileImage} />
-                <Text style={styles.username}>{username}</Text>
-                <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("EditAccount")}>
+                <Text style={styles.username}>{username || 'Loading...'}</Text>
+                <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("EditAccount", { username })}>
                     <Text style={styles.editButtonText}>Edit Account</Text>
                 </TouchableOpacity>
             </View>

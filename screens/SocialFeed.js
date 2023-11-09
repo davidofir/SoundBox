@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { FontAwesome } from '@expo/vector-icons'; // Import the FontAwesome icons
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
+import * as UserRepository from "../domain/FirebaseRepository/UserRepository";
 import { authentication, db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const eventsRepo = new EventsRepository;
 export default SocialFeed = ({ navigation }) => {
     const [events, setEvents] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [following, setFollowing] = useState([]);
-    var tempeviews = reviews;
 
     // Get the current user
     var userId = authentication.currentUser.uid;
@@ -33,21 +33,95 @@ export default SocialFeed = ({ navigation }) => {
 
     // new change
     useEffect(() => {
-        for (let i = 0; i < following.length; i++) {
-            const userRef2 = doc(db, "users", following[i]);
-            getDoc(userRef2)
-                .then((doc) => {
-                    for (let i = 0; i < doc.data().reviews.length; i++) {
-                        const userReviews = {
-                            ...doc.data().reviews[i],
-                            username: doc.data().userName,
-                        };
-                        tempeviews.push(userReviews);
-                    }
-                    setReviews([...tempeviews]);
-                })
-        }
+        const fetchReviews = async () => {
+            const tempReviews = [];
+
+            for (let i = 0; i < following.length; i++) {
+                const userRef2 = doc(db, "users", following[i]);
+                const userDoc = await getDoc(userRef2);
+
+                if (userDoc.data().reviewIds.length !== 0) {
+                    const userReviews = await UserRepository.getUserReviewData(following[i]);
+                    tempReviews.push(...userReviews);
+                }
+            }
+
+            setReviews(tempReviews);
+        };
+
+        fetchReviews();
     }, [following])
+
+    const LikePost = (item) => {
+        var tempLikes = item.likes;
+
+        tempLikes.push(userId)
+
+        // Update the likes list in Firebase
+        const reviewDoc = doc(db, 'reviews', item.id);
+        updateDoc(reviewDoc, {
+            likes: tempLikes
+        })
+    }
+
+    const UnlikePost = (item) => {
+        var tempLikes = item.likes;
+
+        tempLikes.splice(tempLikes.indexOf(userId), 1);
+
+        // Update the likes list in Firebase
+        const reviewDoc = doc(db, 'reviews', item.id);
+        updateDoc(reviewDoc, {
+            likes: tempLikes
+        })
+    }
+
+    const Post = ({ item, userId, LikePost, UnlikePost }) => {
+        const [liked, setLiked] = useState(item.likes.includes(userId));
+
+        const handleLike = () => {
+            if (liked) {
+                UnlikePost(item);
+            } else {
+                LikePost(item);
+            }
+            setLiked(!liked);
+        };
+
+        return (
+            <View style={styles.postContainer}>
+                <View style={styles.postHeader}>
+                    <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
+                    <Text style={styles.username}>{item.username}</Text>
+                </View>
+                <View style={styles.postContent}>
+                    <Text style={styles.artistName}>Artist: {item.artistName}</Text>
+                    <Text style={styles.reviewText}>Review: {item.review}</Text>
+                    <Text style={styles.ratingText}>Rating: {item.rating}</Text>
+                    <Text style={styles.songName}>Song: {item.songName}</Text>
+
+                    <View style={styles.likeContainer}>
+                        <TouchableOpacity onPress={handleLike}>
+                            <Ionicons
+                                name={liked ? 'heart' : 'heart-outline'}
+                                size={20}
+                                color={liked ? 'red' : 'white'}
+                                style={styles.likeIcon}
+                            />
+                        </TouchableOpacity>
+                        <Text style={styles.likeText}>{item.likes.length}</Text>
+                        <TouchableOpacity>
+                            <Ionicons
+                                name="chatbox-outline"
+                                size={20}
+                                color="white"
+                                style={styles.commentIcon} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        );
+    };
 
     return (
         < View style={styles.container} >
@@ -74,25 +148,13 @@ export default SocialFeed = ({ navigation }) => {
                 </View>
                 <View style={styles.container2}>
                     {reviews.map((item, index) => (
-                        <View style={styles.postContainer} key={index}>
-                            <View style={styles.postHeader}>
-                                <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
-                                <Text style={styles.username}>{item.username}</Text>
-                            </View>
-                            <View style={styles.postContent}>
-                                <Text style={styles.artistName}>Artist: {item.artistName}</Text>
-                                <Text style={styles.reviewText}>Review: {item.review}</Text>
-                                <Text style={styles.ratingText}>Rating: {item.rating}</Text>
-                                <Text style={styles.songName}>Song: {item.songName}</Text>
-
-                                <View style={styles.likeContainer}>
-                                    <TouchableOpacity>
-                                        <FontAwesome name="heart" size={20} color="red" style={styles.likeIcon} />
-                                    </TouchableOpacity>
-                                    <Text style={styles.likeText}>12</Text>
-                                </View>
-                            </View>
-                        </View>
+                        <Post
+                            key={index}
+                            item={item}
+                            userId={userId}
+                            LikePost={LikePost}
+                            UnlikePost={UnlikePost}
+                        />
                     ))}
                 </View>
             </ScrollView>
@@ -229,5 +291,8 @@ const styles = StyleSheet.create({
     likeText: {
         fontSize: 14,
         color: 'white',
+    },
+    commentIcon: {
+        marginLeft: 10,
     },
 })
