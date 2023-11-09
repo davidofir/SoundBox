@@ -89,12 +89,6 @@ const styles = StyleSheet.create({
         marginTop: 40,
         textAlign: 'center'
     },
-    noReviewsText2: {
-        fontSize: 20,
-        color: '#353a42',
-        marginTop: 40,
-        textAlign: 'center'
-    },
 
 });
 

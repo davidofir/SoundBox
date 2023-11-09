@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   SafeAreaView, StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Dimensions, 
   TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator,
@@ -9,33 +9,10 @@ import Toast from 'react-native-toast-message';
 import defaultCoverArt from '../../assets/defaultSongImage.png';
 import StarRating from 'react-native-star-rating-widget'; //Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
 import SongReviewsPage from "./SongReviewsPage";
-
-const RatingModel = {
-
-  async getUserReviews(userId) {
-    const userRef = doc(db, "users", userId);
-    const docSnapshot = await getDoc(userRef);  
-    return docSnapshot.data()?.reviews || [];
-  },
-
-  async getUserData(userId) {
-    const userRef = doc(db, "users", userId);
-    const docSnapshot = await getDoc(userRef);
-    const userData = docSnapshot.data();
-    return userData.userName
-  },
-
-  async addReview(userId, reviewData) {
-    const userRef = doc(db, "users", userId);
-    await updateDoc(userRef, {
-      reviews: arrayUnion(reviewData),
-    });
-  },
-};
+import {storeReviewData, RatingModel} from "./ReviewStorage";
 
 const RatingPage = ({ navigation, route }) => {
   const userId = authentication.currentUser.uid;
-  const [reviews, setReviews] = useState([]);
   const {
     paramSongName: songName,
     paramSearched: isSearched,
@@ -52,18 +29,20 @@ const RatingPage = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalY] = useState(new Animated.Value(Dimensions.get('window').height));
-  const [defaultRating, setDefaultRating] = useState(0);
   const maxRating = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
   const [text, setText] = useState("");
   const [rating, setRating] = useState(0);
   const windowHeight = Dimensions.get('window').height;
 
+  //Set the title of the page
+  useLayoutEffect(() => {
+      navigation.setOptions({
+          title: songName 
+      });
+  }, [navigation]);
+
   useEffect(() => {
-    const loadReviews = async () => {
-      const userReviews = await RatingModel.getUserReviews(userId);
-      setReviews(userReviews);
-    };
-    loadReviews();
+
   }, []);
 
   // Function to handle opening the modal
@@ -103,51 +82,7 @@ const RatingPage = ({ navigation, route }) => {
 
       setIsLoading(true); // Start loading
 
-      // Generating a new document inside the 'reviews' collection
-      // Firestore will automatically create a unique ID for this document
-      const reviewRef = doc(collection(db, "reviews"));
-      var reviewUUID = reviewRef.id
-      const reviewData = {
-        id: reviewRef.id, // Firestore generated unique ID
-        userId: userId,
-        username: await RatingModel.getUserData(userId),
-        artistName: finalArtistName,
-        songName: songName,
-        creationTime: new Date().toISOString(),
-        rating: rating,
-        review: message,
-        genre: songGenre,
-        likes: [],
-      };
-
-      // Save the review data to the new document in the 'reviews' collection.
-      await setDoc(reviewRef, reviewData);
-
-      // Reference the 'artists' collection and the specific artist's document.
-      const artistDocRef = doc(db, "artists", finalArtistName);
-
-      // Reference the specific song's document.
-      const songDocRef = doc(artistDocRef, "songs", songName);
-
-      // Check if the song already exists.
-      const songDocSnapshot = await getDoc(songDocRef);
-      if (!songDocSnapshot.exists()) {
-        // If the song does not exist, create a new song document with the first review ID.
-        await setDoc(songDocRef, {
-          reviewIds: [reviewUUID] // Use the ID from the reviewRef.
-        });
-      } else {
-        // If the song exists, add the review ID to the song's document.
-        await updateDoc(songDocRef, {
-          reviewIds: arrayUnion(reviewRef.id)
-        });
-      }
-
-      // update the user's document with the new review ID.
-      const userRef = doc(db, "users", userId);
-      await updateDoc(userRef, {
-        reviewIds: arrayUnion(reviewRef.id)
-      });
+      await storeReviewData(userId, finalArtistName, songName, songGenre, rating, message);
 
       // Close modal and show toast notification
       closeModal();
@@ -160,7 +95,6 @@ const RatingPage = ({ navigation, route }) => {
       setIsLoading(false); // Stop loading regardless of outcome
     }
   };
-  
   
   const showToast = (title, message) => {
     Toast.show({
@@ -429,15 +363,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
-    margin: 5, // This adds space between the buttons
-    borderWidth: 1, // Adjust as needed
+    margin: 5, 
+    borderWidth: 1, 
     borderColor: '#000',
-    borderRadius: 15, // This should be enough to create a rounded look
+    borderRadius: 15, 
   },
   reviewContainer: {
-    flexDirection: 'row', // Make sure the container allows for the items to be side by side
+    flexDirection: 'row', // !!! Make sure the container allows for the items to be side by side
     padding: 10,
-    justifyContent: 'space-between', // This will add space between the buttons
+    justifyContent: 'space-between', // add space between the buttons
     alignItems: 'center',
   },
   buttonText: {
