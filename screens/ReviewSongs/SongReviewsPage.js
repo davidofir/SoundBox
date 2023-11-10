@@ -18,14 +18,20 @@ const SongReviewsPage = ({ route, navigation }) => {
         const fetchReviews = async () => {
             try {
                 const fetchedReviews = await getSongReviews(songName, artistName);
-                setReviews(fetchedReviews);
+    
+                // Sorting reviews based on the number of likes (descending order)
+                const sortedReviews = fetchedReviews.sort((a, b) => {
+                    return b.likes.length - a.likes.length;
+                });
+    
+                setReviews(sortedReviews);
             } catch (error) {
                 console.error('Error fetching reviews:', error);
             } finally {
                 setLoading(false); // Set loading to false when the fetch is complete
             }
         };
-
+    
         fetchReviews();
     }, []);
 
@@ -36,6 +42,7 @@ const SongReviewsPage = ({ route, navigation }) => {
                 <Text style={styles.reviewText}>Rating: {review.rating}</Text>
                 <Text style={styles.reviewText}>Review: {review.review}</Text>
                 <Text style={styles.reviewText}>Date: {new Date(review.creationTime).toLocaleString()}</Text>
+                <Text style={styles.reviewText}>Likes: {review.likes.length}</Text>
             </View>
         );
     };
