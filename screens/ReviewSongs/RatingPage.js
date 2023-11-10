@@ -10,24 +10,24 @@ import defaultCoverArt from '../../assets/defaultSongImage.png';
 import StarRating from 'react-native-star-rating-widget'; //Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
 import SongReviewsPage from "./SongReviewsPage";
 import {storeReviewData, RatingModel, getSongReviews} from "./ReviewStorage";
-
+import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 
 const RatingPage = ({ navigation, route }) => {
   const userId = authentication.currentUser.uid;
+
   const {
     paramSongName: songName,
     paramSearched: isSearched,
-    paramSongGenre: songGenre,
     paramCoverArtUrl: coverArtUrl,
-    paramArtistName: artistName,
+    paramArtistName: possibleArtistName,
     paramSearchedArtist: searchedArtistName
   } = route.params;
-  const finalArtistName = isSearched === 1 ? artistName : searchedArtistName;
-
+  const artistName = isSearched === 1 ? searchedArtistName : possibleArtistName;
   const defaultCoverArtUri = Image.resolveAssetSource(defaultCoverArt).uri;
   const albumArt = coverArtUrl === 3 ? defaultCoverArtUri : coverArtUrl;
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingButtons, setIsLoadingButtons] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalY] = useState(new Animated.Value(Dimensions.get('window').height));
   const [text, setText] = useState("");
@@ -38,6 +38,9 @@ const RatingPage = ({ navigation, route }) => {
   const [numberOfReviews, setNumberOfReviews] = useState(0); 
   const [usersReview, setUsersReview] = useState(null);
   const [usersStarRating, setUsersStarRating] = useState(0);
+  const [albumTitle, setAlbumTitle] = useState();
+  const [datePublished, setDatePublished] = useState();
+  const [duration, setDuration] = useState();
 
   //Set the title of the page
   useLayoutEffect(() => {
@@ -48,8 +51,43 @@ const RatingPage = ({ navigation, route }) => {
 
 
   useEffect(() => {
+    setIsLoadingButtons(true)
     prepareReviewButtons();
+    prepareTrackInfo()
+   
+    
 }, []);
+
+const prepareTrackInfo = async () => {
+  this.trackModel = new TrackModel();
+  try {
+      const trackInfo = await this.trackModel.fetchTrackInfo(songName, artistName);
+      
+      // Check if 'album' object exists. If not, set "Released as A Single"
+      if (trackInfo.track && trackInfo.track.album) {
+          setAlbumTitle(trackInfo.track.album.title);
+      } else {
+          setAlbumTitle("Released as A Single");
+      }
+
+      // Set duration if available
+      if (trackInfo.track && trackInfo.track.duration) {
+          setDuration(trackInfo.track.duration);
+      } else {
+          setDuration("Duration not available");
+      }
+
+      // Check if 'wiki' object exists for publish date
+      if (trackInfo.track && trackInfo.track.wiki) {
+          setDatePublished(trackInfo.track.wiki.published);
+      } else {
+          setDatePublished("Publish date not available");
+      }
+
+  } catch (error) {
+      console.error("Error getting track info", error);
+  }
+}
 
   const prepareReviewButtons = async () => {
     const fetchedReviews = await getSongReviews(songName, artistName);
@@ -84,8 +122,10 @@ const RatingPage = ({ navigation, route }) => {
       setUsersStarRating(userReview.rating)
     } else {
       setUsersReview(null); // Set state to null if no review is found
-      setUsersStarRating(0)
+      setUsersStarRating(null)
     }
+    setIsLoadingButtons(false)
+
   }
 
   // Function to handle opening the modal
@@ -125,7 +165,7 @@ const RatingPage = ({ navigation, route }) => {
 
       setIsLoading(true); // Start loading
 
-      await storeReviewData(userId, finalArtistName, songName, songGenre, rating, coverArtUrl, message);
+      await storeReviewData(userId, artistName, songName, rating, coverArtUrl, message);
 
       // Close modal and show toast notification
       closeModal();
@@ -155,31 +195,57 @@ const RatingPage = ({ navigation, route }) => {
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <SafeAreaView style={styles.container}>
+          <View style={styles.songInfoContainer}>
           <Image source={{ uri: albumArt }} style={styles.albumArtStyle} />
           <Text style={styles.textStyleSong}>{songName}</Text>
-          <Text style={styles.textStyleArtist}>{finalArtistName}</Text>
+          <Text style={styles.textStyleArtist}>{artistName}</Text>
 
-          {/* Trigger button for the modal */}
-          <TouchableOpacity onPress={openModal} style={styles.buttonStyle}>
-            <Text style={styles.buttonTextStyle}>Review This Song</Text>
-          </TouchableOpacity>
+          {/*Song Info */}
+          <View style={styles.infoContainer}>
+            <View style={styles.labelColumn}>
+              <Text style={styles.textStyleLabel}>Album:</Text>
+              <Text style={styles.textStyleLabel}>Date Published:</Text>
+              <Text style={styles.textStyleLabel}>Duration:</Text>
+            </View>
+            <View style={styles.valueColumn}>
+              <Text style={styles.textStyleInfo}>{albumTitle}</Text>
+              <Text style={styles.textStyleInfo}>{datePublished}</Text>
+              <Text style={styles.textStyleInfo}>{duration}</Text>
+            </View>
+          </View>
+          </View>
+
+          
+
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button}
-              onPress={() => navigation.navigate("LoggedUsersReviewPage", {
+          <TouchableOpacity style={styles.button}
+            onPress={() => navigation.navigate("LoggedUsersReviewPage", {
               review: usersReview
           })}>
-              <Text style={styles.buttonText}>View Your Review</Text>
-              <View pointerEvents="none">
-                  <StarRating
-                      rating={usersStarRating}
-                      editable={false} //stars non-interactive
-                      starSize={20}
-                      onChange={() => {}}
-                      enableSwiping ={false}
-                  />
-              </View>
+              {isLoadingButtons ? (
+                  <ActivityIndicator size="medium" color="#040f13" />
+              ) : (
+                  <View>
+                      <Text style={styles.buttonText}>View Your Review</Text>
+                      
+                      {usersStarRating !== null ? (
+                          <View pointerEvents="none">
+                              <StarRating
+                                  rating={usersStarRating}
+                                  editable={false} //stars non-interactive
+                                  starSize={20}
+                                  onChange={() => {}}
+                                  enableSwiping={false}
+                              />
+                          </View>
+                      ) : (
+                          <Text style={styles.noReviewText}>(No Review Found)</Text>
+                      )}
+                  </View>
+              )}
           </TouchableOpacity>
+
           <TouchableOpacity 
             style={styles.button}
             onPress={() => navigation.navigate("SongReviewsPage", {
@@ -187,11 +253,22 @@ const RatingPage = ({ navigation, route }) => {
               artistName: artistName,
             })}
             >
-              <Text style={styles.reviewText}>View Reviews ({numberOfReviews})</Text>
-              <Text style={styles.rating}>Average Rating: {avgRating}★'s</Text>
-              
+              {isLoadingButtons ? (
+                    <ActivityIndicator size="medium" color="#040f13" />
+                  ) : (
+                    <View>
+                      <Text style={styles.reviewText}>View Reviews ({numberOfReviews})</Text>
+                      <Text style={styles.rating}>Average Rating: {avgRating}★'s</Text>
+                    </View>
+
+                  )}
             </TouchableOpacity>
           </View>
+
+          {/* Trigger button for the modal */}
+          <TouchableOpacity onPress={openModal} style={styles.buttonStyle}>
+            <Text style={styles.buttonTextStyle}>Review This Song</Text>
+          </TouchableOpacity>
 
           {/* Modal Definition */}
           <Modal
@@ -241,7 +318,7 @@ const RatingPage = ({ navigation, route }) => {
                     {/* Song name */}
                     <Text style={styles.modalStyleSong}>{songName}</Text>
                     {/* Artist name */}
-                    <Text style={styles.modalStyleArtist}>{finalArtistName}</Text>
+                    <Text style={styles.modalStyleArtist}>{artistName}</Text>
                   </View>
                 </View>
                 <View style={styles.modalContent}>
@@ -273,6 +350,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
+  songInfoContainer: {
+    backgroundColor: '#f2f2f2', // Light grey background
+    borderRadius: 10, // Curved edges
+    padding: 10, // Padding inside the container
+    margin: 10, // Margin around the container
+    alignItems: 'center',
+    // Add shadow for depth, optional
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+ 
+
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+  },
+
   textStyle: {
     textAlign: 'center',
     fontSize: 17,
@@ -293,22 +389,49 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#4e4c4c"
   },
-  buttonStyle: {
-    justifyContent: "center",
-    alignItems: 'center',
+  infoContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     marginTop: 30,
-    padding: 15,
-    backgroundColor: 'black',
-    fontSize: 40,
-    color: "white"
+    paddingHorizontal: 10,
+    marginHorizontal: 9
+  },
+  labelColumn: {
+    width: 120, // Fixed width for labels
+    paddingRight: 10,
+    
+  },
+  valueColumn: {
+    flex: 1, // Take up remaining space
+    alignItems: 'flex-end', // Align values to the right
+  },
+  textStyleLabel: {
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  textStyleInfo: {
+    marginBottom: 20,
+    textAlign: 'right', // Align text to the right
+  },
+  buttonStyle: {
+    backgroundColor: '#24364D',  
+    paddingVertical: 15,       
+    paddingHorizontal: 30,    
+    borderRadius: 25,         
+    alignSelf: 'stretch',       
+    marginHorizontal: 20,       
+    justifyContent: 'center',   
+    alignItems: 'center',  
+    marginVertical: 17,     
   },
   buttonTextStyle: {
-    color: "white"
+    color: "white",
+    fontWeight: 'bold',         
   },
   modalView: {
     position: 'absolute',
-    bottom: 0, // start from bottom
-    width: '100%', // cover full screen width
+    bottom: 0, 
+    width: '100%', 
     height: "100%",
     backgroundColor: 'white',
     borderTopRightRadius: 20,
@@ -375,7 +498,7 @@ const styles = StyleSheet.create({
     width: 230,
     height: 230,
     resizeMode: 'contain', //the image scales to fit within the dimensions and maintain its aspect ratio
-    marginVertical: 20,
+    marginVertical: 10,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -412,6 +535,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: '#000',
     borderRadius: 15, 
+    height: 60, // Set a fixed height
   },
   reviewContainer: {
     flexDirection: 'row', // !!! Make sure the container allows for the items to be side by side
@@ -428,5 +552,13 @@ const styles = StyleSheet.create({
   },
   rating: {
     marginTop: 4,
+  },
+  horizontalLine: {
+    borderBottomColor: 'black', // Faint color for the line
+    borderBottomWidth: 1,      // Thin line
+    marginTop: 10,             // Margin at the top
+    marginBottom: 10,          // Margin at the bottom
+    width: '100%',
+      
   },
 });

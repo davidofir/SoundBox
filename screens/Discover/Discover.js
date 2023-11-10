@@ -123,15 +123,12 @@ class App extends React.Component {
     viewModel.flatlistSwitch === 1 ? item.artist : item.artist.name.toString();
     const coverArtUrl = await searchAndFetchSongCoverArt(item.name, artistName);
 
-    const genre = await viewModel.trackModel.fetchGenre(item.name, artistName);
-    //console.log(`Genre for the track "${item.name}, ${artistName}": ${genre}`);
 
     this.props.navigation.navigate('RatingPage', {
       paramArtistName: item.artist.name,
       paramSongName: item.name,
       paramSearchedArtist: artistName,
       paramSearched: viewModel.flatlistSwitch,
-      paramSongGenre: genre,
       paramCoverArtUrl: coverArtUrl
     });
   }

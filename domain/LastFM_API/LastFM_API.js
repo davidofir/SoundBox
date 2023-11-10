@@ -27,26 +27,30 @@ export class TrackModel {
       
     }
   
-    async fetchGenre(songTitle, artistTitle) {
+    async fetchTrackInfo(songTitle, artistTitle) {
       try {
-        const url = `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${apiKey}&artist=${artistTitle}&track=${songTitle}&format=json`;
+        // Encode the parameters to handle special characters
+        const encodedSongTitle = encodeURIComponent(songTitle);
+        const encodedArtistTitle = encodeURIComponent(artistTitle);
+        const url = `https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${apiKey}&artist=${encodedArtistTitle}&track=${encodedSongTitle}&format=json`;
     
         const response = await fetch(url);
         const data = await response.json();
-    
+        
         // Check if the expected data structure is present and has at least one tag
         if (data.track && data.track.toptags && Array.isArray(data.track.toptags.tag) && data.track.toptags.tag.length > 0) {
-          const genre = data.track.toptags.tag[0].name;
-          return genre;
+          
+          return data;
         } else {
           // Handle the case where the genre information is not available
-          return "Genre not found";
+          return "Info not found";
         }
       } catch (error) {
         console.error("Error fetching genre:", error);
-        return "Error fetching genre";
+        return "Info not found";
       }
     }
+    
   
     getTracks() {
       return this.tracks;
