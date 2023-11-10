@@ -11,6 +11,7 @@ import StarRating from 'react-native-star-rating-widget'; //Source: https://gith
 import SongReviewsPage from "./SongReviewsPage";
 import {storeReviewData, RatingModel, getSongReviews} from "./ReviewStorage";
 
+
 const RatingPage = ({ navigation, route }) => {
   const userId = authentication.currentUser.uid;
   const {
@@ -37,6 +38,7 @@ const RatingPage = ({ navigation, route }) => {
   const [numberOfReviews, setNumberOfReviews] = useState(0); 
   const [usersReview, setUsersReview] = useState(null);
   const [usersStarRating, setUsersStarRating] = useState(0);
+
   //Set the title of the page
   useLayoutEffect(() => {
       navigation.setOptions({
@@ -46,13 +48,13 @@ const RatingPage = ({ navigation, route }) => {
 
 
   useEffect(() => {
-        prepareReviewButtons();
-  }, []);
+    prepareReviewButtons();
+}, []);
 
   const prepareReviewButtons = async () => {
     const fetchedReviews = await getSongReviews(songName, artistName);
     fetchStarRatingAverage(fetchedReviews);
-    fetchUserReview(fetchedReviews);
+    fetchLoggedUserReview(fetchedReviews);
   }
 
   const fetchStarRatingAverage = (fetchedReviews) => {
@@ -72,7 +74,7 @@ const RatingPage = ({ navigation, route }) => {
     } 
 };
 
-  const fetchUserReview = (fetchedReviews) => {
+  const fetchLoggedUserReview = (fetchedReviews) => {
     const userReview = fetchedReviews.find(review => review.userId === userId);
 
     if (userReview) {
@@ -80,12 +82,12 @@ const RatingPage = ({ navigation, route }) => {
       
       setUsersReview(userReview); // Set the found review in state
       setUsersStarRating(userReview.rating)
-
     } else {
       setUsersReview(null); // Set state to null if no review is found
       setUsersStarRating(0)
     }
   }
+
   // Function to handle opening the modal
   const openModal = () => {
 
@@ -123,12 +125,12 @@ const RatingPage = ({ navigation, route }) => {
 
       setIsLoading(true); // Start loading
 
-      await storeReviewData(userId, finalArtistName, songName, songGenre, rating, message);
+      await storeReviewData(userId, finalArtistName, songName, songGenre, rating, coverArtUrl, message);
 
       // Close modal and show toast notification
       closeModal();
       showToast('Success!', 'Review Successfully Posted');
-
+      prepareReviewButtons();
     } catch (error) {
       console.error("Failed to store review:", error);
       showToast('Error', 'Failed to post review');
@@ -163,10 +165,22 @@ const RatingPage = ({ navigation, route }) => {
           </TouchableOpacity>
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button}
+              onPress={() => navigation.navigate("LoggedUsersReviewPage", {
+              review: usersReview
+          })}>
               <Text style={styles.buttonText}>View Your Review</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
+              <View pointerEvents="none">
+                  <StarRating
+                      rating={usersStarRating}
+                      editable={false} //stars non-interactive
+                      starSize={20}
+                      onChange={() => {}}
+                      enableSwiping ={false}
+                  />
+              </View>
+          </TouchableOpacity>
+          <TouchableOpacity 
             style={styles.button}
             onPress={() => navigation.navigate("SongReviewsPage", {
               songName: songName,
@@ -232,7 +246,7 @@ const RatingPage = ({ navigation, route }) => {
                 </View>
                 <View style={styles.modalContent}>
                   <StarRating rating={rating} onChange={setRating} starSize={50} />
-                  <Text style={styles.textStyle}>{rating + " / 5"}</Text>
+                  <Text style={styles.textStyle}>{"(" + rating + " / 5)"}</Text>
                   <TextInput
                     style={styles.input}
                     onChangeText={setText}
@@ -249,7 +263,6 @@ const RatingPage = ({ navigation, route }) => {
       <Toast />
     </>
   );
-
 };
 export default RatingPage;
 
@@ -279,16 +292,6 @@ const styles = StyleSheet.create({
     alignItems: "baseline",
     fontWeight: "bold",
     color: "#4e4c4c"
-  },
-  customRatingBarStyle: {
-    justifyContent: "center",
-    flexDirection: 'row',
-    marginTop: 30,
-  },
-  starImgStyle: {
-    width: 40,
-    height: 40,
-    resizeMode: "cover"
   },
   buttonStyle: {
     justifyContent: "center",
@@ -366,6 +369,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
     fontSize: 15,
+    textAlignVertical: 'top', 
   },
   albumArtStyle: {
     width: 230,

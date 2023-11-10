@@ -37,7 +37,7 @@ export const getListUserReviews = async (userId) => {
   };
 
 
-  export const storeReviewData = async (userId, finalArtistName, songName, songGenre, rating, message ) => {
+  export const storeReviewData = async (userId, finalArtistName, songName, songGenre, rating, coverArtUrl, message ) => {
     // Generating a new document inside the 'reviews' collection
       // Firestore will automatically create a unique ID for this document
       const reviewRef = doc(collection(db, "reviews"));
@@ -54,6 +54,7 @@ export const getListUserReviews = async (userId) => {
         review: message,
         genre: songGenre,
         likes: [],
+        albumImgURL: coverArtUrl
       };
 
       // Save the review data to the new document in the 'reviews' collection.
