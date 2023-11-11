@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity } from 'r
 import { StatusBar } from 'expo-status-bar';
 import Colors from '../../constants/colors';
 import { authentication, db } from '../../firebase';
-import { doc, getDocs, collection, addDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, getDocs, getDoc, collection, addDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
 
 export default Comment = ({ navigation, route }) => {
@@ -13,7 +13,35 @@ export default Comment = ({ navigation, route }) => {
 
     useEffect(() => {
 
-    }, []);
+        const fetchComments = async () => {
+            const tempComments = [];
+            const reviewRef = doc(db, 'reviews', item.id);
+            const docSnapshot = await getDoc(reviewRef);
+
+            if (docSnapshot.exists()) {
+                const reviewData = docSnapshot.data();
+
+                for (let i = 0; i < reviewData.commentIds.length; i++) {
+                    const commentRef = doc(db, "comments", reviewData.commentIds[i]);
+                    const commentDoc = await getDoc(commentRef);
+
+                    if (commentDoc.exists()) {
+                        const userComment = commentDoc.data();
+                        tempComments.push(userComment);
+                    } else {
+                        console.error(`Comment with ID ${reviewData.commentIds[i]} does not exist.`);
+                    }
+                }
+
+                setComments(tempComments);
+            } else {
+                console.error(`Review with ID ${item.id} does not exist.`);
+            }
+        };
+
+        fetchComments();
+
+    }, [item.id]);
 
     const AddComment = async () => {
         const user = authentication.currentUser;
@@ -59,9 +87,9 @@ export default Comment = ({ navigation, route }) => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <View style={styles.commentContainer}>
-                        <Text style={styles.commentText}>{item.text}</Text>
+                        <Text style={styles.commentText}>{item.comment}</Text>
                         <Text style={styles.timestampText}>
-                            {item.timestamp.toDateString()}
+                            {item.creationTime}
                         </Text>
                     </View>
                 )}
@@ -94,11 +122,11 @@ const styles = StyleSheet.create({
     },
     commentText: {
         fontSize: 16,
-        color: Colors.white,
+        color: 'white',
     },
     timestampText: {
         fontSize: 12,
-        color: Colors.gray,
+        color: 'white',
         marginTop: 8,
     },
     inputContainer: {
