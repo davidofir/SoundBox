@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   SafeAreaView, StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Dimensions, 
-  TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator,
+  TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator, ScrollView,
 } from "react-native";
-import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion, getDocs } from "firebase/firestore";
 import { authentication, db } from "../../firebase";
 import Toast from 'react-native-toast-message';
 import defaultCoverArt from '../../assets/defaultSongImage.png';
@@ -38,9 +37,10 @@ const RatingPage = ({ navigation, route }) => {
   const [numberOfReviews, setNumberOfReviews] = useState(0); 
   const [usersReview, setUsersReview] = useState(null);
   const [usersStarRating, setUsersStarRating] = useState(0);
-  const [albumTitle, setAlbumTitle] = useState();
+  const [albumTitle, setAlbumTitle] = useState("");
   const [datePublished, setDatePublished] = useState();
   const [duration, setDuration] = useState();
+  const [genres, setGenres] = useState();
 
   //Set the title of the page
   useLayoutEffect(() => {
@@ -67,27 +67,70 @@ const prepareTrackInfo = async () => {
       if (trackInfo.track && trackInfo.track.album) {
           setAlbumTitle(trackInfo.track.album.title);
       } else {
-          setAlbumTitle("Released as A Single");
+          setAlbumTitle("(Released as A Single)");
       }
 
       // Set duration if available
       if (trackInfo.track && trackInfo.track.duration) {
-          setDuration(trackInfo.track.duration);
-      } else {
-          setDuration("Duration not available");
-      }
+        const durationInMilliseconds = trackInfo.track.duration;
+        const durationInSeconds = Math.floor(durationInMilliseconds / 1000);
+        const minutes = Math.floor(durationInSeconds / 60);
+        const seconds = durationInSeconds % 60;
+        console.log(trackInfo)
+        // Format the time to XX:XX
+        const formattedDuration = minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
+        if (duration == '00:00'){
+          setDuration("duration not available");
+        } else {
+          setDuration(formattedDuration);
+        }
+    } else {
+        setDuration("duration not available");
+    }
+
 
       // Check if 'wiki' object exists for publish date
       if (trackInfo.track && trackInfo.track.wiki) {
-          setDatePublished(trackInfo.track.wiki.published);
+        const fullPublishedDate = trackInfo.track.wiki.published;
+        const datePublished = fullPublishedDate.split(",")[0]; // Take only the date part
+        setDatePublished(datePublished);
       } else {
           setDatePublished("Publish date not available");
       }
+
+      // Set genre if available
+      if (trackInfo.track && trackInfo.track.toptags && trackInfo.track.toptags.tag && trackInfo.track.toptags.tag.length > 0) {
+        const excludedTags = ['joaoaksnes', 'MySpotigramBot', "-1001819731063"]; // Add more tags to exclude here
+        const filteredTags = trackInfo.track.toptags.tag.filter(tag => !excludedTags.includes(tag.name));
+        const genres = filteredTags.map(tag => tag.name);
+    
+        let topTwoGenres = '';
+        if (genres.length > 0) {
+            topTwoGenres = genres.slice(0, 2).join(", ");
+        } else {
+            topTwoGenres = "Tags not available";
+        }
+    
+        setGenres(topTwoGenres);
+    } else {
+        setGenres("Tags not available");
+    }
 
   } catch (error) {
       console.error("Error getting track info", error);
   }
 }
+
+const [songNameFontSize, setSongNameFontSize] = useState(29); // Initial font size for song name
+const [albumTitleFontSize, setAlbumTitleFontSize] = useState(17); // Initial font size for album title
+
+// Function to adjust font size based on text height
+const adjustFontSize = (event, fontSizeSetter, initialFontSize) => {
+    const { height } = event.nativeEvent.layout;
+    if (height > 30) { // Assuming 30 is the height of one line
+        fontSizeSetter(initialFontSize * 0.9); // Reduce font size by 10%
+    }
+};
 
   const prepareReviewButtons = async () => {
     const fetchedReviews = await getSongReviews(songName, artistName);
@@ -203,14 +246,16 @@ const prepareTrackInfo = async () => {
           {/*Song Info */}
           <View style={styles.infoContainer}>
             <View style={styles.labelColumn}>
-              <Text style={styles.textStyleLabel}>Album:</Text>
+              <Text style={styles.textStyleLabel}>Album: {albumTitle.length > 28 ? '\n' : ''}</Text>
               <Text style={styles.textStyleLabel}>Date Published:</Text>
               <Text style={styles.textStyleLabel}>Duration:</Text>
+              <Text style={styles.textStyleLabel}>Tags:</Text>
             </View>
             <View style={styles.valueColumn}>
               <Text style={styles.textStyleInfo}>{albumTitle}</Text>
               <Text style={styles.textStyleInfo}>{datePublished}</Text>
               <Text style={styles.textStyleInfo}>{duration}</Text>
+              <Text style={styles.textStyleInfo}>{genres}</Text>
             </View>
           </View>
           </View>
@@ -269,10 +314,10 @@ const prepareTrackInfo = async () => {
           <TouchableOpacity onPress={openModal} style={styles.buttonStyle}>
             <Text style={styles.buttonTextStyle}>Review This Song</Text>
           </TouchableOpacity>
-
+         
           {/* Modal Definition */}
           <Modal
-            animationType="none" // we are using Animated for the modal animation
+            animationType="none" // Animated for the modal animation
             transparent={true}
             visible={modalVisible}
             onRequestClose={closeModal}
@@ -356,14 +401,12 @@ const styles = StyleSheet.create({
     padding: 10, // Padding inside the container
     margin: 10, // Margin around the container
     alignItems: 'center',
-    // Add shadow for depth, optional
+    // Add shadow for depth
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 1,
+      height: 3,
     },
- 
-
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
     elevation: 3,
@@ -392,7 +435,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginTop: 30,
+    marginTop: 15,
     paddingHorizontal: 10,
     marginHorizontal: 9
   },
@@ -422,7 +465,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,       
     justifyContent: 'center',   
     alignItems: 'center',  
-    marginVertical: 17,     
+    marginVertical: 5,     
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
   buttonTextStyle: {
     color: "white",
@@ -498,7 +548,7 @@ const styles = StyleSheet.create({
     width: 230,
     height: 230,
     resizeMode: 'contain', //the image scales to fit within the dimensions and maintain its aspect ratio
-    marginVertical: 10,
+    marginVertical: 0,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -523,7 +573,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 4,
     marginHorizontal: 10,
-    marginTop: 20,
+    marginTop: 7,
   },
   button: {
     padding: 10,
@@ -535,7 +585,14 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: '#000',
     borderRadius: 15, 
-    height: 60, // Set a fixed height
+    height: 70, // Set a fixed height
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
   },
   reviewContainer: {
     flexDirection: 'row', // !!! Make sure the container allows for the items to be side by side
@@ -549,16 +606,12 @@ const styles = StyleSheet.create({
   },
   reviewText: {
     fontWeight: 'bold',
+
   },
   rating: {
     marginTop: 4,
+    alignItems: "center",
+    alignContent: "center"
   },
-  horizontalLine: {
-    borderBottomColor: 'black', // Faint color for the line
-    borderBottomWidth: 1,      // Thin line
-    marginTop: 10,             // Margin at the top
-    marginBottom: 10,          // Margin at the bottom
-    width: '100%',
-      
-  },
+
 });

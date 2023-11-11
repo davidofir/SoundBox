@@ -3,8 +3,19 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import StarRating from 'react-native-star-rating-widget';
 const defaultCoverArt = require('../../assets/defaultSongImage.png');
 
+
+
 const LoggedUsersReviewPage = ({ navigation, route }) => {
     const { review } = route.params;
+
+        //Set the title of the page
+        useLayoutEffect(() => {
+            navigation.setOptions({
+                title: "Your Review:" 
+            });
+        }, [navigation]);
+
+
 
     if (!review) {
         return (
