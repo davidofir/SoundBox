@@ -71,6 +71,7 @@ export default Comment = ({ navigation, route }) => {
             downvotes: [],
         };
 
+        setComments((prevComments) => [...prevComments, commentData]);
         await setDoc(commentRef, commentData);
 
         const reviewRef = doc(db, "reviews", item.id);
@@ -87,6 +88,7 @@ export default Comment = ({ navigation, route }) => {
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <View style={styles.commentContainer}>
+                        <Text style={styles.commentUsername}>{item.username}</Text>
                         <Text style={styles.commentText}>{item.comment}</Text>
                         <Text style={styles.timestampText}>
                             {item.creationTime}
@@ -118,31 +120,39 @@ const styles = StyleSheet.create({
     commentContainer: {
         padding: 16,
         borderBottomWidth: 1,
-        borderBottomColor: Colors.lightGray,
+        borderBottomColor: '#29293d',
+    },
+    commentUsername: {
+        fontSize: 16,
+        color: 'white',
     },
     commentText: {
         fontSize: 16,
         color: 'white',
+        marginTop: 1,
     },
     timestampText: {
         fontSize: 12,
-        color: 'white',
+        color: '#8c8c9c',
         marginTop: 8,
     },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         borderTopWidth: 1,
-        borderTopColor: Colors.lightGray,
-        padding: 8,
+        borderTopColor: '#29293d',
+        padding: 20,
+        paddingBottom: 35
     },
     input: {
         flex: 1,
         height: 40,
-        backgroundColor: Colors.darkGray,
-        borderRadius: 8,
+        backgroundColor: '#1f1f2e',
+        borderWidth: 1,
+        borderColor: '#29293d',
+        borderRadius: 25,
         paddingHorizontal: 16,
-        color: Colors.white,
+        color: 'white',
     },
     addButton: {
         marginLeft: 8,
@@ -152,6 +162,6 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     addButtonText: {
-        color: Colors.white,
+        color: 'white',
     },
 });
