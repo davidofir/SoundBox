@@ -110,7 +110,7 @@ export default SocialFeed = ({ navigation }) => {
                             />
                         </TouchableOpacity>
                         <Text style={styles.likeText}>{item.likes.length}</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate("Comment")}>
+                        <TouchableOpacity onPress={() => navigation.navigate("Comment", { item })}>
                             <Ionicons
                                 name="chatbox-outline"
                                 size={20}
