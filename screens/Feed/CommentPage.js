@@ -5,6 +5,7 @@ import Colors from '../../constants/colors';
 import { authentication, db } from '../../firebase';
 import { doc, getDocs, getDoc, collection, addDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
+import { Ionicons } from '@expo/vector-icons';
 
 export default Comment = ({ navigation, route }) => {
     const [comments, setComments] = useState([]);
@@ -81,6 +82,26 @@ export default Comment = ({ navigation, route }) => {
 
     };
 
+    const Comment = ({ item, userId, LikeComment, UnlikeComment }) => {
+
+        return (
+            <FlatList
+                data={comments}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                    <View style={styles.commentContainer}>
+                        <Text style={styles.commentUsername}>{item.username}</Text>
+                        <Text style={styles.commentText}>{item.comment}</Text>
+                        <Text style={styles.timestampText}>
+                            {item.creationTime}
+                        </Text>
+                    </View>
+                )}
+            />
+        );
+
+    }
+
     return (
         <View style={styles.container}>
             <FlatList
@@ -93,6 +114,26 @@ export default Comment = ({ navigation, route }) => {
                         <Text style={styles.timestampText}>
                             {item.creationTime}
                         </Text>
+                        <View style={styles.likeContainer}>
+                            <TouchableOpacity>
+                                <Ionicons
+                                    name={'chevron-up'}
+                                    size={20}
+                                    color={'white'}
+                                    style={styles.likeIcon}
+                                />
+                            </TouchableOpacity>
+                            <Text style={styles.likeText}>0</Text>
+                            <TouchableOpacity>
+                                <Ionicons
+                                    name={'chevron-down'}
+                                    size={20}
+                                    color={'white'}
+                                    style={styles.dislikeIcon}
+                                />
+                            </TouchableOpacity>
+                            <Text style={styles.dislikeText}>0</Text>
+                        </View>
                     </View>
                 )}
             />
@@ -162,6 +203,26 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     addButtonText: {
+        color: 'white',
+    },
+    likeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    likeIcon: {
+        marginRight: 5,
+    },
+    likeText: {
+        fontSize: 14,
+        color: 'white',
+    },
+    dislikeIcon: {
+        marginLeft: 5,
+        marginRight: 5,
+    },
+    dislikeText: {
+        fontSize: 14,
         color: 'white',
     },
 });
