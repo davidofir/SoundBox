@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Colors from '../../constants/colors';
 import { authentication, db } from '../../firebase';
@@ -11,6 +11,8 @@ export default Comment = ({ navigation, route }) => {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const { item } = route.params;
+
+    var userId = authentication.currentUser.uid;
 
     useEffect(() => {
 
@@ -82,61 +84,124 @@ export default Comment = ({ navigation, route }) => {
 
     };
 
-    const Comment = ({ item, userId, LikeComment, UnlikeComment }) => {
+    const LikeComment = (item) => {
+        var tempLikes = item.upvotes;
+
+        tempLikes.push(userId)
+
+        // Update the likes list in Firebase
+        const reviewDoc = doc(db, 'comments', item.id);
+        updateDoc(reviewDoc, {
+            upvotes: tempLikes
+        })
+    }
+
+    const UnlikeComment = (item) => {
+        var tempLikes = item.upvotes;
+
+        tempLikes.splice(tempLikes.indexOf(userId), 1);
+
+        // Update the likes list in Firebase
+        const reviewDoc = doc(db, 'comments', item.id);
+        updateDoc(reviewDoc, {
+            upvotes: tempLikes
+        })
+    }
+
+    const DislikeComment = (item) => {
+        var tempDislikes = item.downvotes;
+
+        tempDislikes.push(userId)
+
+        // Update the likes list in Firebase
+        const reviewDoc = doc(db, 'comments', item.id);
+        updateDoc(reviewDoc, {
+            downvotes: tempDislikes
+        })
+    }
+
+    const UndislikeComment = (item) => {
+        var tempDislikes = item.downvotes;
+
+        tempDislikes.splice(tempDislikes.indexOf(userId), 1);
+
+        // Update the likes list in Firebase
+        const reviewDoc = doc(db, 'comments', item.id);
+        updateDoc(reviewDoc, {
+            downvotes: tempDislikes
+        })
+    }
+
+    const Comment = ({ item, userId, LikeComment, UnlikeComment, DislikeComment, UndislikeComment }) => {
+        const [liked, setLiked] = useState(item.upvotes.includes(userId));
+        const [disliked, setDisliked] = useState(item.downvotes.includes(userId));
+
+        const handleLike = () => {
+            if (liked) {
+                UnlikeComment(item);
+            } else {
+                LikeComment(item);
+            }
+            setLiked(!liked);
+        }
+
+        const handleDislike = () => {
+            if (disliked) {
+                UndislikeComment(item);
+            } else {
+                DislikeComment(item);
+            }
+            setDisliked(!disliked);
+        }
 
         return (
-            <FlatList
-                data={comments}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <View style={styles.commentContainer}>
-                        <Text style={styles.commentUsername}>{item.username}</Text>
-                        <Text style={styles.commentText}>{item.comment}</Text>
-                        <Text style={styles.timestampText}>
-                            {item.creationTime}
-                        </Text>
-                    </View>
-                )}
-            />
-        );
+            <View style={styles.commentContainer}>
+                <Text style={styles.commentUsername}>{item.username}</Text>
+                <Text style={styles.commentText}>{item.comment}</Text>
+                <Text style={styles.timestampText}>{item.creationTime}</Text>
 
+                <View style={styles.likeContainer}>
+                    <TouchableOpacity onPress={handleLike}>
+                        <Ionicons
+                            name={liked ? 'chevron-up' : 'chevron-up-outline'}
+                            size={20}
+                            color={liked ? 'blue' : 'white'}
+                            style={styles.likeIcon}
+                        />
+                    </TouchableOpacity>
+                    <Text style={styles.likeText}>{item.upvotes.length}</Text>
+
+                    <TouchableOpacity onPress={handleDislike}>
+                        <Ionicons
+                            name={disliked ? 'chevron-down' : 'chevron-down-outline'}
+                            size={20}
+                            color={disliked ? 'red' : 'white'}
+                            style={styles.dislikeIcon}
+                        />
+                    </TouchableOpacity>
+                    <Text style={styles.dislikeText}>{item.downvotes.length}</Text>
+                </View>
+            </View>
+        )
     }
 
     return (
         <View style={styles.container}>
-            <FlatList
-                data={comments}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                    <View style={styles.commentContainer}>
-                        <Text style={styles.commentUsername}>{item.username}</Text>
-                        <Text style={styles.commentText}>{item.comment}</Text>
-                        <Text style={styles.timestampText}>
-                            {item.creationTime}
-                        </Text>
-                        <View style={styles.likeContainer}>
-                            <TouchableOpacity>
-                                <Ionicons
-                                    name={'chevron-up'}
-                                    size={20}
-                                    color={'white'}
-                                    style={styles.likeIcon}
-                                />
-                            </TouchableOpacity>
-                            <Text style={styles.likeText}>0</Text>
-                            <TouchableOpacity>
-                                <Ionicons
-                                    name={'chevron-down'}
-                                    size={20}
-                                    color={'white'}
-                                    style={styles.dislikeIcon}
-                                />
-                            </TouchableOpacity>
-                            <Text style={styles.dislikeText}>0</Text>
-                        </View>
-                    </View>
-                )}
-            />
+            <ScrollView>
+                <View>
+                    {comments.map((item, index) => (
+                        <Comment
+                            key={index}
+                            item={item}
+                            userId={userId}
+                            LikeComment={LikeComment}
+                            UnlikeComment={UnlikeComment}
+                            DislikeComment={DislikeComment}
+                            UndislikeComment={UndislikeComment}
+                        />
+                    ))}
+                </View>
+            </ScrollView>
             <View style={styles.inputContainer}>
                 <TextInput
                     style={styles.input}
@@ -148,7 +213,6 @@ export default Comment = ({ navigation, route }) => {
                     <Text style={styles.addButtonText}>Add</Text>
                 </TouchableOpacity>
             </View>
-            <StatusBar style="auto" />
         </View>
     );
 };
@@ -166,6 +230,7 @@ const styles = StyleSheet.create({
     commentUsername: {
         fontSize: 16,
         color: 'white',
+        fontWeight: 'bold',
     },
     commentText: {
         fontSize: 16,
@@ -183,7 +248,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: '#29293d',
         padding: 20,
-        paddingBottom: 35
+        paddingBottom: 35,
     },
     input: {
         flex: 1,
