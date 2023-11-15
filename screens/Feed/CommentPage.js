@@ -36,15 +36,16 @@ export default Comment = ({ navigation, route }) => {
                     }
                 }
 
+                tempComments.sort((a, b) => b.upvotes.length - a.upvotes.length);
                 setComments(tempComments);
             } else {
                 console.error(`Review with ID ${item.id} does not exist.`);
             }
-        };
+        }
 
         fetchComments();
 
-    }, [item.id]);
+    }, [item.id])
 
     const AddComment = async () => {
         const user = authentication.currentUser;
@@ -72,7 +73,7 @@ export default Comment = ({ navigation, route }) => {
             creationTime: new Date().toISOString(),
             upvotes: [],
             downvotes: [],
-        };
+        }
 
         setComments((prevComments) => [...prevComments, commentData]);
         await setDoc(commentRef, commentData);
@@ -80,9 +81,9 @@ export default Comment = ({ navigation, route }) => {
         const reviewRef = doc(db, "reviews", item.id);
         await updateDoc(reviewRef, {
             commentIds: arrayUnion(commentRef.id)
-        });
+        })
 
-    };
+    }
 
     const LikeComment = (item) => {
         var tempLikes = item.upvotes;
@@ -139,19 +140,29 @@ export default Comment = ({ navigation, route }) => {
         const handleLike = () => {
             if (liked) {
                 UnlikeComment(item);
+                setLiked(false);
             } else {
+                if (disliked) {
+                    UndislikeComment(item);
+                    setDisliked(false);
+                }
                 LikeComment(item);
+                setLiked(true);
             }
-            setLiked(!liked);
         }
 
         const handleDislike = () => {
             if (disliked) {
                 UndislikeComment(item);
+                setDisliked(false);
             } else {
+                if (liked) {
+                    UnlikeComment(item);
+                    setLiked(false);
+                }
                 DislikeComment(item);
+                setDisliked(true);
             }
-            setDisliked(!disliked);
         }
 
         return (
