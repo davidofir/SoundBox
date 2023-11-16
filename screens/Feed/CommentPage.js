@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TextInput, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import Colors from '../../constants/colors';
 import { authentication, db } from '../../firebase';
-import { doc, getDocs, getDoc, collection, addDoc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, getDocs, getDoc, collection, addDoc, setDoc, updateDoc, arrayUnion, deleteDoc } from 'firebase/firestore';
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
 import { Ionicons } from '@expo/vector-icons';
 
@@ -133,6 +133,33 @@ export default Comment = ({ navigation, route }) => {
         })
     }
 
+    const deleteComment = async (item) => {
+        try {
+            const commentRef = doc(db, 'comments', item.id);
+            const reviewRef = doc(db, 'reviews', item.reviewId);
+
+            const reviewDoc = await getDoc(reviewRef);
+
+            if (reviewDoc.exists()) {
+                var tempComments = reviewDoc.data().commentIds;
+
+                tempComments.splice(tempComments.indexOf(item.id), 1);
+
+                await updateDoc(reviewRef, {
+                    commentIds: tempComments
+                });
+
+                await deleteDoc(commentRef);
+
+                setComments((prevComments) => prevComments.filter((comment) => comment.id !== item.id));
+            } else {
+                console.error(`Review with ID ${item.reviewId} does not exist.`);
+            }
+        } catch (error) {
+            console.error("Error deleting comment:", error);
+        }
+    }
+
     const Comment = ({ item, userId, LikeComment, UnlikeComment, DislikeComment, UndislikeComment }) => {
         const [liked, setLiked] = useState(item.upvotes.includes(userId));
         const [disliked, setDisliked] = useState(item.downvotes.includes(userId));
@@ -165,6 +192,10 @@ export default Comment = ({ navigation, route }) => {
             }
         }
 
+        const handleDelete = async () => {
+            deleteComment(item);
+        }
+
         return (
             <View style={styles.commentContainer}>
                 <Text style={styles.commentUsername}>{item.username}</Text>
@@ -191,13 +222,26 @@ export default Comment = ({ navigation, route }) => {
                         />
                     </TouchableOpacity>
                     <Text style={styles.dislikeText}>{item.downvotes.length}</Text>
+
+                    {item.userId === userId && (
+                        <TouchableOpacity onPress={handleDelete} style={styles.deleteIconContainer}>
+                            <Ionicons
+                                name="trash-bin-outline"
+                                size={20}
+                                color="white"
+                            />
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
         )
     }
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
             <ScrollView>
                 <View>
                     {comments.map((item, index) => (
@@ -224,7 +268,7 @@ export default Comment = ({ navigation, route }) => {
                     <Text style={styles.addButtonText}>Add</Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 
@@ -259,7 +303,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: '#29293d',
         padding: 20,
-        paddingBottom: 35,
+        paddingBottom: 45,
     },
     input: {
         flex: 1,
@@ -300,5 +344,9 @@ const styles = StyleSheet.create({
     dislikeText: {
         fontSize: 14,
         color: 'white',
+    },
+    deleteIconContainer: {
+        position: 'absolute',
+        right: 0,
     },
 });
