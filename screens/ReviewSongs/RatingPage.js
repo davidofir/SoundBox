@@ -44,6 +44,7 @@ const RatingPage = ({ navigation, route }) => {
   const [datePublished, setDatePublished] = useState();
   const [duration, setDuration] = useState();
   const [genres, setGenres] = useState();
+  const [reviewButton, setReviewButton] = useState("Review This Song")
 
   //Set the title of the page
   useLayoutEffect(() => {
@@ -135,6 +136,7 @@ const prepareTrackInfo = async () => {
           const average = totalRating / fetchedReviews.length;
           setAvgRating(Number(average.toFixed(2))); 
           setNumberOfReviews(fetchedReviews.length);
+          setReviewButton("Update Your Review")
         } else {
           setAvgRating(0)
           setNumberOfReviews(fetchedReviews.length);
@@ -363,7 +365,7 @@ const prepareTrackInfo = async () => {
 
           {/* Trigger button for the modal */}
           <TouchableOpacity onPress={openModal} style={styles.buttonStyle}>
-            <Text style={styles.buttonTextStyle}>Review This Song</Text>
+            <Text style={styles.buttonTextStyle}>{reviewButton}</Text>
           </TouchableOpacity>
          
           {/* Modal Definition */}

@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion, query, where, getDocs } from "firebase/firestore";
 
 import { authentication, db } from "../../firebase";
 
@@ -38,54 +38,89 @@ export const getListUserReviews = async (userId) => {
 
 
 export const storeReviewData = async (userId, finalArtistName, songName, rating, coverArtUrl, message) => {
-  // Generating a new document inside the 'reviews' collection
-  // Firestore will automatically create a unique ID for this document
-  const reviewRef = doc(collection(db, "reviews"));
-  var reviewUUID = reviewRef.id
+  try {
+    // Reference the 'reviews' collection
+    const reviewsCollectionRef = collection(db, "reviews");
 
-  const reviewData = {
-    id: reviewRef.id, // Firestore generated unique ID
-    userId: userId,
-    username: await RatingModel.getUserData(userId),
-    artistName: finalArtistName,
-    songName: songName,
-    creationTime: new Date().toISOString(),
-    rating: rating,
-    review: message,
-    likes: [],
-    albumImgURL: coverArtUrl,
-    commentIds: [],
-  };
+    // Query for an existing review with the same userId, finalArtistName, and songName
+    const existingReviewQuery = query(
+      reviewsCollectionRef,
+      where("userId", "==", userId),
+      where("artistName", "==", finalArtistName),
+      where("songName", "==", songName)
+    );
 
-  // Save the review data to the new document in the 'reviews' collection.
-  await setDoc(reviewRef, reviewData);
+    const existingReviewQuerySnapshot = await getDocs(existingReviewQuery);
 
-  // Reference the 'artists' collection and the specific artist's document.
-  const artistDocRef = doc(db, "artists", finalArtistName);
+    if (existingReviewQuerySnapshot.size === 0) {
+      // Generating a new document inside the 'reviews' collection
+      // Firestore will automatically create a unique ID for this document
+      const reviewRef = doc(collection(db, "reviews"));
+      var reviewUUID = reviewRef.id
 
-  // Reference the specific song's document.
-  const songDocRef = doc(artistDocRef, "songs", songName);
+      const reviewData = {
+        id: reviewRef.id, // Firestore generated unique ID
+        userId: userId,
+        username: await RatingModel.getUserData(userId),
+        artistName: finalArtistName,
+        songName: songName,
+        creationTime: new Date().toISOString(),
+        rating: rating,
+        review: message,
+        likes: [],
+        albumImgURL: coverArtUrl,
+        commentIds: [],
+      };
 
-  // Check if the song already exists.
-  const songDocSnapshot = await getDoc(songDocRef);
-  if (!songDocSnapshot.exists()) {
-    // If the song does not exist, create a new song document with the first review ID.
-    await setDoc(songDocRef, {
-      reviewIds: [reviewUUID] // Use the ID from the reviewRef.
-    });
-  } else {
-    // If the song exists, add the review ID to the song's document.
-    await updateDoc(songDocRef, {
-      reviewIds: arrayUnion(reviewRef.id)
-    });
+      // Save the review data to the new document in the 'reviews' collection.
+      await setDoc(reviewRef, reviewData);
+
+      // Reference the 'artists' collection and the specific artist's document.
+      const artistDocRef = doc(db, "artists", finalArtistName);
+
+      // Reference the specific song's document.
+      const songDocRef = doc(artistDocRef, "songs", songName);
+
+      // Check if the song already exists.
+      const songDocSnapshot = await getDoc(songDocRef);
+      if (!songDocSnapshot.exists()) {
+        // If the song does not exist, create a new song document with the first review ID.
+        await setDoc(songDocRef, {
+          reviewIds: [reviewUUID] // Use the ID from the reviewRef.
+        });
+      } else {
+        // If the song exists, add the review ID to the song's document.
+        await updateDoc(songDocRef, {
+          reviewIds: arrayUnion(reviewRef.id)
+        });
+      }
+
+      // update the user's document with the new review ID.
+      const userRef = doc(db, "users", userId);
+      await updateDoc(userRef, {
+        reviewIds: arrayUnion(reviewRef.id)
+      });
+      return true
+
+      
+    } else {
+      // If an existing review is found, update it
+      const existingReviewId = existingReviewQuerySnapshot.docs[0].id;
+      const existingReviewRef = doc(reviewsCollectionRef, existingReviewId);
+
+      // Update the existing review with the new data
+      await updateDoc(existingReviewRef, {
+        rating: rating,
+        review: message,
+      });
+
+      // Return the ID of the updated review
+      return existingReviewId;
+    }
+  } catch (error) {
+    console.error("Error storing/updating review:", error);
+    return null;
   }
-
-  // update the user's document with the new review ID.
-  const userRef = doc(db, "users", userId);
-  await updateDoc(userRef, {
-    reviewIds: arrayUnion(reviewRef.id)
-  });
-  return true
 }
 
 export const getSongReviewIDs = async (songName, artistName) => {
