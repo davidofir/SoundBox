@@ -8,7 +8,8 @@ import {
   Keyboard,
   Button,
   FlatList,
-  ScrollView
+  ScrollView,
+  Image
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { authentication, db } from "../../firebase";
@@ -16,7 +17,7 @@ import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "fireba
 import axios from 'axios';
 import { getListUserReviews } from '../../domain/RecommendRepository/RecommendationRepository';
 import { getUserReviewData } from '../../domain/FirebaseRepository/UserRepository';
-
+const defaultCoverArt = require('../../assets/defaultSongImage.png')
 
 const Recommendations = ({ navigation, route }) => {
   const topArtists = [];
@@ -38,14 +39,16 @@ const Recommendations = ({ navigation, route }) => {
   // Query Firestore database with current UID
 
   useEffect(() => {
-      fetchData();
-      
+      getUserReviews();
     }, []);
 
-    async function fetchData(){
-      await getUserReviews();
-      await getTopSongs();
-    }
+    useEffect(() => {
+      if (reviews && reviews.length > 0) {
+        
+        fetchRecommendedSongs();
+      }
+    }, [reviews]);
+
     //get all of the logged users reviews
     async function getUserReviews(){
       var currId = authentication.currentUser.uid;
@@ -56,13 +59,6 @@ const Recommendations = ({ navigation, route }) => {
     async function getTopArtists(){
       await getTopUserArtists()
     }
-
-    async function getTopSongs(){
-      await fetchRecommendedSongs()
-      
-    }
-
-
 
   async function getTopUserArtists() {
     const artistMap = new Map();
@@ -238,15 +234,30 @@ return (
       />
     </View>
     
-<View>
-  <Text style={styles.header}>Recommended Songs For You</Text>
-  {apiResponseSongs &&
-    apiResponseSongs.similartracks.track.slice(0, 6).map((item, index) => (
-      <Text key={index} style={styles.ArtistAndTrack}>
-        {item.name} by {item.artist.name}
-      </Text>
-    ))}
-</View>
+    <View>
+      <Text style={styles.header}>Recommended Songs For You</Text>
+      {apiResponseSongs ? (
+        <ScrollView horizontal={true}>
+          {apiResponseSongs.similartracks.track.slice(0, 6).map((item, index) => (
+            <View key={index} style={styles.box}>
+              <Image
+                source={defaultCoverArt}
+                style={styles.image}
+              />
+              <Text style={styles.songName}>
+                {item.name.length > 25 // Adjust the character limit as needed
+                  ? `${item.name.slice(0, 31)}...`
+                  : item.name
+                }
+              </Text>
+              <Text style={styles.artistName}>{item.artist.name}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      ) : (
+        <Text>Loading...</Text> // Add your loading indicator here
+      )}
+    </View>
 
    
 
@@ -318,10 +329,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 0,
   },
-  SongName: {
-    fontSize: 18,
-    marginVertical: 5,
-  },
+
   songInputContainer: {
     marginTop: 20,
   },
@@ -357,12 +365,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgray'
   },
 
+  image: {
+    width: 130, // Adjust the image width as needed
+    height: 130, // Adjust the image height as needed
+    alignSelf: 'center', // Center the image horizontally
+  },
+  songName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center', // Center the text horizontally
+  },
   artistName: {
     fontSize: 14,
-    textAlign: 'left',
-    paddingHorizontal: 8,
-    flexShrink: 1,   // allows the text to shrink if needed
-    width: '70%',    // adjust this as needed based on your design
+    textAlign: 'center', // Center the text horizontally
+  },
+  box: {
+    backgroundColor: 'lightgray',
+    borderRadius: 10,
+    margin: 10,
+    padding: 10,
+    width: 150, // Adjust the width as per your preference
   },
 });
 

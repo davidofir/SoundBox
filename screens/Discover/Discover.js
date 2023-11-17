@@ -160,7 +160,7 @@ class App extends React.Component {
           title="Search"
         />
         
-
+        <SongComponent/>
 
         {/* Heading */}
         {viewModel.flatlistSwitch === 0 && (
