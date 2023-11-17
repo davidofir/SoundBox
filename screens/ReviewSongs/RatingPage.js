@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   SafeAreaView, StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Dimensions, 
-  TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator, Linking, Button
+  TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator, Linking, ScrollView
 } from "react-native";
 import { authentication, db } from "../../firebase";
 import Toast from 'react-native-toast-message';
@@ -249,55 +249,54 @@ const prepareTrackInfo = async () => {
     }
   };
   
-  const openAppleMusic = () => {
-    // Construct the Apple Music URL for the app
-    const appleMusicAppUrl = `apple-music://music.apple.com/search?term=${songName}+${artistName}`;
-
-    // Check if the Apple Music app is installed
-    Linking.canOpenURL(appleMusicAppUrl)
-      .then((supported) => {
-        if (supported) {
-          Linking.openURL(appleMusicAppUrl); // Open in the Apple Music app
-          console.log("Opened in Apple Music app");
-        } else {
-          // Construct the Apple Music URL for the web
-          const appleMusicWebUrl = `https://music.apple.com/search?term=${songName}+${artistName}`;
-          Linking.openURL(appleMusicWebUrl); // Open in the web browser
-          console.log("Opened in web browser");
-        }
-      })
-      .catch((error) => {
-        console.error('Error checking if Apple Music app is installed:', error);
-        showToast('Error', 'Apple Music Link Not Found');
-      });
+  const openAppleMusic = async () => {
+    try {
+      // Construct the Apple Music URL for the app
+      const appleMusicAppUrl = `apple-music://music.apple.com/search?term=${songName}+${artistName}`;
+  
+      // Check if the Apple Music app is installed
+      const supported = await Linking.canOpenURL(appleMusicAppUrl);
+  
+      if (supported) {
+        await Linking.openURL(appleMusicAppUrl); // Open in the Apple Music app
+        console.log("Opened in Apple Music app");
+      } else {
+        // Construct the Apple Music URL for the web
+        const appleMusicWebUrl = `https://music.apple.com/search?term=${songName}+${artistName}`;
+        await Linking.openURL(appleMusicWebUrl); // Open in the web browser
+        console.log("Opened in web browser");
+      }
+    } catch (error) {
+    }
   };
   
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        
-        <SafeAreaView style={styles.container}>
-         
+        <ScrollView>
+          
           <View style={styles.songInfoContainer}>
-            <Image source={{ uri: albumArt }} style={styles.albumArtStyle} />
-            <Text style={styles.textStyleSong}>{songName}</Text>
-            <Text style={styles.textStyleArtist}>{artistName}</Text>
-
+            
+            
             <View style={{ flexDirection: 'row' }}>
-              <TouchableOpacity onPress={openSpotify} style={{ marginRight: 250 }}>
+              <TouchableOpacity onPress={openSpotify} style={{ paddingRight: 15, marginTop: 180 }}>
                 <Image
                   source={require('../../assets/spotify.png')}
                   style={{ width: 40, height: 40 }}
                 />
               </TouchableOpacity>
-              
-              <TouchableOpacity onPress={openAppleMusic}>
+              <Image source={{ uri: albumArt }} style={styles.albumArtStyle} />
+              <TouchableOpacity onPress={openAppleMusic} style={{ paddingLeft: 15, marginTop: 180 }}>
                 <Image
                   source={require('../../assets/appleMusic.png')}
                   style={{ width: 40, height: 40 }}
                 />
               </TouchableOpacity>
             </View>
+            <Text style={styles.textStyleSong}>{songName}</Text>
+            <Text style={styles.textStyleArtist}>{artistName}</Text>
+
+ 
             {/*Song Info */}
             <View style={styles.infoContainer}>
               <View style={styles.labelColumn}>
@@ -433,7 +432,7 @@ const prepareTrackInfo = async () => {
             </TouchableWithoutFeedback>
           </Modal>
           
-        </SafeAreaView>
+          </ScrollView>
       </TouchableWithoutFeedback>
       <Toast />
     </>
@@ -463,6 +462,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.70,
     shadowRadius: 3.22,
     elevation: 9,
+    
   },
 
   textStyle: {
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
 
   textStyleSong: {
     fontSize: 29,
-    marginTop: 0,
+    marginTop: 10,
     alignItems: "baseline",
     fontWeight: "bold",
     textAlign: 'center',
@@ -486,6 +486,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#4e4c4c",
     textAlign: 'center',
+    marginBottom: 0
   },
   infoContainer: {
     flexDirection: 'row',
@@ -528,6 +529,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
+    marginBottom: 60
   },
   buttonTextStyle: {
     color: "white",
