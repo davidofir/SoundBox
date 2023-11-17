@@ -37,7 +37,7 @@ const Recommendations = ({ navigation, route }) => {
   const [searchResults, setSearchResults] = useState(null);
 
   // Query Firestore database with current UID
-
+  
   useEffect(() => {
       getUserReviews();
     }, []);
@@ -136,13 +136,16 @@ function getTopRatedReview(reviews) {
   const randomReview = topRatedReviews[Math.floor(Math.random() * topRatedReviews.length)];
   
   return randomReview;
-}
+} 
 
 async function fetchRecommendedSongs() {
   const topReview = getTopRatedReview(reviews);
+  console.log(topReview)
   if (topReview) {
+    const encodedSongTitle = encodeURIComponent(topReview.songName);
+    const encodedArtistTitle = encodeURIComponent(topReview.artistName);
     const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 
-    const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${topReview.artistName}&track=${topReview.songName}&api_key=${apiKey}&format=json`;
+    const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodedArtistTitle}&track=${encodedSongTitle}&api_key=${apiKey}&format=json`;
     
     try {
       const response = await fetch(url);
@@ -153,6 +156,7 @@ async function fetchRecommendedSongs() {
       const data = await response.json();
       if (data.similartracks && data.similartracks.track) {
         setApiResponseSongs(data);
+        console.log(apiResponseSongs)
       } else {
         console.error('Invalid API response format for song recommendations');
       }
