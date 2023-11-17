@@ -8,6 +8,7 @@ import {
   FlatList,
   Image,
   TouchableWithoutFeedback,
+  ScrollView
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
@@ -158,6 +159,8 @@ class App extends React.Component {
           }}
           title="Search"
         />
+        
+
 
         {/* Heading */}
         {viewModel.flatlistSwitch === 0 && (

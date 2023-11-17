@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   SafeAreaView, StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Dimensions, 
-  TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator, ScrollView,
+  TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator, Linking, Button
 } from "react-native";
 import { authentication, db } from "../../firebase";
 import Toast from 'react-native-toast-message';
 import defaultCoverArt from '../../assets/defaultSongImage.png';
+import spotifyLogo from '../../assets/spotify.png'
+import appleMusicLogo from '../../assets/appleMusic.png'
 import StarRating from 'react-native-star-rating-widget'; //Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
-import SongReviewsPage from "./SongReviewsPage";
+
 import {storeReviewData, RatingModel, getSongReviews} from "./ReviewStorage";
 import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
+import { getTrackID } from "../../domain/SpotifyAPI/SpotifyAPI";
 
 const RatingPage = ({ navigation, route }) => {
   const userId = authentication.currentUser.uid;
@@ -32,7 +35,7 @@ const RatingPage = ({ navigation, route }) => {
   const [text, setText] = useState("");
   const [rating, setRating] = useState(0);
   const windowHeight = Dimensions.get('window').height;
-
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [avgRating, setAvgRating] = useState(0); 
   const [numberOfReviews, setNumberOfReviews] = useState(0); 
   const [usersReview, setUsersReview] = useState(null);
@@ -49,13 +52,10 @@ const RatingPage = ({ navigation, route }) => {
       });
   }, [navigation]);
 
-
   useEffect(() => {
     setIsLoadingButtons(true)
     prepareReviewButtons();
-    prepareTrackInfo()
-   
-    
+    prepareTrackInfo() 
 }, []);
 
 const prepareTrackInfo = async () => {
@@ -76,7 +76,7 @@ const prepareTrackInfo = async () => {
         const durationInSeconds = Math.floor(durationInMilliseconds / 1000);
         const minutes = Math.floor(durationInSeconds / 60);
         const seconds = durationInSeconds % 60;
-        console.log(trackInfo)
+
         // Format the time to XX:XX
         const formattedDuration = minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
         if (duration == '00:00'){
@@ -120,17 +120,6 @@ const prepareTrackInfo = async () => {
       console.error("Error getting track info", error);
   }
 }
-
-const [songNameFontSize, setSongNameFontSize] = useState(29); // Initial font size for song name
-const [albumTitleFontSize, setAlbumTitleFontSize] = useState(17); // Initial font size for album title
-
-// Function to adjust font size based on text height
-const adjustFontSize = (event, fontSizeSetter, initialFontSize) => {
-    const { height } = event.nativeEvent.layout;
-    if (height > 30) { // Assuming 30 is the height of one line
-        fontSizeSetter(initialFontSize * 0.9); // Reduce font size by 10%
-    }
-};
 
   const prepareReviewButtons = async () => {
     const fetchedReviews = await getSongReviews(songName, artistName);
@@ -234,40 +223,103 @@ const adjustFontSize = (event, fontSizeSetter, initialFontSize) => {
     });
   };
 
+  const openSpotify = async () => {
+    trackId = null;
+    var spotifyUri = `spotify:track:${trackId}`;
+
+    try {
+      trackId = await getTrackID(songName, artistName)
+    } catch (error) {
+      console.log(error)
+    }
+
+    if (trackId){
+      // Check if the Spotify app is installed
+      Linking.canOpenURL(spotifyUri).then((supported) => {
+        //if app is installed open app. if not open web
+        if (supported) {
+          Linking.openURL(spotifyUri);
+        } else {
+          spotifyUri = `https://open.spotify.com/track/${trackId}`
+          Linking.openURL(spotifyUri);
+        }
+      })
+    } else {
+      showToast('Error', 'Spotify Link Not Found');
+    }
+  };
+  
+  const openAppleMusic = () => {
+    // Construct the Apple Music URL for the app
+    const appleMusicAppUrl = `apple-music://music.apple.com/search?term=${songName}+${artistName}`;
+
+    // Check if the Apple Music app is installed
+    Linking.canOpenURL(appleMusicAppUrl)
+      .then((supported) => {
+        if (supported) {
+          Linking.openURL(appleMusicAppUrl); // Open in the Apple Music app
+          console.log("Opened in Apple Music app");
+        } else {
+          // Construct the Apple Music URL for the web
+          const appleMusicWebUrl = `https://music.apple.com/search?term=${songName}+${artistName}`;
+          Linking.openURL(appleMusicWebUrl); // Open in the web browser
+          console.log("Opened in web browser");
+        }
+      })
+      .catch((error) => {
+        console.error('Error checking if Apple Music app is installed:', error);
+        showToast('Error', 'Apple Music Link Not Found');
+      });
+  };
+  
   return (
     <>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        
         <SafeAreaView style={styles.container}>
+         
           <View style={styles.songInfoContainer}>
-          <Image source={{ uri: albumArt }} style={styles.albumArtStyle} />
-          <Text style={styles.textStyleSong}>{songName}</Text>
-          <Text style={styles.textStyleArtist}>{artistName}</Text>
+            <Image source={{ uri: albumArt }} style={styles.albumArtStyle} />
+            <Text style={styles.textStyleSong}>{songName}</Text>
+            <Text style={styles.textStyleArtist}>{artistName}</Text>
 
-          {/*Song Info */}
-          <View style={styles.infoContainer}>
-            <View style={styles.labelColumn}>
-              <Text style={styles.textStyleLabel}>Album: {albumTitle.length > 28 ? '\n' : ''}</Text>
-              <Text style={styles.textStyleLabel}>Date Published:</Text>
-              <Text style={styles.textStyleLabel}>Duration:</Text>
-              <Text style={styles.textStyleLabel}>Tags:</Text>
+            <View style={{ flexDirection: 'row' }}>
+              <TouchableOpacity onPress={openSpotify} style={{ marginRight: 250 }}>
+                <Image
+                  source={require('../../assets/spotify.png')}
+                  style={{ width: 40, height: 40 }}
+                />
+              </TouchableOpacity>
+              
+              <TouchableOpacity onPress={openAppleMusic}>
+                <Image
+                  source={require('../../assets/appleMusic.png')}
+                  style={{ width: 40, height: 40 }}
+                />
+              </TouchableOpacity>
             </View>
-            <View style={styles.valueColumn}>
-              <Text style={styles.textStyleInfo}>{albumTitle}</Text>
-              <Text style={styles.textStyleInfo}>{datePublished}</Text>
-              <Text style={styles.textStyleInfo}>{duration}</Text>
-              <Text style={styles.textStyleInfo}>{genres}</Text>
+            {/*Song Info */}
+            <View style={styles.infoContainer}>
+              <View style={styles.labelColumn}>
+                <Text style={styles.textStyleLabel}>Album: {albumTitle.length > 28 ? '\n' : ''}</Text>
+                <Text style={styles.textStyleLabel}>Date Published:</Text>
+                <Text style={styles.textStyleLabel}>Duration:</Text>
+                <Text style={styles.textStyleLabel}>Tags:</Text>
+              </View>
+              <View style={styles.valueColumn}>
+                <Text style={styles.textStyleInfo}>{albumTitle}</Text>
+                <Text style={styles.textStyleInfo}>{datePublished}</Text>
+                <Text style={styles.textStyleInfo}>{duration}</Text>
+                <Text style={styles.textStyleInfo}>{genres}</Text>
+              </View>
             </View>
-          </View>
-          </View>
+        </View>
 
-          
-
-
-          <View style={styles.buttonContainer}>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button}
             onPress={() => navigation.navigate("LoggedUsersReviewPage", {
               review: usersReview
-          })}>
+            })}>
               {isLoadingButtons ? (
                   <ActivityIndicator size="medium" color="#040f13" />
               ) : (
@@ -380,6 +432,7 @@ const adjustFontSize = (event, fontSizeSetter, initialFontSize) => {
               </Animated.View>
             </TouchableWithoutFeedback>
           </Modal>
+          
         </SafeAreaView>
       </TouchableWithoutFeedback>
       <Toast />
@@ -396,7 +449,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   songInfoContainer: {
-    backgroundColor: '#f2f2f2', // Light grey background
+    backgroundColor: '#e3e4e6', // Light grey background
     borderRadius: 10, // Curved edges
     padding: 10, // Padding inside the container
     margin: 10, // Margin around the container
@@ -407,9 +460,9 @@ const styles = StyleSheet.create({
       width: 0,
       height: 3,
     },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-    elevation: 3,
+    shadowOpacity: 0.70,
+    shadowRadius: 3.22,
+    elevation: 9,
   },
 
   textStyle: {
@@ -423,14 +476,16 @@ const styles = StyleSheet.create({
     fontSize: 29,
     marginTop: 0,
     alignItems: "baseline",
-    fontWeight: "bold"
+    fontWeight: "bold",
+    textAlign: 'center',
   },
   textStyleArtist: {
     fontSize: 23,
     marginTop: 0,
     alignItems: "baseline",
     fontWeight: "bold",
-    color: "#4e4c4c"
+    color: "#4e4c4c",
+    textAlign: 'center',
   },
   infoContainer: {
     flexDirection: 'row',
@@ -508,6 +563,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     resizeMode: 'contain',
+    borderColor: 'black',
+    borderWidth: 0.3,
 
     marginHorizontal: 10,
     marginVertical: 20,
@@ -549,6 +606,8 @@ const styles = StyleSheet.create({
     height: 230,
     resizeMode: 'contain', //the image scales to fit within the dimensions and maintain its aspect ratio
     marginVertical: 0,
+    borderColor: 'black',
+    borderWidth: 0.3
   },
   modalHeader: {
     flexDirection: 'row',
@@ -612,6 +671,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
     alignItems: "center",
     alignContent: "center"
+  },
+  scrollViewContent: {
+    paddingTop: 20, // Add top padding for white space
+    paddingBottom: 20, // Add bottom padding for white space
   },
 
 });

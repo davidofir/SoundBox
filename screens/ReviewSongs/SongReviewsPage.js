@@ -41,25 +41,32 @@ const SongReviewsPage = ({ route, navigation }) => {
                 <Text style={styles.reviewText}>User: {review.username}</Text>
                 <Text style={styles.reviewText}>Rating: {review.rating}</Text>
                 <Text style={styles.reviewText}>Review: {review.review}</Text>
-                <Text style={styles.reviewText}>Date: {new Date(review.creationTime).toLocaleString()}</Text>
+                <Text style={styles.reviewText}>Posted: {new Date(review.creationTime).toLocaleString()}</Text>
                 <Text style={styles.reviewText}>Likes: {review.likes.length}</Text>
             </View>
         );
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.header}>{songName}</Text>
-            {loading ? (
-                <ActivityIndicator size="large" color="black" />
-            ) : reviews.length > 0 ? (
-                reviews.map(renderReview)
-            ) : (
-                <Text style={styles.noReviewsText}>There aren't any reviews for this song yet!
-                </Text>
+        <View style={{ flex: 1 }}>
+            <View>
+                <Text style={styles.header}>{songName}</Text>
+                <Text style={styles.headerArtist}>{artistName}</Text>
+            </View>
+            <ScrollView contentContainerStyle={styles.container}>
                 
-            )}
-        </ScrollView>
+                {loading ? (
+                    <ActivityIndicator size="large" color="black" />
+                ) : reviews.length > 0 ? (
+                    reviews.map(renderReview)
+                ) : (
+                    <Text style={styles.noReviewsText}>There aren't any reviews for this song yet!
+                    </Text>
+                    
+                )}
+            </ScrollView>
+        </View>
+       
     );
 };
 
@@ -69,11 +76,19 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         padding: 10,
+        textAlign: 'center'
     },
     header: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginBottom: 20,
+        textAlign: 'center',
+        marginTop: 10
+    },
+    headerArtist: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        textAlign: 'center',
     },
     reviewContainer: {
         backgroundColor: 'lightgray',

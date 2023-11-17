@@ -72,6 +72,10 @@ const Recommendations = ({ navigation, route }) => {
   }
 */
 
+  async function fetchUsersReviews(){
+    
+  }
+
   async function getTopUserArtists() {
     const artistMap = new Map();
     const lambda = 0.5; // Might need to adjust after further testing and more reviews are made

@@ -103,7 +103,7 @@ export const getSongReviewIDs = async (songName, artistName) => {
       reviewIds = songSnapshot.data().reviewIds || [];
       return reviewIds;
     } else {
-      console.log("Error fetching review IDs");
+      console.log("No reviews found.");
       return reviewIds;
     }
 

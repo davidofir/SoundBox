@@ -46,7 +46,7 @@ async function searchAndFetchSongCoverArt(songName, artistName) {
 
     // Check if either songName or artistName contains quotes
     if (songName.includes('"') || artistName.includes('"') || songName.includes("'") || artistName.includes("'")) {
-      // Use the modified approach for songs with quotes
+      // Use a modified approach for songs with quotes - was messing up the url
       searchQuery = encodeURIComponent(`track:${songName} artist:${artistName}`);
     } else {
       // Use the regular approach
@@ -88,8 +88,48 @@ async function searchAndFetchSongCoverArt(songName, artistName) {
   }
 }
 
+async function getTrackID(songName, artistName) {
+  try {
+    const accessToken = await getAccessToken();
+    let searchQuery;
+
+    // Check if either songName or artistName contains quotes
+    if (songName.includes('"') || artistName.includes('"') || songName.includes("'") || artistName.includes("'")) {
+      // Use a modified approach for songs with quotes - was messing up the url
+      searchQuery = encodeURIComponent(`track:${songName} artist:${artistName}`);
+    } else {
+      // Use the regular approach
+      searchQuery = `track:${songName} artist:${artistName}`;
+    }
+
+    const searchResponse = await axiosInstance.get('https://api.spotify.com/v1/search', {
+      params: {
+        q: searchQuery,
+        type: 'track',
+      },
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    const track = searchResponse.data.tracks.items[0];
+
+    if (track) {
+      const trackId = track.id;
+      return trackId
+      
+    } else {
+      return null;
+    }
+  }  catch (error) {
+    console.error('Error fetching Track ID:', error);
+    // Return the default image URL (local asset) on error as well
+    return null;
+  }
+}
+
 async function searchAndFetchArtistImage(){
   
 }
 
-export { searchAndFetchSongCoverArt };
+export { searchAndFetchSongCoverArt, getTrackID };
