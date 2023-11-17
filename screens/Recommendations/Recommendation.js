@@ -11,10 +11,11 @@ import {
   ScrollView
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
-import { authentication, db } from "../firebase";
+import { authentication, db } from "../../firebase";
 import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import axios from 'axios';
-
+import { getListUserReviews } from '../../domain/RecommendRepository/RecommendationRepository';
+import { getUserReviewData } from '../../domain/FirebaseRepository/UserRepository';
 
 
 const Recommendations = ({ navigation, route }) => {
@@ -33,55 +34,42 @@ const Recommendations = ({ navigation, route }) => {
   const [apiResponseSongs, setApiResponseSongs] = useState(null); // Added state to store song recommendations
   const [inputArtist, setInputArtist] = useState('');
   const [searchResults, setSearchResults] = useState(null);
+
   // Query Firestore database with current UID
 
   useEffect(() => {
-    const userRef = doc(db, 'users', userId);
-
-    getDoc(userRef).then((doc) => {
-      setReviews(doc.data().reviews);
-
-      // Get the length of the array for the number of reviews
-      reviewCount = doc.data().reviews.length;
-      // Get the array of reviews
-      reviewArray = doc.data().reviews;
+      fetchData();
       
-      getTopUserArtists();
-      fetchRecommendedSongs();
-      
-    });
-  }, []);
+    }, []);
 
-  useEffect(() => {
-    if (reviews && reviews.length > 0) {
-      
-      fetchRecommendedSongs();
+    async function fetchData(){
+      await getUserReviews();
+      await getTopSongs();
     }
-  }, [reviews]);
+    //get all of the logged users reviews
+    async function getUserReviews(){
+      var currId = authentication.currentUser.uid;
+      var reviews = await getUserReviewData(currId)
+      setReviews(reviews) 
+    }
 
-/*
-  function printReviews() {
-    reviews.forEach((item, index) => {
-      console.log(`Review ${index}:`);
-      console.log(`Artist: ${item.artistName}`);
-      console.log(`Rating: ${item.rating}`);
-      console.log(`Review: ${item.review}`);
-      console.log(`Song: ${item.songName}`);
-      console.log('------------------');
-    });
-  }
-*/
+    async function getTopArtists(){
+      await getTopUserArtists()
+    }
 
-  async function fetchUsersReviews(){
-    
-  }
+    async function getTopSongs(){
+      await fetchRecommendedSongs()
+      
+    }
+
+
 
   async function getTopUserArtists() {
     const artistMap = new Map();
     const lambda = 0.5; // Might need to adjust after further testing and more reviews are made
 
     // Build the map with aggregate ratings and counts.
-    reviewArray.forEach(review => {
+    reviews.forEach(review => {
         const { artistName, rating } = review;
 
         if (artistMap.has(artistName)) {
@@ -112,7 +100,6 @@ const Recommendations = ({ navigation, route }) => {
   // Find the top 2 artists with the highest weighted scores.
   meanReviewList.sort((a, b) => b.weightedScore - a.weightedScore);
   const topTwoArtists = meanReviewList.slice(0, 2).map(artist => artist.name);
-
   fetchSimilarArtists(topTwoArtists);
 }
 
@@ -250,13 +237,16 @@ return (
           renderItem={({ item }) => <ArtistItem artistName={item} />}
       />
     </View>
-
-    <View>
-      <Text style={styles.header}>Recommended Songs For You</Text>
-      {apiResponseSongs && apiResponseSongs.similartracks.track.slice(0, 6).map((item, index) => (
-        <Text key={index} style={styles.ArtistName}>{item.name}</Text>
-      ))}
-    </View>
+    
+<View>
+  <Text style={styles.header}>Recommended Songs For You</Text>
+  {apiResponseSongs &&
+    apiResponseSongs.similartracks.track.slice(0, 6).map((item, index) => (
+      <Text key={index} style={styles.ArtistAndTrack}>
+        {item.name} by {item.artist.name}
+      </Text>
+    ))}
+</View>
 
    
 
@@ -377,3 +367,15 @@ const styles = StyleSheet.create({
 });
 
 export default Recommendations;
+/*
+  function printReviews() {
+    reviews.forEach((item, index) => {
+      console.log(`Review ${index}:`);
+      console.log(`Artist: ${item.artistName}`);
+      console.log(`Rating: ${item.rating}`);
+      console.log(`Review: ${item.review}`);
+      console.log(`Song: ${item.songName}`);
+      console.log('------------------');
+    });
+  }
+*/
