@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import * as ChatRepository from '../../domain/ChatRepositroy/ChatRepository';
 import { authentication } from '../../firebase';
+import { getUserProfileData } from '../../domain/FirebaseRepository/UserRepository';
 
 export default function useChatViewModel(roomId) {
   const [messages, setMessages] = useState([]);
@@ -43,17 +44,22 @@ export default function useChatViewModel(roomId) {
   }
 
     function onSend(newMessage) {
-      const messageToSend = {
-          ...newMessage,
-          createdAt: new Date().toISOString(),
-          user: {
-              _id: authentication.currentUser.uid,
-              name: authentication.currentUser.email,
-          },
-      };
+        const userData = getUserProfileData().then((user)=>{
+            console.log(user)
+            const messageToSend = {
+                ...newMessage,
+                createdAt: new Date().toISOString(),
+                user: {
+                    _id: authentication.currentUser.uid,
+                    name: user.userName,
+                },
+            };
+      
+            ChatRepository.sendMessage(messageToSend);
+            setMessages((previousMessages) => [messageToSend, ...previousMessages]);
+        })
+        console.log(userData);
 
-      ChatRepository.sendMessage(messageToSend);
-      setMessages((previousMessages) => [messageToSend, ...previousMessages]);
   }
 
     return {

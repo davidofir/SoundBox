@@ -26,7 +26,6 @@ const getUserProfileData = async () => {
         throw error;
     }
 };
-
 const getUserReviewData = async (userId) => {
     //const userId = authentication.currentUser.uid;
     const userRef = doc(db, "users", userId);
