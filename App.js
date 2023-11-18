@@ -17,7 +17,7 @@ import FollowersPage from './screens/AccountProfile/FollowersPage';
 import FollowingPage from './screens/AccountProfile/FollowingPage';
 import SearchPage from './screens/SearchPage';
 import UserPage from './screens/UserPage';
-import Recommendations from './screens/Recommendation';
+import Recommendations from './screens/Recommendations/Recommendation';
 import Chat from './screens/Chat/Chat';
 import EditAccountPage from './screens/AccountProfile/EditAccountPage';
 import SongReviewsPage from './screens/ReviewSongs/SongReviewsPage';
