@@ -10,6 +10,7 @@ import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { async } from "@firebase/util";
 import colors from "../../constants/colors";
 import useRegisterViewModel from "./RegisterViewModel";
+import { useEffect } from "react";
 
 const Separator = () => (
     <View style={styles.separator} />
@@ -49,7 +50,6 @@ const Register = ({ navigation }) => {
         navigation.navigate("Login")
     }
     */
-
     return (
         <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-500} behavior="padding">
             <Text

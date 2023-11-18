@@ -23,9 +23,49 @@ import EditAccountPage from './screens/AccountProfile/EditAccountPage';
 import SongReviewsPage from './screens/ReviewSongs/SongReviewsPage';
 import LoggedUsersReviewPage from './screens/ReviewSongs/LoggedUsersReviewPage'
 import CommentPage from './screens/Feed/CommentPage';
-
+import * as Notifications from 'expo-notifications';
+import { useEffect } from 'react';
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 const Stack = createStackNavigator();
+const getNotificationsPermission = async()=>{
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+  if (finalStatus !== 'granted') {
+    console.error('Failed to get push token for push notification!');
+    return;
+  }
+}
 export default function App() {
+  useEffect(()=>{
+    getNotificationsPermission().then(() => {
+      const notificationListener = Notifications.addNotificationReceivedListener(notification => {
+        console.log('Notification Received:', notification);
+        // Handle the received notification
+      });
+
+      const responseListener = Notifications.addNotificationResponseReceivedListener(response => {
+        console.log('Notification Response:', response);
+        // Handle the notification response
+      });
+
+      // Cleanup function
+      return () => {
+        Notifications.removeNotificationSubscription(notificationListener);
+        Notifications.removeNotificationSubscription(responseListener);
+      };
+    }).catch((error)=>console.log('Permission Rejected',error));
+
+  },[]);
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='Login'

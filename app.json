@@ -8,8 +8,17 @@
           "NSAllowsArbitraryLoads": true
         }
       }
-    }
-    
+    },
+    "android":{
+      "package":"com.capstone.soundbox",
+      "googleServicesFile":"./google-services.json"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d13860db-d533-4cf2-ae3f-b64db6a1773d"
+      }
+    },
+    "owner": "soundbox5"
   },
   "name": "soundbox"
 }

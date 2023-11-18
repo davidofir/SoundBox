@@ -6,16 +6,20 @@ const useRegisterViewModel = (navigation) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+
     const registerAccount = async () => {
         try {
             const user = await FirebaseManager.signUpWithEmailAndPassword(email, password);
 
             // Save user data to Firestore
+            let newToken = await UserRepository.registerForPushNotificationsAsync();
+            console.log('stored token:',newToken)
             const userData = {
                 userName,
                 followers: [],
                 following: [],
                 reviewIds: [],
+                token: newToken
             };
 
             await UserRepository.createUserDocument(user.uid, userData);

@@ -42,8 +42,6 @@ const Login = ({ navigation }) => {
             .catch(error => alert(error.message))
     }
     */
-
-
     return (
         <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-500} behavior="padding">
             <ImageBackground source={require("../../assets/bkg.png")} resizeMode="cover" style={styles.image}>

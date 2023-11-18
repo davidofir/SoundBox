@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "948556525121",
+    "project_id": "soundbox-e1143",
+    "storage_bucket": "soundbox-e1143.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948556525121:android:b58f340fb25f93f689e0c0",
+        "android_client_info": {
+          "package_name": "com.capstone.soundbox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHrS_Ryw2dV7IcK6u8c8xAJ7eOeLbXFZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
