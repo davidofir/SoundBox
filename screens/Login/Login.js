@@ -53,6 +53,7 @@ const Login = ({ navigation }) => {
                         value={email}
                         onChangeText={text => setEmail(text)}
                         style={styles.input}
+                        autoCapitalize='none'
 
                     />
                     <TextInput
@@ -62,6 +63,7 @@ const Login = ({ navigation }) => {
                         onChangeText={text => setPassword(text)}
                         style={styles.input}
                         secureTextEntry
+                        autoCapitalize='none'
 
                     />
                 </View>

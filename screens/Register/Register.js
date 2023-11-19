@@ -65,6 +65,7 @@ const Register = ({ navigation }) => {
                     value={userName}
                     onChangeText={text => setUser(text)}
                     style={styles.input}
+                    autoCapitalize="none"
                 />
                 <Text style={styles.Text}>Email</Text>
                 <TextInput
@@ -73,6 +74,7 @@ const Register = ({ navigation }) => {
                     value={email}
                     onChangeText={text => setEmail(text)}
                     style={styles.input}
+                    autoCapitalize="none"
                 />
                 <Text style={styles.Text}>Password</Text>
                 <TextInput
@@ -82,6 +84,7 @@ const Register = ({ navigation }) => {
                     onChangeText={text => setPassword(text)}
                     style={styles.input}
                     secureTextEntry={true}
+                    autoCapitalize="none"
                 />
             </View>
 
