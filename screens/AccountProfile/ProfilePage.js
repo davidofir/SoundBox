@@ -85,7 +85,7 @@ export default ProfilePage = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1f1f2e',
+        backgroundColor: 'white',
         padding: 16,
     },
     headerContainer: {
@@ -98,12 +98,12 @@ const styles = StyleSheet.create({
         borderRadius: 50,
     },
     username: {
-        color: 'white',
+        color: 'black',
         fontSize: 18,
         marginVertical: 10,
     },
     editButton: {
-        backgroundColor: '#3498db',
+        backgroundColor: '#4f4f4f',
         paddingVertical: 8,
         paddingHorizontal: 16,
         borderRadius: 20,
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     statsValue: {
-        color: 'white',
+        color: 'black',
         fontSize: 24,
         fontWeight: 'bold',
     },
@@ -134,26 +134,34 @@ const styles = StyleSheet.create({
     postItem: {
         marginBottom: 10,
         padding: 16,
-        backgroundColor: '#3d3d59',
+        backgroundColor: 'white',
         borderRadius: 10,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 2,
+        elevation: 5,
     },
     artistName: {
-        color: 'white',
+        color: 'black',
         fontSize: 16,
         fontWeight: 'bold',
     },
     reviewText: {
-        color: 'white',
+        color: 'black',
         fontSize: 14,
         marginTop: 5,
     },
     ratingText: {
-        color: 'white',
+        color: 'black',
         fontSize: 14,
         marginTop: 5,
     },
     songName: {
-        color: 'white',
+        color: 'black',
         fontSize: 14,
         marginTop: 5,
     },

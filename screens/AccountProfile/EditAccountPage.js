@@ -89,7 +89,7 @@ export default EditAccountPage = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1f1f2e',
+        backgroundColor: 'white',
     },
     profileHeader: {
         alignItems: 'center',
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
     },
     username: {
-        color: 'white',
+        color: 'black',
         fontSize: 20,
         fontWeight: 'bold',
         marginTop: 10,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     sectionTitle: {
-        color: 'white',
+        color: 'black',
         fontSize: 18,
         fontWeight: 'bold',
         paddingTop: 10
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
     },
     saveButton: {
-        backgroundColor: '#007AFF', // Replace with your desired color
+        backgroundColor: '#4f4f4f',
         borderRadius: 5,
         height: 40,
         alignItems: 'center',

@@ -105,7 +105,7 @@ export default SocialFeed = ({ navigation }) => {
                             <Ionicons
                                 name={liked ? 'heart' : 'heart-outline'}
                                 size={20}
-                                color={liked ? 'red' : 'white'}
+                                color={liked ? 'red' : 'black'}
                                 style={styles.likeIcon}
                             />
                         </TouchableOpacity>
@@ -114,7 +114,7 @@ export default SocialFeed = ({ navigation }) => {
                             <Ionicons
                                 name="chatbox-outline"
                                 size={20}
-                                color="white"
+                                color="black"
                                 style={styles.commentIcon} />
                         </TouchableOpacity>
                     </View>
@@ -162,23 +162,23 @@ export default SocialFeed = ({ navigation }) => {
             {/* Social Media Navigation Bar */}
             <View style={styles.navigationContainer}>
                 <TouchableOpacity onPress={() => navigation.replace("Home")}>
-                    <FontAwesome name="home" size={24} color="white" />
+                    <FontAwesome name="home" size={24} color="#4f4f4f" />
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate("Search")}>
-                    <FontAwesome name="search" size={24} color="white" />
+                    <FontAwesome name="search" size={24} color="#4f4f4f" />
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate("Discover")}>
-                    <FontAwesome name="plus-square" size={24} color="white" />
+                    <FontAwesome name="plus-square" size={24} color="#4f4f4f" />
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate("Recommendations")}>
-                    <FontAwesome name="heart" size={24} color="white" />
+                    <FontAwesome name="heart" size={24} color="#4f4f4f" />
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-                    <FontAwesome name="user" size={24} color="white" />
+                    <FontAwesome name="user" size={24} color="#4f4f4f" />
                 </TouchableOpacity>
             </View>
         </View >
@@ -188,7 +188,7 @@ export default SocialFeed = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1f1f2e',
+        backgroundColor: 'white',
     },
     artistContainer: {
         paddingLeft: 10,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 6,
     },
     postContainer: {
-        backgroundColor: '#3d3d59',
+        backgroundColor: 'white',
         borderRadius: 10,
         margin: 10,
         padding: 10,
@@ -235,7 +235,8 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     text: {
-        color: '#8c8c9c',
+        color: '#4f4f4f',
+        fontWeight: 'bold',
     },
     profileImage: {
         width: 40,
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
     username: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: 'white',
+        color: 'black',
     },
     postContent: {
         marginTop: 10,
@@ -254,31 +255,31 @@ const styles = StyleSheet.create({
     artistName: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: 'white',
+        color: 'black',
     },
     reviewText: {
         fontSize: 14,
         marginTop: 5,
-        color: 'white',
+        color: 'black',
     },
     ratingText: {
         fontSize: 14,
         marginTop: 5,
-        color: 'white',
+        color: 'black',
     },
     songName: {
         fontSize: 14,
         marginTop: 5,
-        color: 'white',
+        color: 'black',
     },
     navigationContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        backgroundColor: '#1f1f2e',
+        backgroundColor: 'white',
         paddingBottom: 42,
         paddingTop: 15,
         borderTopWidth: 1,
-        borderTopColor: '#29293d',
+        borderTopColor: '#ededed',
     },
     likeContainer: {
         flexDirection: 'row',
@@ -290,7 +291,7 @@ const styles = StyleSheet.create({
     },
     likeText: {
         fontSize: 14,
-        color: 'white',
+        color: 'black',
     },
     commentIcon: {
         marginLeft: 10,

@@ -72,7 +72,7 @@ export default FollowersPage = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1f1f2e',
+        backgroundColor: 'white',
     },
     loadingIndicator: {
         flex: 1,
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 10,
         borderBottomWidth: 1,
-        borderBottomColor: '#29293d',
+        borderBottomColor: '#ededed',
     },
     itemImage: {
         width: 50,
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     itemText: {
-        color: 'white',
+        color: 'black',
         fontSize: 16,
     },
 });

@@ -33,7 +33,7 @@ Notifications.setNotificationHandler({
   }),
 });
 const Stack = createStackNavigator();
-const getNotificationsPermission = async()=>{
+const getNotificationsPermission = async () => {
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
   if (existingStatus !== 'granted') {
@@ -46,7 +46,7 @@ const getNotificationsPermission = async()=>{
   }
 }
 export default function App() {
-  useEffect(()=>{
+  useEffect(() => {
     getNotificationsPermission().then(() => {
       const notificationListener = Notifications.addNotificationReceivedListener(notification => {
         console.log('Notification Received:', notification);
@@ -63,17 +63,27 @@ export default function App() {
         Notifications.removeNotificationSubscription(notificationListener);
         Notifications.removeNotificationSubscription(responseListener);
       };
-    }).catch((error)=>console.log('Permission Rejected',error));
+    }).catch((error) => console.log('Permission Rejected', error));
 
-  },[]);
+  }, []);
   return (
     <NavigationContainer>
+      <StatusBar
+        style="dark"
+      />
       <Stack.Navigator initialRouteName='Login'
         screenOptions={{
-          headerStyle: { backgroundColor: '#1f1f2e' },
-          headerTintColor: '#fff',
+          headerStyle: {
+            backgroundColor: 'white',
+            shadowOffset: {
+              width: 0,
+              height: 1.5,
+            },
+            shadowOpacity: 0.3,
+          },
+          headerTintColor: '#4f4f4f',
           headerTitleStyle: { fontWeight: 'bold' },
-          headerShadowVisible: false,
+          headerShadowVisible: true,
           headerBackTitleVisible: false,
         }}>
         <Stack.Screen name="Login" component={Login} />

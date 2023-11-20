@@ -207,7 +207,7 @@ export default Comment = ({ navigation, route }) => {
                         <Ionicons
                             name={liked ? 'chevron-up' : 'chevron-up-outline'}
                             size={20}
-                            color={liked ? 'blue' : 'white'}
+                            color={liked ? 'blue' : 'black'}
                             style={styles.likeIcon}
                         />
                     </TouchableOpacity>
@@ -217,7 +217,7 @@ export default Comment = ({ navigation, route }) => {
                         <Ionicons
                             name={disliked ? 'chevron-down' : 'chevron-down-outline'}
                             size={20}
-                            color={disliked ? 'red' : 'white'}
+                            color={disliked ? 'red' : 'black'}
                             style={styles.dislikeIcon}
                         />
                     </TouchableOpacity>
@@ -228,7 +228,7 @@ export default Comment = ({ navigation, route }) => {
                             <Ionicons
                                 name="trash-bin-outline"
                                 size={20}
-                                color="white"
+                                color="black"
                             />
                         </TouchableOpacity>
                     )}
@@ -261,6 +261,7 @@ export default Comment = ({ navigation, route }) => {
                 <TextInput
                     style={styles.input}
                     placeholder="Add a comment..."
+                    placeholderTextColor={'#d1d1d1'}
                     value={newComment}
                     onChangeText={(text) => setNewComment(text)}
                 />
@@ -275,21 +276,21 @@ export default Comment = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1f1f2e',
+        backgroundColor: 'white',
     },
     commentContainer: {
         padding: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#29293d',
+        borderBottomColor: '#ededed',
     },
     commentUsername: {
         fontSize: 16,
-        color: 'white',
+        color: 'black',
         fontWeight: 'bold',
     },
     commentText: {
         fontSize: 16,
-        color: 'white',
+        color: 'black',
         marginTop: 1,
     },
     timestampText: {
@@ -301,25 +302,25 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderTopWidth: 1,
-        borderTopColor: '#29293d',
+        borderTopColor: '#ededed',
         padding: 20,
         paddingBottom: 45,
     },
     input: {
         flex: 1,
         height: 40,
-        backgroundColor: '#1f1f2e',
+        backgroundColor: 'white',
         borderWidth: 1,
-        borderColor: '#29293d',
+        borderColor: '#d1d1d1',
         borderRadius: 25,
         paddingHorizontal: 16,
-        color: 'white',
+        color: 'black',
     },
     addButton: {
         marginLeft: 8,
         paddingVertical: 10,
         paddingHorizontal: 16,
-        backgroundColor: Colors.primary,
+        backgroundColor: '#4f4f4f',
         borderRadius: 8,
     },
     addButtonText: {
@@ -335,7 +336,7 @@ const styles = StyleSheet.create({
     },
     likeText: {
         fontSize: 14,
-        color: 'white',
+        color: 'black',
     },
     dislikeIcon: {
         marginLeft: 5,
@@ -343,7 +344,7 @@ const styles = StyleSheet.create({
     },
     dislikeText: {
         fontSize: 14,
-        color: 'white',
+        color: 'black',
     },
     deleteIconContainer: {
         position: 'absolute',
