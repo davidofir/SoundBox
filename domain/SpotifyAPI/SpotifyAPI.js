@@ -48,9 +48,11 @@ async function searchAndFetchSongCoverArt(songName, artistName) {
     if (songName.includes('"') || artistName.includes('"') || songName.includes("'") || artistName.includes("'")) {
       // Use a modified approach for songs with quotes - was messing up the url
       searchQuery = encodeURIComponent(`track:${songName} artist:${artistName}`);
+ 
     } else {
       // Use the regular approach
       searchQuery = `track:${songName} artist:${artistName}`;
+    
     }
 
     const searchResponse = await axiosInstance.get('https://api.spotify.com/v1/search', {
@@ -61,8 +63,9 @@ async function searchAndFetchSongCoverArt(songName, artistName) {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    });
+    }); 
 
+    
     const track = searchResponse.data.tracks.items[0];
 
     if (track) {
@@ -97,6 +100,7 @@ async function getTrackID(songName, artistName) {
     if (songName.includes('"') || artistName.includes('"') || songName.includes("'") || artistName.includes("'")) {
       // Use a modified approach for songs with quotes - was messing up the url
       searchQuery = encodeURIComponent(`track:${songName} artist:${artistName}`);
+
     } else {
       // Use the regular approach
       searchQuery = `track:${songName} artist:${artistName}`;
@@ -113,12 +117,18 @@ async function getTrackID(songName, artistName) {
     });
 
     const track = searchResponse.data.tracks.items[0];
-
+    print(track + "track")
     if (track) {
       const trackId = track.id;
+      if (songName == 'vampire'){
+        print(track)
+      }
       return trackId
       
     } else {
+      if (songName == 'vampire'){
+        print(track + "DAWDADWW")
+      }
       return null;
     }
   }  catch (error) {

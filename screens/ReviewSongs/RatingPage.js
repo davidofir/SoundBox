@@ -27,7 +27,6 @@ const RatingPage = ({ navigation, route }) => {
   const artistName = isSearched === 1 ? searchedArtistName : possibleArtistName;
   const defaultCoverArtUri = Image.resolveAssetSource(defaultCoverArt).uri;
   const albumArt = coverArtUrl === 3 ? defaultCoverArtUri : coverArtUrl;
-
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingButtons, setIsLoadingButtons] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -164,7 +163,7 @@ const prepareTrackInfo = async () => {
 
   // Function to handle opening the modal
   const openModal = () => {
-
+    console.log(defaultCoverArt)
     setModalVisible(true);
     Animated.timing(modalY, {
       toValue: windowHeight * 0.1, // animate to top

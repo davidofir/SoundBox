@@ -11,10 +11,12 @@ import {
   ScrollView
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import Recommendations from '../Recommendations/Recommendation';
 import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
 import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 import { useState, useEffect, memo } from 'react';
 const defaultCoverArt = require('../../assets/defaultSongImage.png')
+import { fetchRecommendedSongs } from '../Recommendations/RecommendSongs';
 
 // ViewModel Class
 class AppViewModel {
@@ -52,7 +54,7 @@ const viewModel = new AppViewModel();
 
 const Cell = memo(({ cellItem }) => {
   const [coverArtUrl, setCoverArtUrl] = useState(null);
-
+  
   const fetchCoverArt = async () => {
     let artistNameImage = cellItem.artist.name;
     if (viewModel.flatlistSwitch === 1) {
@@ -71,8 +73,11 @@ const Cell = memo(({ cellItem }) => {
     }
   };
 
+
+
   useEffect(() => {
     fetchCoverArt();
+    
   }, [cellItem]); // Only re-run the effect if cellItem changes
 
   let artistName = cellItem.artist.name;
@@ -105,11 +110,20 @@ const Cell = memo(({ cellItem }) => {
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { tracks: [] };
+    this.state = { tracks: [],
+                   recommendedSongs: null };
 
     viewModel.fetchTopTracks().then(() => {
       this.setState({ tracks: viewModel.getTracks() });
     });
+  }
+  async componentDidMount() {
+    try {
+      const songsData = await fetchRecommendedSongs();
+      this.setState({ recommendedSongs: songsData });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   componentWillUnmount() {
@@ -118,6 +132,7 @@ class App extends React.Component {
       searchInput: "",
     });
   }
+
 
   async handleRowPress(item) {
     const artistName =
@@ -135,6 +150,7 @@ class App extends React.Component {
   }
 
   render() {
+    const { recommendedSongs } = this.state;
     return (
       <View style={styles.container}>
         {/* Searchbar */}
@@ -159,26 +175,53 @@ class App extends React.Component {
           }}
           title="Search"
         />
-        
-     
+    {/* Vertical FlatList */}
+    <FlatList
+      data={this.state.tracks}
+      renderItem={({ item }) => (
+        <TouchableOpacity onPress={() => this.handleRowPress(item)}>
+          <Cell cellItem={item} />
+        </TouchableOpacity>
+      )}
+      keyExtractor={(_, index) => index.toString()}
 
-        {/* Heading */}
-        {viewModel.flatlistSwitch === 0 && (
-          <Text style={styles.heading}>Popular Right Now</Text>
-        )}
-
-        {/* Songs */}
-        <FlatList
-          data={this.state.tracks}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => this.handleRowPress(item)}>
-              <Cell cellItem={item} />
-            </TouchableOpacity>
+      
+      // Horizontal list as the header component of the vertical list
+      ListHeaderComponent={() => (
+        <>
+        <Text style={styles.heading}>Recommended For You</Text>
+          {recommendedSongs ? (
+            <FlatList
+              horizontal
+              data={recommendedSongs.similartracks.track.slice(0, 6)}
+              renderItem={({ item, index }) => (
+                <View key={index} style={styles.box}>
+                  <Image
+                    source={defaultCoverArt}
+                    style={styles.image}
+                  />
+                  <Text style={styles.songName}>
+                    {item.name.length > 25
+                      ? `${item.name.slice(0, 31)}...`
+                      : item.name
+                    }
+                  </Text>
+                  <Text style={styles.artistName}>{item.artist.name}</Text>
+                </View>
+              )}
+              keyExtractor={(_, index) => index.toString()}
+            />
+          ) : (
+            <Text>Loading...</Text>
           )}
-          keyExtractor={(_, index) => index.toString()}
-        />
-      </View>
-    );
+
+          {/* Any other content you want at the top of the vertical list */}
+          <Text style={styles.heading}>Popular Right Now</Text>
+        </>
+      )}
+    />
+  </View>
+);
   }
 }
 
@@ -230,6 +273,35 @@ const styles = StyleSheet.create({
     height: 35,
     borderRadius: 20,
     paddingLeft: 10,
+  },
+  image: {
+    width: 100, // Adjust the image width as needed
+    height: 100, // Adjust the image height as needed
+    alignSelf: 'center', // Center the image horizontally
+  },
+  songName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center', // Center the text horizontally
+  },
+  artistName: {
+    fontSize: 14,
+    textAlign: 'center', // Center the text horizontally
+  },
+  box: {
+    backgroundColor: '#F7F6F6',
+    borderRadius: 10,
+    margin: 10,
+    padding: 10,
+    width: 150, 
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.30,
+    shadowRadius: 1.22,
+    elevation: 3,
   },
 });
 

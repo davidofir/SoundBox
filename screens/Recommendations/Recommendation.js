@@ -37,9 +37,9 @@ const Recommendations = ({ navigation, route }) => {
   const [searchResults, setSearchResults] = useState(null);
 
   // Query Firestore database with current UID
-  
+
   useEffect(() => {
-      getUserReviews();
+    getUserReviews();
     }, []);
 
     useEffect(() => {
@@ -49,12 +49,7 @@ const Recommendations = ({ navigation, route }) => {
       }
     }, [reviews]);
 
-    //get all of the logged users reviews
-    async function getUserReviews(){
-      var currId = authentication.currentUser.uid;
-      var reviews = await getUserReviewData(currId)
-      setReviews(reviews) 
-    }
+
 
     async function getTopArtists(){
       await getTopUserArtists()
@@ -128,19 +123,11 @@ async function fetchSimilarArtists(artists) {
   }
 }
 
-function getTopRatedReview(reviews) {
-  const maxRating = Math.max(...reviews.map(review => review.rating));
-  const topRatedReviews = reviews.filter(review => review.rating === maxRating);
 
-  // If there are multiple reviews with the highest rating, pick a random one.
-  const randomReview = topRatedReviews[Math.floor(Math.random() * topRatedReviews.length)];
-  
-  return randomReview;
-} 
 
 async function fetchRecommendedSongs() {
+  
   const topReview = getTopRatedReview(reviews);
-  console.log(topReview)
   if (topReview) {
     const encodedSongTitle = encodeURIComponent(topReview.songName);
     const encodedArtistTitle = encodeURIComponent(topReview.artistName);
@@ -156,7 +143,6 @@ async function fetchRecommendedSongs() {
       const data = await response.json();
       if (data.similartracks && data.similartracks.track) {
         setApiResponseSongs(data);
-        console.log(apiResponseSongs)
       } else {
         console.error('Invalid API response format for song recommendations');
       }
@@ -196,47 +182,6 @@ const ArtistItem = ({ artistName }) => (
 );
 
 return (
-  <ScrollView style={{flex: 1}} contentContainerStyle={{padding: 5}}>
-<View style={styles.songInputContainer}>
-    <Text style={styles.topHeader}>Find Similar Songs</Text>
-    
-    <TextInput
-        style={styles.songInput}
-        value={inputSong}
-        onChangeText={(text) => setInputSong(text)}
-        placeholder="Song name"
-        placeholderTextColor="gray"
-    />
-    <TextInput
-        style={styles.songInput}
-        value={inputArtist}
-        onChangeText={(text) => setInputArtist(text)}
-        placeholder="Artist name"
-        placeholderTextColor="gray"
-    />
-  
-      <Button
-          title="Get Recommended Songs"
-          onPress={() => fetchRecommendedSongsForSearch(inputArtist, inputSong)}
-      />
-      {searchResults && (
-        <View>
-          <Text style={styles.header}>Search Results:</Text>
-          {searchResults.similartracks.track.slice(0, 6).map((item, index) => (
-            <Text key={index} style={styles.artistName}>{item.name}</Text>
-          ))}
-        </View>
-      )}
-    </View>
-    <View>
-      <Text style={styles.header}>Recommended Artists</Text>
-      <FlatList 
-          data={apiResponse && apiResponse.slice(0, 7)}
-          horizontal={true}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => <ArtistItem artistName={item} />}
-      />
-    </View>
     
     <View>
       <Text style={styles.header}>Recommended Songs For You</Text>
@@ -262,10 +207,6 @@ return (
         <Text>Loading...</Text> // Add your loading indicator here
       )}
     </View>
-
-   
-
-  </ScrollView>
 );
 };
 
