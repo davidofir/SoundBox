@@ -201,6 +201,7 @@ export default SocialFeed = ({ navigation }) => {
                                 color="black"
                                 style={styles.commentIcon} />
                         </TouchableOpacity>
+                        <Text style={styles.likeText}>{item.commentIds.length}</Text>
                     </View>
 
                     {/*<Text style={styles.artistName}>Artist: {item.artistName}</Text>*/}
@@ -404,6 +405,7 @@ const styles = StyleSheet.create({
     },
     commentIcon: {
         marginLeft: 12,
+        marginRight: 8,
     },
     albumContainer: {
         flexDirection: 'row',
