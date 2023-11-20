@@ -7,6 +7,8 @@ import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
 import * as UserRepository from "../domain/FirebaseRepository/UserRepository";
 import { authentication, db } from '../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import StarRating from 'react-native-star-rating-widget';
+const defaultCoverArt = require('../assets/defaultSongImage.png');
 
 const eventsRepo = new EventsRepository;
 export default SocialFeed = ({ navigation }) => {
@@ -94,12 +96,19 @@ export default SocialFeed = ({ navigation }) => {
                     <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
                     <Text style={styles.username}>{item.username}</Text>
                 </View>
-                <View style={styles.postContent}>
-                    <Text style={styles.artistName}>Artist: {item.artistName}</Text>
-                    <Text style={styles.reviewText}>Review: {item.review}</Text>
-                    <Text style={styles.ratingText}>Rating: {item.rating}</Text>
-                    <Text style={styles.songName}>Song: {item.songName}</Text>
 
+                <View style={styles.albumContainer}>
+                    <Image
+                        source={item?.albumImgURL ? { uri: item.albumImgURL } : defaultCoverArt}
+                        style={styles.modalAlbumArt}
+                    />
+                    <View style={{ flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
+                        <Text style={styles.modalStyleSong}>{item.songName}</Text>
+                        <Text style={styles.modalStyleArtist}>{item.artistName}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.postContent}>
                     <View style={styles.likeContainer}>
                         <TouchableOpacity onPress={handleLike}>
                             <Ionicons
@@ -118,6 +127,30 @@ export default SocialFeed = ({ navigation }) => {
                                 style={styles.commentIcon} />
                         </TouchableOpacity>
                     </View>
+
+                    {/*<Text style={styles.artistName}>Artist: {item.artistName}</Text>*/}
+                    <Text style={styles.reviewText}><Text style={styles.username}>{item.username}</Text> {item.review}</Text>
+                    <Text style={styles.ratingText}>Rating:
+                        <StarRating
+                            rating={item.rating}
+                            editable={false}
+                            starSize={13}
+                            onChange={() => { }}
+                            enableSwiping={false}
+                        />
+                    </Text>
+                    {/*<Text style={styles.songName}>Song: {item.songName}</Text>*/}
+
+                    <Text style={styles.StyleDate}>
+                        {new Date(item.creationTime).toLocaleString('en-CA', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })}, {new Date(item.creationTime).toLocaleString('en-CA', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                        })}
+                    </Text>
                 </View>
             </View>
         );
@@ -250,7 +283,7 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     postContent: {
-        marginTop: 15,
+        marginTop: 1,
     },
     artistName: {
         fontSize: 16,
@@ -258,17 +291,17 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     reviewText: {
-        fontSize: 14,
+        fontSize: 16,
         marginTop: 5,
         color: '#333',
     },
     ratingText: {
-        fontSize: 14,
+        fontSize: 16,
         marginTop: 5,
         color: '#333',
     },
     songName: {
-        fontSize: 14,
+        fontSize: 16,
         marginTop: 5,
         color: '#333',
     },
@@ -295,5 +328,30 @@ const styles = StyleSheet.create({
     },
     commentIcon: {
         marginLeft: 12,
+    },
+    albumContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    modalAlbumArt: {
+        width: 120,
+        height: 120,
+        resizeMode: 'contain',
+        marginRight: 10,
+    },
+    modalStyleSong: {
+        fontSize: 20,
+        fontWeight: "bold",
+    },
+    modalStyleArtist: {
+        fontSize: 17,
+        fontWeight: "bold",
+        color: "#4e4c4c",
+        marginTop: 5,
+    },
+    StyleDate: {
+        fontSize: 12,
+        marginTop: 10,
+        color: '#bfbfbf',
     },
 })
