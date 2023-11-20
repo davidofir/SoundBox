@@ -64,35 +64,3 @@ function getTopRatedReview(reviews) {
   
   return randomReview;
 } 
-
-
-const styles = StyleSheet.create({
-    header: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        marginTop: 25,
-      },
-    image: {
-      width: 130, // Adjust the image width as needed
-      height: 130, // Adjust the image height as needed
-      alignSelf: 'center', // Center the image horizontally
-    },
-    songName: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      textAlign: 'center', // Center the text horizontally
-    },
-    artistName: {
-      fontSize: 14,
-      textAlign: 'center', // Center the text horizontally
-    },
-    box: {
-      backgroundColor: 'lightgray',
-      borderRadius: 10,
-      margin: 10,
-      padding: 10,
-      width: 150, // Adjust the width as per your preference
-    },
-  });
-  
