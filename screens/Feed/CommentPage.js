@@ -207,7 +207,7 @@ export default Comment = ({ navigation, route }) => {
                         <Ionicons
                             name={liked ? 'chevron-up' : 'chevron-up-outline'}
                             size={20}
-                            color={liked ? 'blue' : 'black'}
+                            color={liked ? '#84c280' : 'black'}
                             style={styles.likeIcon}
                         />
                     </TouchableOpacity>
@@ -217,7 +217,7 @@ export default Comment = ({ navigation, route }) => {
                         <Ionicons
                             name={disliked ? 'chevron-down' : 'chevron-down-outline'}
                             size={20}
-                            color={disliked ? 'red' : 'black'}
+                            color={disliked ? '#ee6055' : 'black'}
                             style={styles.dislikeIcon}
                         />
                     </TouchableOpacity>

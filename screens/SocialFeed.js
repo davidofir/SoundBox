@@ -105,7 +105,7 @@ export default SocialFeed = ({ navigation }) => {
                             <Ionicons
                                 name={liked ? 'heart' : 'heart-outline'}
                                 size={20}
-                                color={liked ? 'red' : 'black'}
+                                color={liked ? '#ee6055' : 'black'}
                                 style={styles.likeIcon}
                             />
                         </TouchableOpacity>
