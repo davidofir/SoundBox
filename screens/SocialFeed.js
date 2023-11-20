@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, FlatList } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, FlatList, Linking } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons, Entypo, Fontisto } from '@expo/vector-icons';
 import EventsRepository from '../domain/EventsAPI/EventsRepositoryImpl';
 import * as UserRepository from "../domain/FirebaseRepository/UserRepository";
 import { authentication, db } from '../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import StarRating from 'react-native-star-rating-widget';
+import Toast from 'react-native-toast-message';
+import { getTrackID } from "../domain/SpotifyAPI/SpotifyAPI";
 const defaultCoverArt = require('../assets/defaultSongImage.png');
 
 const eventsRepo = new EventsRepository;
@@ -78,6 +80,18 @@ export default SocialFeed = ({ navigation }) => {
         })
     }
 
+    const showToast = (title, message) => {
+        Toast.show({
+            type: 'success',
+            position: 'bottom',
+            text1: title,
+            text2: message,
+            visibilityTime: 6000,
+            autoHide: true,
+            bottomOffset: 40,
+        });
+    };
+
     const Post = ({ item, userId, LikePost, UnlikePost }) => {
         const [liked, setLiked] = useState(item.likes.includes(userId));
 
@@ -88,6 +102,53 @@ export default SocialFeed = ({ navigation }) => {
                 LikePost(item);
             }
             setLiked(!liked);
+        };
+
+        const openSpotify = async () => {
+            trackId = null;
+            var spotifyUri = `spotify:track:${trackId}`;
+
+            try {
+                trackId = await getTrackID(item.songName, item.artistName)
+            } catch (error) {
+                console.log(error)
+            }
+
+            if (trackId) {
+                // Check if the Spotify app is installed
+                Linking.canOpenURL(spotifyUri).then((supported) => {
+                    //if app is installed open app. if not open web
+                    if (supported) {
+                        Linking.openURL(spotifyUri);
+                    } else {
+                        spotifyUri = `https://open.spotify.com/track/${trackId}`
+                        Linking.openURL(spotifyUri);
+                    }
+                })
+            } else {
+                showToast('Error', 'Spotify Link Not Found');
+            }
+        };
+
+        const openAppleMusic = async () => {
+            try {
+                // Construct the Apple Music URL for the app
+                const appleMusicAppUrl = `apple-music://music.apple.com/search?term=${item.songName}+${item.artistName}`;
+
+                // Check if the Apple Music app is installed
+                const supported = await Linking.canOpenURL(appleMusicAppUrl);
+
+                if (supported) {
+                    await Linking.openURL(appleMusicAppUrl); // Open in the Apple Music app
+                    console.log("Opened in Apple Music app");
+                } else {
+                    // Construct the Apple Music URL for the web
+                    const appleMusicWebUrl = `https://music.apple.com/search?term=${item.songName}+${item.artistName}`;
+                    await Linking.openURL(appleMusicWebUrl); // Open in the web browser
+                    console.log("Opened in web browser");
+                }
+            } catch (error) {
+            }
         };
 
         return (
@@ -105,6 +166,20 @@ export default SocialFeed = ({ navigation }) => {
                     <View style={{ flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
                         <Text style={styles.modalStyleSong}>{item.songName}</Text>
                         <Text style={styles.modalStyleArtist}>{item.artistName}</Text>
+                        <View style={styles.linksContainer}>
+                            <TouchableOpacity onPress={openSpotify} style={{ marginRight: 10, marginTop: 10 }}>
+                                <Entypo
+                                    name="spotify"
+                                    size={25}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={openAppleMusic} style={{ marginTop: 10 }}>
+                                <Fontisto
+                                    name="applemusic"
+                                    size={22}
+                                />
+                            </TouchableOpacity>
+                        </View>
                     </View>
                 </View>
 
@@ -137,6 +212,7 @@ export default SocialFeed = ({ navigation }) => {
                             starSize={13}
                             onChange={() => { }}
                             enableSwiping={false}
+                            color='black'
                         />
                     </Text>
                     {/*<Text style={styles.songName}>Song: {item.songName}</Text>*/}
@@ -330,6 +406,10 @@ const styles = StyleSheet.create({
         marginLeft: 12,
     },
     albumContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    linksContainer: {
         flexDirection: 'row',
         alignItems: 'center',
     },
