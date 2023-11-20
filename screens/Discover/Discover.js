@@ -75,6 +75,7 @@ const Cell = memo(({ cellItem }) => {
 
 
 
+
   useEffect(() => {
     fetchCoverArt();
     
@@ -149,8 +150,51 @@ class App extends React.Component {
     });
   }
 
+  
+
   render() {
     const { recommendedSongs } = this.state;
+
+      // New component for rendering each recommended song
+      const RecommendedSongCell = memo(({ songItem }) => {
+        const [coverArtUrl, setCoverArtUrl] = useState(null);
+
+        const fetchCoverArt = async () => {
+          // Assuming songItem has artist and name properties
+          try {
+            const imageUrl = await searchAndFetchSongCoverArt(songItem.name, songItem.artist.name);
+            if (imageUrl !== 3) {
+              setCoverArtUrl(imageUrl);
+            }
+          } catch (error) {
+            console.error('Error fetching cover art:', error);
+          }
+        };
+
+        useEffect(() => {
+          fetchCoverArt();
+        }, [songItem]); // Re-run the effect if songItem changes
+
+        return (
+          <TouchableOpacity onPress={() => this.handleRowPress(songItem)}>
+            <View style={styles.box}>
+              <Image
+                source={coverArtUrl ? { uri: coverArtUrl } : defaultCoverArt}
+                style={styles.image}
+              />
+              <Text style={styles.songName}>
+                {songItem.name.length > 25
+                  ? `${songItem.name.slice(0, 31)}...`
+                  : songItem.name
+                }
+              </Text>
+              <Text style={styles.artistName}>{songItem.artist.name}</Text>
+            </View>
+          </TouchableOpacity>
+        );
+      });
+
+
     return (
       <View style={styles.container}>
         {/* Searchbar */}
@@ -189,26 +233,12 @@ class App extends React.Component {
       // Horizontal list as the header component of the vertical list
       ListHeaderComponent={() => (
         <>
-        <Text style={styles.heading}>Recommended For You</Text>
+          <Text style={styles.heading}>Recommended For You</Text>
           {recommendedSongs ? (
             <FlatList
               horizontal
               data={recommendedSongs.similartracks.track.slice(0, 6)}
-              renderItem={({ item, index }) => (
-                <View key={index} style={styles.box}>
-                  <Image
-                    source={defaultCoverArt}
-                    style={styles.image}
-                  />
-                  <Text style={styles.songName}>
-                    {item.name.length > 25
-                      ? `${item.name.slice(0, 31)}...`
-                      : item.name
-                    }
-                  </Text>
-                  <Text style={styles.artistName}>{item.artist.name}</Text>
-                </View>
-              )}
+              renderItem={({ item }) => <RecommendedSongCell songItem={item} />}
               keyExtractor={(_, index) => index.toString()}
             />
           ) : (
@@ -265,7 +295,7 @@ const styles = StyleSheet.create({
     color: "black",
     fontWeight: 'bold',
     fontSize: 30,
-    paddingBottom: 20,
+    paddingBottom: 10,
     paddingTop: 20,
   },
   searchBar: {
@@ -294,6 +324,7 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 10,
     width: 150, 
+    height: 170,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
