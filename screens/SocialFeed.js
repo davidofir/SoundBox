@@ -188,7 +188,7 @@ export default SocialFeed = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: '#f4f4f4',
     },
     artistContainer: {
         paddingLeft: 10,
@@ -209,15 +209,15 @@ const styles = StyleSheet.create({
         width: 120,
         height: 150,
         borderRadius: 12,
-        backgroundColor: 'black',
+        backgroundColor: '#333',
         overflow: 'hidden',
         marginHorizontal: 6,
     },
     postContainer: {
-        backgroundColor: 'white',
-        borderRadius: 10,
-        margin: 10,
-        padding: 10,
+        backgroundColor: '#fff',
+        borderRadius: 15,
+        margin: 15,
+        padding: 15,
         width: 370,
         minHeight: 150,
         shadowColor: '#000',
@@ -225,17 +225,17 @@ const styles = StyleSheet.create({
             width: 0,
             height: 2,
         },
-        shadowOpacity: 0.25,
+        shadowOpacity: 0.2,
         shadowRadius: 3.84,
         elevation: 5,
     },
     postHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 15,
     },
     text: {
-        color: '#4f4f4f',
+        color: '#333',
         fontWeight: 'bold',
     },
     profileImage: {
@@ -247,53 +247,53 @@ const styles = StyleSheet.create({
     username: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: 'black',
+        color: '#000',
     },
     postContent: {
-        marginTop: 10,
+        marginTop: 15,
     },
     artistName: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: 'black',
+        color: '#333',
     },
     reviewText: {
         fontSize: 14,
         marginTop: 5,
-        color: 'black',
+        color: '#333',
     },
     ratingText: {
         fontSize: 14,
         marginTop: 5,
-        color: 'black',
+        color: '#333',
     },
     songName: {
         fontSize: 14,
         marginTop: 5,
-        color: 'black',
+        color: '#333',
     },
     navigationContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        backgroundColor: 'white',
+        backgroundColor: '#fff',
         paddingBottom: 42,
         paddingTop: 15,
         borderTopWidth: 1,
-        borderTopColor: '#ededed',
+        borderTopColor: '#ddd',
     },
     likeContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 10,
+        marginTop: 15,
     },
     likeIcon: {
-        marginRight: 5,
+        marginRight: 8,
     },
     likeText: {
         fontSize: 14,
-        color: 'black',
+        color: '#333',
     },
     commentIcon: {
-        marginLeft: 10,
+        marginLeft: 12,
     },
 })
