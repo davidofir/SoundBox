@@ -6,7 +6,8 @@
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
-        }
+        },
+        "NSRemoteNotificationUsageDescription": "This app would like to send you notifications."
       }
     },
     "android":{
