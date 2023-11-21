@@ -8,7 +8,8 @@ import {
   FlatList,
   Image,
   TouchableWithoutFeedback,
-  ScrollView
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Recommendations from '../Recommendations/Recommendation';
@@ -75,6 +76,7 @@ const Cell = memo(({ cellItem }) => {
 
 
 
+
   useEffect(() => {
     fetchCoverArt();
     
@@ -111,7 +113,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { tracks: [],
-                   recommendedSongs: null };
+                   recommendedSongs: null,
+                   isLoading: true, };
 
     viewModel.fetchTopTracks().then(() => {
       this.setState({ tracks: viewModel.getTracks() });
@@ -120,9 +123,10 @@ class App extends React.Component {
   async componentDidMount() {
     try {
       const songsData = await fetchRecommendedSongs();
-      this.setState({ recommendedSongs: songsData });
+      this.setState({ recommendedSongs: songsData, isLoading: false });
     } catch (error) {
       console.error(error);
+      this.setState({ isLoading: false });
     }
   }
 
@@ -149,32 +153,76 @@ class App extends React.Component {
     });
   }
 
+  
+
   render() {
-    const { recommendedSongs } = this.state;
+    const { recommendedSongs, isLoading } = this.state;
+
+      // New component for rendering each recommended song
+      const RecommendedSongCell = memo(({ songItem }) => {
+        const [coverArtUrl, setCoverArtUrl] = useState(null);
+
+        const fetchCoverArt = async () => {
+          // Assuming songItem has artist and name properties
+          try {
+            const imageUrl = await searchAndFetchSongCoverArt(songItem.name, songItem.artist.name);
+            if (imageUrl !== 3) {
+              setCoverArtUrl(imageUrl);
+            }
+          } catch (error) {
+            console.error('Error fetching cover art:', error);
+          }
+        };
+
+        useEffect(() => {
+          fetchCoverArt();
+        }, [songItem]); // Re-run the effect if songItem changes
+
+        return (
+          <TouchableOpacity onPress={() => this.handleRowPress(songItem)}>
+            <View style={styles.box}>
+              <Image
+                source={coverArtUrl ? { uri: coverArtUrl } : defaultCoverArt}
+                style={styles.image}
+              />
+              <Text style={styles.songName}>
+                {songItem.name.length > 25
+                  ? `${songItem.name.slice(0, 31)}...`
+                  : songItem.name
+                }
+              </Text>
+              <Text style={styles.artistName}>{songItem.artist.name}</Text>
+            </View>
+          </TouchableOpacity>
+        );
+      });
+
+
     return (
       <View style={styles.container}>
         {/* Searchbar */}
-        <TextInput
-          autoCapitalize="none"
-          autoCorrect={false}
-          clearButtonMode="always"
-          onChangeText={(text) => viewModel.setSearchInput(text)}
-          placeholder="Search"
-          placeholderTextColor="grey"
-          style={styles.searchBar}
-        />
-        {/* Button */}
-        <Button
-          onPress={() => {
-            const input = viewModel.searchInput; // Access the searchInput from the viewModel
-            if (input && input.trim() !== "") { // Check if the input is not empty or just whitespace
-              viewModel.fetchSong().then(() => {
-                this.setState({ tracks: viewModel.getTracks() });
-              });
-            }
-          }}
-          title="Search"
-        />
+        <View style={styles.searchBarContainer}>
+      <TextInput
+        autoCapitalize="none"
+        autoCorrect={false}
+        clearButtonMode="always"
+        onChangeText={(text) => viewModel.setSearchInput(text)}
+        placeholder="Search Songs"
+        placeholderTextColor="grey"
+        style={styles.searchBar}
+      />
+      <Button
+        onPress={() => {
+          const input = viewModel.searchInput;
+          if (input && input.trim() !== "") {
+            viewModel.fetchSong().then(() => {
+              this.setState({ tracks: viewModel.getTracks() });
+            });
+          }
+        }}
+        title="Search"
+      />
+    </View>
     {/* Vertical FlatList */}
     <FlatList
       data={this.state.tracks}
@@ -189,31 +237,22 @@ class App extends React.Component {
       // Horizontal list as the header component of the vertical list
       ListHeaderComponent={() => (
         <>
-        <Text style={styles.heading}>Recommended For You</Text>
-          {recommendedSongs ? (
+          <Text style={styles.heading}>Recommended For You</Text>
+          {isLoading ? (
+          <ActivityIndicator size="large" color="black" style={{ paddingTop: 10 }} />
+        ) : recommendedSongs ? (
+          <View>
+            
             <FlatList
               horizontal
               data={recommendedSongs.similartracks.track.slice(0, 6)}
-              renderItem={({ item, index }) => (
-                <View key={index} style={styles.box}>
-                  <Image
-                    source={defaultCoverArt}
-                    style={styles.image}
-                  />
-                  <Text style={styles.songName}>
-                    {item.name.length > 25
-                      ? `${item.name.slice(0, 31)}...`
-                      : item.name
-                    }
-                  </Text>
-                  <Text style={styles.artistName}>{item.artist.name}</Text>
-                </View>
-              )}
+              renderItem={({ item }) => <RecommendedSongCell songItem={item} />}
               keyExtractor={(_, index) => index.toString()}
             />
-          ) : (
-            <Text>Loading...</Text>
-          )}
+          </View>
+        ) : (
+          <Text>Start reviewing songs to get personalized suggestions!</Text>// This message shows when there are no recommendations
+        )}
 
           {/* Any other content you want at the top of the vertical list */}
           <Text style={styles.heading}>Popular Right Now</Text>
@@ -265,14 +304,23 @@ const styles = StyleSheet.create({
     color: "black",
     fontWeight: 'bold',
     fontSize: 30,
-    paddingBottom: 20,
+    paddingBottom: 10,
     paddingTop: 20,
   },
+  searchBarContainer: {
+    flexDirection: 'row', // Align children horizontally
+    alignItems: 'center', // Center children vertically
+    paddingHorizontal: 10, // Add some horizontal padding
+    paddingVertical: 5, // Add some vertical padding
+    marginBottom: 5
+  },
   searchBar: {
+    flex: 1, // Take up as much space as possible
     backgroundColor: "whitesmoke",
     height: 35,
     borderRadius: 20,
     paddingLeft: 10,
+    marginRight: 10, // Add some margin to the right
   },
   image: {
     width: 100, // Adjust the image width as needed
@@ -294,6 +342,7 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 10,
     width: 150, 
+    height: 170,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

@@ -163,7 +163,6 @@ const prepareTrackInfo = async () => {
 
   // Function to handle opening the modal
   const openModal = () => {
-    console.log(defaultCoverArt)
     setModalVisible(true);
     Animated.timing(modalY, {
       toValue: windowHeight * 0.1, // animate to top
@@ -260,12 +259,12 @@ const prepareTrackInfo = async () => {
   
       if (supported) {
         await Linking.openURL(appleMusicAppUrl); // Open in the Apple Music app
-        console.log("Opened in Apple Music app");
+        
       } else {
         // Construct the Apple Music URL for the web
         const appleMusicWebUrl = `https://music.apple.com/search?term=${songName}+${artistName}`;
         await Linking.openURL(appleMusicWebUrl); // Open in the web browser
-        console.log("Opened in web browser");
+        
       }
     } catch (error) {
     }
@@ -334,6 +333,7 @@ const prepareTrackInfo = async () => {
                                   starSize={20}
                                   onChange={() => {}}
                                   enableSwiping={false}
+                                  color="black"
                               />
                           </View>
                       ) : (

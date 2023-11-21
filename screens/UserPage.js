@@ -186,7 +186,7 @@ export default UserPage = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: '#f4f4f4',
         padding: 16,
     },
     headerContainer: {

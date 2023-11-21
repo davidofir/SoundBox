@@ -123,7 +123,15 @@ async function fetchSimilarArtists(artists) {
   }
 }
 
+function getTopRatedReview(reviews) {
+  const maxRating = Math.max(...reviews.map(review => review.rating));
+  const topRatedReviews = reviews.filter(review => review.rating === maxRating);
 
+  // If there are multiple reviews with the highest rating, pick a random one.
+  const randomReview = topRatedReviews[Math.floor(Math.random() * topRatedReviews.length)];
+  
+  return randomReview;
+} 
 
 async function fetchRecommendedSongs() {
   
@@ -184,8 +192,10 @@ const ArtistItem = ({ artistName }) => (
 return (
     
     <View>
-      <Text style={styles.header}>Recommended Songs For You</Text>
+      
       {apiResponseSongs ? (
+        <View>
+        <Text style={styles.header}>Recommended Songs For You</Text>
         <ScrollView horizontal={true}>
           {apiResponseSongs.similartracks.track.slice(0, 6).map((item, index) => (
             <View key={index} style={styles.box}>
@@ -203,6 +213,7 @@ return (
             </View>
           ))}
         </ScrollView>
+        </View>
       ) : (
         <Text>Loading...</Text> // Add your loading indicator here
       )}

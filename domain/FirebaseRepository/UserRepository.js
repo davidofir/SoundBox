@@ -27,34 +27,42 @@ const getUserProfileData = async () => {
     }
 };
 const getUserReviewData = async (userId) => {
-    //const userId = authentication.currentUser.uid;
     const userRef = doc(db, "users", userId);
-    var userData
+    var userData;
 
     try {
         const docSnapshot = await getDoc(userRef);
         userData = docSnapshot.data();
     } catch (error) {
         console.error("Error fetching user data:", error);
-        throw error;
+
+        return null;
     }
 
-    const reviews = userData.reviewIds
-    var tempReviews = []
+    // Check if userData is defined and has reviewIds
+    if (!userData || !userData.reviewIds) {
+        console.log("No reviews or user data found.");
+        return []; // Return an empty array to indicate no reviews
+    }
 
-    for (i = 0; i < reviews.length; i++) {
+    const reviews = userData.reviewIds;
+    var tempReviews = [];
+
+    for (let i = 0; i < reviews.length; i++) {
         const reviewRef = doc(db, "reviews", reviews[i]);
         try {
             const docSnapshot = await getDoc(reviewRef);
             const reviewData = docSnapshot.data();
-            tempReviews.push(reviewData);
+            if (reviewData) {
+                tempReviews.push(reviewData);
+            }
         } catch (error) {
-            console.error("Error fetching user data:", error);
-            throw error;
+            console.error("Error fetching review data:", error);
+
         }
     }
 
-    return tempReviews
+    return tempReviews;
 }
 
 const updateUserFollowers = async (userId, updatedFollowers) => {
