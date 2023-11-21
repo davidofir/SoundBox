@@ -2,6 +2,7 @@ import { getDoc, setDoc, doc, updateDoc } from "firebase/firestore";
 import { db, authentication } from "../../firebase";
 import { signOut } from "firebase/auth";
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 
 const createUserDocument = async (userId, userData) => {
     try {
@@ -100,16 +101,26 @@ const registerForPushNotificationsAsync = async () => {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      console.error('Failed to get push token for push notification!');
-      return;
+        console.error('Failed to get push token for push notification!');
+        return;
     }
-    let token = (await Notifications.getExpoPushTokenAsync()).data;
-    // Use `token` to associate it with the user's account or store it for future use
+
+    // Access the projectId using expoConfig instead of manifest
+    const projectId = Constants.expoConfig.extra.eas.projectId;
+
+    let token;
+    if (projectId) {
+        token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+    } else {
+        console.error('Project ID is undefined!');
+        return;
+    }
+
     console.log('Push token:', token);
     return token;
-  };
+};
 export { createUserDocument, getUserProfileData, getUserReviewData, updateUserFollowers, updateUserFollowing,updateUserToken,registerForPushNotificationsAsync };

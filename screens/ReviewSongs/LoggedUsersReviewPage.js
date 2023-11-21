@@ -1,12 +1,46 @@
 import React, { useLayoutEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import StarRating from 'react-native-star-rating-widget';
+import { Ionicons,} from '@expo/vector-icons';
 const defaultCoverArt = require('../../assets/defaultSongImage.png');
 
 
 
 const LoggedUsersReviewPage = ({ navigation, route }) => {
     const { review } = route.params;
+
+    const LikePost = (item) => {
+        var tempLikes = item.likes;
+
+        tempLikes.push(userId)
+
+        // Update the likes list in Firebase
+        const reviewDoc = doc(db, 'reviews', item.id);
+        updateDoc(reviewDoc, {
+            likes: tempLikes
+        })
+    }
+
+    const UnlikePost = (item) => {
+        var tempLikes = item.likes;
+
+        tempLikes.splice(tempLikes.indexOf(userId), 1);
+
+        // Update the likes list in Firebase
+        const reviewDoc = doc(db, 'reviews', item.id);
+        updateDoc(reviewDoc, {
+            likes: tempLikes
+        })
+    }
+
+    const handleLike = () => {
+        if (liked) {
+            UnlikePost(item);
+        } else {
+            LikePost(item);
+        }
+        setLiked(!liked);
+    };
 
         //Set the title of the page
         useLayoutEffect(() => {
@@ -58,6 +92,23 @@ const LoggedUsersReviewPage = ({ navigation, route }) => {
                 <Text>{"(" + review.rating + " / 5)"}</Text>
                 <Text style={styles.input}>{review.review}</Text>
             </View>
+
+            <TouchableOpacity onPress={handleLike}>
+                            <Ionicons
+                                name={liked ? 'heart' : 'heart-outline'}
+                                size={20}
+                                color={liked ? '#ee6055' : 'black'}
+                                style={styles.likeIcon}
+                            />
+                        </TouchableOpacity>
+                        <Text style={styles.likeText}>{item.likes.length}</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate("Comment", { item })}>
+                            <Ionicons
+                                name="chatbox-outline"
+                                size={20}
+                                color="black"
+                                style={styles.commentIcon} />
+                        </TouchableOpacity>
         </View>
     );
 };
