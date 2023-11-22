@@ -9,22 +9,39 @@ import { authentication, db } from "../../firebase";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { updateEmail, signOut } from "firebase/auth";
 import useAccountProfileViewModel from "./AccountProfileViewModel";
+import * as ImagePicker from 'expo-image-picker';
 
 export default EditAccountPage = ({ navigation, route }) => {
 
     // new changes - using viewmodel
     const item = route.params.username;
-    const { username, userEmail } = useAccountProfileViewModel(navigation);
+    const { username, userEmail, image } = useAccountProfileViewModel(navigation);
 
     const [newUsername, setNewUsername] = useState("");
     const [newEmail, setNewEmail] = useState("");
+
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    const pickImage = async () => {
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            setSelectedImage(result);
+        }
+    };
 
     const saveChanges = async () => {
         try {
             // Update the username in the database.
             const userDocRef = doc(db, "users", authentication.currentUser.uid);
             await updateDoc(userDocRef, {
-                userName: newUsername || username
+                userName: newUsername || username,
+                profilePicture: selectedImage ? selectedImage.assets[0].uri : null,
             });
 
             // Update the email in the database.
@@ -54,10 +71,12 @@ export default EditAccountPage = ({ navigation, route }) => {
     return (
         <View style={styles.container}>
             <View style={styles.profileHeader}>
-                <Image
-                    source={require('../../assets/defaultPic.png')}
-                    style={styles.profileImage}
-                />
+                <TouchableOpacity onPress={pickImage}>
+                    <Image
+                        source={image ? { uri: image } : require('../../assets/defaultPic.png')}
+                        style={styles.profileImage}
+                    />
+                </TouchableOpacity>
                 <Text style={styles.username}>{item}</Text>
             </View>
             <View style={styles.editForm}>

@@ -9,6 +9,7 @@ const useProfileViewModel = (navigation) => {
     const [following, setFollowing] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [userEmail, setUserEmail] = useState("");
+    const [image, setImage] = useState("");
 
     useEffect(() => {
         const fetchUserProfileData = async () => {
@@ -21,6 +22,7 @@ const useProfileViewModel = (navigation) => {
                     setFollowers(userData.followers || []);
                     setFollowing(userData.following || []);
                     setReviews(reviewData || []);
+                    setImage(userData.profilePicture);
 
                     if (user) {
                         setUserEmail(user.email);
@@ -44,7 +46,7 @@ const useProfileViewModel = (navigation) => {
         navigation.navigate("Following", { followingArray: following })
     };
 
-    return { username, followers, following, reviews, userEmail, navigateToFollowers, navigateToFollowing };
+    return { username, followers, following, reviews, userEmail, image, navigateToFollowers, navigateToFollowing };
 };
 
 export default useProfileViewModel;

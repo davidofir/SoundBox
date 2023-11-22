@@ -20,7 +20,7 @@ export default ProfilePage = ({ navigation }) => {
     */
 
     // new changes - using viewmodel
-    const { username, followers, following, reviews, navigateToFollowers, navigateToFollowing } = useAccountProfileViewModel(navigation);
+    const { username, followers, following, reviews, image, navigateToFollowers, navigateToFollowing } = useAccountProfileViewModel(navigation);
 
     /* old changes
     // Get the current user
@@ -47,7 +47,7 @@ export default ProfilePage = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
-                <Image source={require('../../assets/defaultPic.png')} style={styles.profileImage} />
+                <Image source={image ? { uri: image } : require('../../assets/defaultPic.png')} style={styles.profileImage} />
                 <Text style={styles.username}>{username || 'Loading...'}</Text>
                 <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("EditAccount", { username })}>
                     <Text style={styles.editButtonText}>Edit Account</Text>
