@@ -151,12 +151,36 @@ export default SocialFeed = ({ navigation }) => {
             }
         };
 
+        const onNavigate = (item) => {
+            navigation.navigate('UserPage', { item });
+        }
+
+        const navigateProfile = async () => {
+            try {
+                const userRef = doc(db, "users", item.userId);
+                const userSnapshot = await getDoc(userRef);
+
+                if (userSnapshot.exists()) {
+                    const tempUserData = userSnapshot.data();
+                    const userData = { ...tempUserData, id: item.userId };
+
+                    onNavigate(userData);
+                } else {
+                    console.error("User data not found");
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        }
+
         return (
             <View style={styles.postContainer}>
-                <View style={styles.postHeader}>
-                    <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
-                    <Text style={styles.username}>{item.username}</Text>
-                </View>
+                <TouchableOpacity onPress={navigateProfile}>
+                    <View style={styles.postHeader}>
+                        <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
+                        <Text style={styles.username}>{item.username}</Text>
+                    </View>
+                </TouchableOpacity>
 
                 <View style={styles.albumContainer}>
                     <Image
