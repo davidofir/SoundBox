@@ -1,9 +1,9 @@
-import { getDoc, setDoc, doc, updateDoc } from "firebase/firestore";
+import { getDoc, setDoc, doc, updateDoc,arrayRemove } from "firebase/firestore";
 import { db, authentication } from "../../firebase";
 import { signOut } from "firebase/auth";
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const createUserDocument = async (userId, userData) => {
     try {
         await setDoc(doc(db, "users", userId), userData);
@@ -87,16 +87,60 @@ const updateUserFollowing = async (userId, updatedFollowing) => {
         console.error("Error updating user following:", error);
     }
 }
-const updateUserToken = async(userId,token) => {
-    try{
-        const userRef = doc(db,"users",userId);
-        await updateDoc(userRef,{
-            token: token
-        })
-    } catch(error){
-        console.error('Error updating user token:',error)
+const updateUserToken = async (userId, newToken) => {
+    try {
+        // First, check if the new token is different from the stored token
+        const storedToken = await AsyncStorage.getItem('pushToken');
+        if (newToken !== storedToken) {
+            const userRef = doc(db, "users", userId);
+            const userDoc = await getDoc(userRef);
+
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                let tokens = userData.tokens || [];
+
+                // Add the new token if it's not already in the user's tokens array
+                if (!tokens.includes(newToken)) {
+                    tokens.push(newToken);
+                    await updateDoc(userRef, {
+                        tokens: tokens
+                    });
+                }
+
+                // Update the token in AsyncStorage
+                await AsyncStorage.setItem('pushToken', newToken);
+            } else {
+                console.log("User document does not exist");
+            }
+        }
+    } catch (error) {
+        console.error('Error updating user token:', error);
     }
-}
+};
+const removeUserToken = async (userId) => {
+    try {
+        const userRef = doc(db, "users", userId);
+
+        // Retrieve the stored token
+        const storedToken = await AsyncStorage.getItem('pushToken');
+        if (!storedToken) {
+            console.log("No stored token found");
+            return;
+        }
+
+        // Remove the token from the user's tokens array in Firestore
+        await updateDoc(userRef, {
+            tokens: arrayRemove(storedToken)
+        });
+
+        // Remove the token from AsyncStorage
+        await AsyncStorage.removeItem('pushToken');
+    } catch (error) {
+        console.error('Error removing user token:', error);
+    }
+};
+
+
 const registerForPushNotificationsAsync = async () => {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
@@ -123,4 +167,4 @@ const registerForPushNotificationsAsync = async () => {
     console.log('Push token:', token);
     return token;
 };
-export { createUserDocument, getUserProfileData, getUserReviewData, updateUserFollowers, updateUserFollowing,updateUserToken,registerForPushNotificationsAsync };
+export { createUserDocument, getUserProfileData, getUserReviewData, updateUserFollowers, updateUserFollowing,updateUserToken,registerForPushNotificationsAsync,removeUserToken };

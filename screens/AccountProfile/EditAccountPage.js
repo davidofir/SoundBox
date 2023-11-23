@@ -11,7 +11,8 @@ import { updateEmail, signOut } from "firebase/auth";
 import useAccountProfileViewModel from "./AccountProfileViewModel";
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { removeUserToken } from '../../domain/FirebaseRepository/UserRepository';
 export default EditAccountPage = ({ navigation, route }) => {
 
     // new changes - using viewmodel
@@ -77,18 +78,32 @@ export default EditAccountPage = ({ navigation, route }) => {
         }
     }
 
-    const SignOut = () => {
-        signOut(authentication)
-            .then((re) => {
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: 'Login' }],
-                });
-            })
-            .catch((re) => {
-                console.log(re);
+    const SignOut = async () => {
+        try {
+            const token = await AsyncStorage.getItem('pushToken');
+            if (token) {
+                await removeUserToken(authentication.currentUser.uid, token); // Assuming removeUserToken is defined as shown earlier
+                await AsyncStorage.removeItem('pushToken');
+            }
+    
+            // Perform sign out from Firebase
+            await signOut(authentication);
+    
+            // Retrieve the token from AsyncStorage
+
+    
+            // Remove the token from the backend if it exists
+
+            // Reset navigation to show the login screen
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
             });
-    }
+    
+        } catch (error) {
+            console.log('Error during sign out:', error);
+        }
+    };
 
     return (
         <View style={styles.container}>

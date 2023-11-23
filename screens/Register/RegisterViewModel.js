@@ -19,7 +19,7 @@ const useRegisterViewModel = (navigation) => {
                 followers: [],
                 following: [],
                 reviewIds: [],
-                token: newToken
+                token: [newToken]
             };
 
             await UserRepository.createUserDocument(user.uid, userData);
