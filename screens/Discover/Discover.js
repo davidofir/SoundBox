@@ -101,7 +101,7 @@ const Cell = memo(({ cellItem }) => {
           <Text style={styles.whiteText}>{artistName}</Text>
         </View>
         <View style={styles.accessoryView}>
-          {/* Other components or content */}
+        
         </View>
       </View>
     </TouchableWithoutFeedback>

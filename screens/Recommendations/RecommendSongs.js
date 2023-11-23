@@ -22,6 +22,7 @@ import { getUserReviewData } from '../../domain/FirebaseRepository/UserRepositor
 
 export async function fetchRecommendedSongs() {
   var reviews = await getUserReviews()
+  
   const topReview = getTopRatedReview(reviews);
   if (topReview) {
     const encodedSongTitle = encodeURIComponent(topReview.songName);

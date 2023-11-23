@@ -10,14 +10,18 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import StarRating from 'react-native-star-rating-widget';
 import Toast from 'react-native-toast-message';
 import { getTrackID } from "../domain/SpotifyAPI/SpotifyAPI";
+import { fetchRecommendedArtists } from './Recommendations/RecommendArtists';
+import { ActivityIndicator } from 'react-native';
 const defaultCoverArt = require('../assets/defaultSongImage.png');
+
 
 const eventsRepo = new EventsRepository;
 export default SocialFeed = ({ navigation }) => {
     const [events, setEvents] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [following, setFollowing] = useState([]);
-
+    const [artistRecommendations, setArtistRecommendations] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     // Get the current user
     var userId = authentication.currentUser.uid;
 
@@ -25,6 +29,21 @@ export default SocialFeed = ({ navigation }) => {
     useEffect(() => {
 
         const userRef = doc(db, "users", userId);
+
+        //get artist recommendations
+        async function loadArtistRecommendations() {
+            try {
+                setIsLoading(true);
+                const recommendations = await fetchRecommendedArtists();
+                setArtistRecommendations(recommendations);
+                setIsLoading(false);
+
+            } catch (error) {
+                console.error('Failed to fetch artist recommendations:', error);
+                setIsLoading(false);
+            }
+        }
+        loadArtistRecommendations();
 
         getDoc(userRef)
             .then((doc) => {
@@ -151,12 +170,36 @@ export default SocialFeed = ({ navigation }) => {
             }
         };
 
+        const onNavigate = (item) => {
+            navigation.navigate('UserPage', { item });
+        }
+
+        const navigateProfile = async () => {
+            try {
+                const userRef = doc(db, "users", item.userId);
+                const userSnapshot = await getDoc(userRef);
+
+                if (userSnapshot.exists()) {
+                    const tempUserData = userSnapshot.data();
+                    const userData = { ...tempUserData, id: item.userId };
+
+                    onNavigate(userData);
+                } else {
+                    console.error("User data not found");
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        }
+
         return (
             <View style={styles.postContainer}>
-                <View style={styles.postHeader}>
-                    <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
-                    <Text style={styles.username}>{item.username}</Text>
-                </View>
+                <TouchableOpacity onPress={navigateProfile}>
+                    <View style={styles.postHeader}>
+                        <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
+                        <Text style={styles.username}>{item.username}</Text>
+                    </View>
+                </TouchableOpacity>
 
                 <View style={styles.albumContainer}>
                     <Image
@@ -236,26 +279,32 @@ export default SocialFeed = ({ navigation }) => {
     return (
         < View style={styles.container} >
             <ScrollView>
+                {/* Recommendations */}
                 <View style={styles.horizontalProfileContainer}>
                     <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Artists</Text>
                     <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
                 </View>
                 <View style={styles.artistContainer}>
-                    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                        <View>
-                            <Image source={require("../assets/artists/jayz.png")} style={styles.imageContainer} />
-                        </View>
-                        <View>
-                            <Image source={require("../assets/artists/Yonce.png")} style={styles.imageContainer} />
-                        </View>
-                        <View>
-                            <Image source={require("../assets/artists/cee.png")} style={styles.imageContainer} />
-                        </View>
-                        <View>
-                            <Image source={require("../assets/artists/swift.png")} style={styles.imageContainer} />
-                        </View>
-                    </ScrollView>
+                    {isLoading ? (
+                        <ActivityIndicator size="large" color="black" style={styles.spinner} />
+                    ) : artistRecommendations && artistRecommendations.length > 0 ? (
+                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                            {artistRecommendations.map((artist, index) => (
+                                <View key={index} style={styles.artistView}>
+                                    <Image
+                                        source={artist.imageUrl ? { uri: artist.imageUrl } : require("../assets/defaultPic.png")}
+                                        style={styles.imageContainer}
+                                    />
+                                    <Text style={styles.artistName}>{artist.artistName}</Text>
+                                </View>
+                            ))}
+                        </ScrollView>
+                    ) : (
+                        <Text style={styles.noArtistText}>Interact with the app to receive tailored recommendations based on your activity."</Text>
+                    )}
                 </View>
+                {/* Recommendations End */}
+
                 <View style={styles.container2}>
                     {reviews.map((item, index) => (
                         <Post
@@ -302,6 +351,20 @@ const styles = StyleSheet.create({
     },
     artistContainer: {
         paddingLeft: 10,
+    },
+    artistView: {
+        alignItems: 'center', // Center items vertically
+        marginRight: 10, // Add some spacing between the artist views
+    },
+    spinner: {
+        height: 170,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    artistName: {
+        marginTop: 5, // Space between the image and the text
+        textAlign: 'center', // Center the artist's name
     },
     container2: {
         alignItems: 'center',
@@ -366,6 +429,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
+    },
+    noArtistText: {
+        textAlign: 'center',
+        marginTop: 20, // Adjust as needed
+        fontSize: 16, // Adjust as needed
     },
     reviewText: {
         fontSize: 16,

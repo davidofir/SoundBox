@@ -8,16 +8,16 @@ import {
   Keyboard,
   Button,
   FlatList,
-  ScrollView,
-  Image
+  ScrollView, 
+  Image, TouchableOpacity,
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { authentication, db } from "../../firebase";
 import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import axios from 'axios';
-import { getListUserReviews } from '../../domain/RecommendRepository/RecommendationRepository';
-import { getUserReviewData } from '../../domain/FirebaseRepository/UserRepository';
-const defaultCoverArt = require('../../assets/defaultSongImage.png')
+import { fetchRecommendedArtists } from './RecommendArtists';
+import { ActivityIndicator } from 'react-native';
+import { fetchRecommendedSongs } from './RecommendSongs';
 
 const Recommendations = ({ navigation, route }) => {
   const topArtists = [];
@@ -35,191 +35,131 @@ const Recommendations = ({ navigation, route }) => {
   const [apiResponseSongs, setApiResponseSongs] = useState(null); // Added state to store song recommendations
   const [inputArtist, setInputArtist] = useState('');
   const [searchResults, setSearchResults] = useState(null);
+ 
+  const defaultCoverArt = require('../../assets/defaultSongImage.png');
 
-  // Query Firestore database with current UID
+  const [artistRecommendations, setArtistRecommendations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [songRecommendations, setSongRecommendations] = useState([]);
+  const [isLoadingSongs, setIsLoadingSongs] = useState(true);
+
+    // Query Firestore database with current UID
+    useEffect(() => {
+
+      //get artist recommendations
+      async function loadArtistRecommendations() {
+          try {
+              setIsLoading(true);
+              const recommendations = await fetchRecommendedArtists();
+              setArtistRecommendations(recommendations);
+              setIsLoading(false);
+
+          } catch (error) {
+              console.error('Failed to fetch artist recommendations:', error);
+              setIsLoading(false);
+          }
+      }
+        loadArtistRecommendations();
+
+        // Fetch song recommendations
+        async function loadSongRecommendations() {
+          try {
+            setIsLoadingSongs(true);
+            const songRecs = await fetchRecommendedSongs();
+            setSongRecommendations(songRecs.similartracks.track); // Access the track array
+            setIsLoadingSongs(false);
+          } catch (error) {
+            console.error('Failed to fetch song recommendations:', error);
+            setIsLoadingSongs(false);
+          }
+        }
+        
+        loadSongRecommendations();
+        console.log(songRecommendations)
+  }, [])
+
+  // RecommendedSongCell component inside Recommendations
+const RecommendedSongCell = ({ songItem }) => {
+  const [coverArtUrl, setCoverArtUrl] = useState(null);
 
   useEffect(() => {
-    getUserReviews();
-    }, []);
-
-    useEffect(() => {
-      if (reviews && reviews.length > 0) {
-        
-        fetchRecommendedSongs();
+    const fetchCoverArt = async () => {
+      try {
+        console.log(songItem.name + "111")
+        const imageUrl = await searchAndFetchSongCoverArt(songItem.name, songItem.artist.name);
+        setCoverArtUrl(imageUrl);
+      } catch (error) {
+        console.error('Error fetching cover art:', error);
       }
-    }, [reviews]);
+    };
+    fetchCoverArt();
+  }, [songItem]);
 
-
-
-    async function getTopArtists(){
-      await getTopUserArtists()
-    }
-
-  async function getTopUserArtists() {
-    const artistMap = new Map();
-    const lambda = 0.5; // Might need to adjust after further testing and more reviews are made
-
-    // Build the map with aggregate ratings and counts.
-    reviews.forEach(review => {
-        const { artistName, rating } = review;
-
-        if (artistMap.has(artistName)) {
-            const currentArtistData = artistMap.get(artistName);
-            artistMap.set(artistName, {
-                rating: currentArtistData.rating + rating,
-                count: currentArtistData.count + 1,
-            });
-        } else {
-            artistMap.set(artistName, {
-                rating: rating,
-                count: 1,
-            });
-        }
-    });
-
-    // Convert Map to Array and calculate the mean and weighted score for each artist.
-    const meanReviewList = Array.from(artistMap.entries()).map(([name, data]) => {
-        const averageRating = data.rating / data.count;
-        return {
-            name: name,
-            rating: averageRating,
-            count: data.count,
-            weightedScore: averageRating + (lambda * data.count)
-        };
-    });
-
-  // Find the top 2 artists with the highest weighted scores.
-  meanReviewList.sort((a, b) => b.weightedScore - a.weightedScore);
-  const topTwoArtists = meanReviewList.slice(0, 2).map(artist => artist.name);
-  fetchSimilarArtists(topTwoArtists);
-}
-
-
-async function fetchSimilarArtists(artists) {
-  try {
-    const artistResponses = await Promise.all(
-      artists.map(artist => axios.get(`http://192.168.1.133:8080/recommend?artist_name=${artist}`))
-    );
-
-    const combinedArtists = [];
-    const addedArtistsSet = new Set();
-
-    // Iterate over each API response
-    for (let response of artistResponses) {
-      // Iterate over each recommended artist
-      for (let artist of response.data.recommended_artists) {
-        // Check if we already added this artist or if we reached the limit of 6
-        if (!addedArtistsSet.has(artist) && combinedArtists.length < 6) {
-          combinedArtists.push(artist);
-          addedArtistsSet.add(artist);
-        }
-      }
-    }
-
-    setApiResponse(combinedArtists);
-
-  } catch (error) {
-    console.error('Fetch error:', error);
-  }
-}
-
-function getTopRatedReview(reviews) {
-  const maxRating = Math.max(...reviews.map(review => review.rating));
-  const topRatedReviews = reviews.filter(review => review.rating === maxRating);
-
-  // If there are multiple reviews with the highest rating, pick a random one.
-  const randomReview = topRatedReviews[Math.floor(Math.random() * topRatedReviews.length)];
-  
-  return randomReview;
-} 
-
-async function fetchRecommendedSongs() {
-  
-  const topReview = getTopRatedReview(reviews);
-  if (topReview) {
-    const encodedSongTitle = encodeURIComponent(topReview.songName);
-    const encodedArtistTitle = encodeURIComponent(topReview.artistName);
-    const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 
-    const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodedArtistTitle}&track=${encodedSongTitle}&api_key=${apiKey}&format=json`;
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const data = await response.json();
-      if (data.similartracks && data.similartracks.track) {
-        setApiResponseSongs(data);
-      } else {
-        console.error('Invalid API response format for song recommendations');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-    
-  }
-}
-
-async function fetchRecommendedSongsForSearch(artist, song) {
-  const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 
-  const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${artist}&track=${song}&api_key=${apiKey}&format=json`;
-  
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    const data = await response.json();
-    if (data.similartracks && data.similartracks.track) {
-      setSearchResults(data); // Save the search results to the new state
-  } else {
-      console.error('Invalid API response format for song recommendations');
-  }
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-const ArtistItem = ({ artistName }) => (
-  <View style={styles.artistItemContainer}>
-    <View style={styles.circle} />
-    <Text style={styles.artistName}>{artistName}</Text>
-  </View>
-);
+  return (
+    <TouchableOpacity onPress={() => {/* handle press action here */}}>
+      <View style={styles.songBox}>
+        <Image
+          source={coverArtUrl ? { uri: coverArtUrl } : defaultCoverArt}
+          style={styles.songImage}
+        />
+        <Text style={styles.songName}>{songItem.name}</Text>
+        <Text style={styles.artistName}>{songItem.artist.name}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 return (
-    
-    <View>
-      
-      {apiResponseSongs ? (
-        <View>
-        <Text style={styles.header}>Recommended Songs For You</Text>
-        <ScrollView horizontal={true}>
-          {apiResponseSongs.similartracks.track.slice(0, 6).map((item, index) => (
-            <View key={index} style={styles.box}>
+  <ScrollView style={{flex: 1}} contentContainerStyle={{padding: 5}}>
+    {/* Artist Recommendations Section */}
+    <View style={styles.horizontalProfileContainer}>
+      <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Artists</Text>
+      <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
+    </View>
+    <View style={styles.artistContainer}>
+      {isLoading ? (
+        <ActivityIndicator size="large" color="black" style={styles.spinner} />
+      ) : artistRecommendations && artistRecommendations.length > 0 ? (
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          {artistRecommendations.map((artist, index) => (
+            <View key={index} style={styles.artistView}>
               <Image
-                source={defaultCoverArt}
-                style={styles.image}
+                source={artist.imageUrl ? { uri: artist.imageUrl } : require("../../assets/defaultPic.png")}
+                style={styles.imageContainer}
               />
-              <Text style={styles.songName}>
-                {item.name.length > 25 // Adjust the character limit as needed
-                  ? `${item.name.slice(0, 31)}...`
-                  : item.name
-                }
-              </Text>
-              <Text style={styles.artistName}>{item.artist.name}</Text>
+              <Text style={styles.artistName}>{artist.artistName}</Text>
             </View>
           ))}
         </ScrollView>
-        </View>
       ) : (
-        <Text>Loading...</Text> // Add your loading indicator here
+        <Text style={styles.noArtistText}>Interact with the app to receive tailored recommendations based on your activity."</Text>
       )}
     </View>
+
+    {/* Song Recommendations Section */}
+    <View style={styles.horizontalProfileContainer}>
+      <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Songs</Text>
+      <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
+    </View>
+    {isLoadingSongs ? (
+      <ActivityIndicator size="large" color="black" />
+    ) : songRecommendations && songRecommendations.length > 0 ? (
+      <FlatList
+        horizontal
+        data={songRecommendations}
+        renderItem={({ item }) => <RecommendedSongCell songItem={item} />}
+        keyExtractor={(_, index) => index.toString()}
+      />
+    ) : (
+      <Text style={{ textAlign: 'center', marginTop: 20 }}>
+        No song recommendations available.
+      </Text>
+    )}
+  </ScrollView>
 );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -228,6 +168,37 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
+  artistContainer: {
+    paddingLeft: 10,
+},
+artistView: {
+    alignItems: 'center', // Center items vertically
+    marginRight: 10, // Add some spacing between the artist views
+  },
+  spinner: {
+    height: 170, 
+    alignItems: 'center',
+    justifyContent: 'center',
+},
+imageContainer: {
+  width: 120,
+  height: 150,
+  borderRadius: 12,
+  backgroundColor: '#333',
+  overflow: 'hidden',
+  marginHorizontal: 6,
+},
+  artistName: {
+    marginTop: 5, // Space between the image and the text
+    textAlign: 'center', // Center the artist's name
+  },
+  horizontalProfileContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    margin: 5,
+    width: 'auto',
+    height: 'auto',
+},
   textStyle: {
     textAlign: 'top',
     fontSize: 23,
@@ -285,7 +256,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 0,
   },
-
+  SongName: {
+    fontSize: 18,
+    marginVertical: 5,
+  },
   songInputContainer: {
     marginTop: 20,
   },
@@ -321,9 +295,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgray'
   },
 
+  artistName: {
+    fontSize: 14,
+    textAlign: 'left',
+    paddingHorizontal: 8,
+    flexShrink: 1,   // allows the text to shrink if needed
+    width: '70%',    // adjust this as needed based on your design
+  },
   image: {
-    width: 130, // Adjust the image width as needed
-    height: 130, // Adjust the image height as needed
+    width: 100, // Adjust the image width as needed
+    height: 100, // Adjust the image height as needed
     alignSelf: 'center', // Center the image horizontally
   },
   songName: {
@@ -336,24 +317,21 @@ const styles = StyleSheet.create({
     textAlign: 'center', // Center the text horizontally
   },
   box: {
-    backgroundColor: 'lightgray',
+    backgroundColor: '#F7F6F6',
     borderRadius: 10,
     margin: 10,
     padding: 10,
-    width: 150, // Adjust the width as per your preference
+    width: 150, 
+    height: 170,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.30,
+    shadowRadius: 1.22,
+    elevation: 3,
   },
 });
 
 export default Recommendations;
-/*
-  function printReviews() {
-    reviews.forEach((item, index) => {
-      console.log(`Review ${index}:`);
-      console.log(`Artist: ${item.artistName}`);
-      console.log(`Rating: ${item.rating}`);
-      console.log(`Review: ${item.review}`);
-      console.log(`Song: ${item.songName}`);
-      console.log('------------------');
-    });
-  }
-*/

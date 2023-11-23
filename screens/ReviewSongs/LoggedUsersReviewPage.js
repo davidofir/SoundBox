@@ -1,33 +1,43 @@
 import React, { useLayoutEffect } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useState } from 'react';
+
 import StarRating from 'react-native-star-rating-widget';
 import { Ionicons,} from '@expo/vector-icons';
+
+import { authentication, db, } from "../../firebase";
+import { doc, updateDoc } from 'firebase/firestore';
+
+import { ScrollView } from 'react-native-gesture-handler';
 const defaultCoverArt = require('../../assets/defaultSongImage.png');
 
 
 
 const LoggedUsersReviewPage = ({ navigation, route }) => {
     const { review } = route.params;
+    var userId = authentication.currentUser.uid;
+    const [liked, setLiked] = useState(review.likes.includes(userId));
+    
 
-    const LikePost = (item) => {
-        var tempLikes = item.likes;
+    const LikePost = () => {
+        var tempLikes = review.likes;
 
         tempLikes.push(userId)
 
         // Update the likes list in Firebase
-        const reviewDoc = doc(db, 'reviews', item.id);
+        const reviewDoc = doc(db, 'reviews', review.id);
         updateDoc(reviewDoc, {
             likes: tempLikes
         })
     }
 
-    const UnlikePost = (item) => {
-        var tempLikes = item.likes;
+    const UnlikePost = () => {
+        var tempLikes = review.likes;
 
         tempLikes.splice(tempLikes.indexOf(userId), 1);
 
         // Update the likes list in Firebase
-        const reviewDoc = doc(db, 'reviews', item.id);
+        const reviewDoc = doc(db, 'reviews', review.id);
         updateDoc(reviewDoc, {
             likes: tempLikes
         })
@@ -35,9 +45,9 @@ const LoggedUsersReviewPage = ({ navigation, route }) => {
 
     const handleLike = () => {
         if (liked) {
-            UnlikePost(item);
+            UnlikePost();
         } else {
-            LikePost(item);
+            LikePost();
         }
         setLiked(!liked);
     };
@@ -61,6 +71,7 @@ const LoggedUsersReviewPage = ({ navigation, route }) => {
 
     return (
         <View>
+            <ScrollView>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Image 
                     source={review?.albumImgURL ? { uri: review.albumImgURL } : defaultCoverArt} 
@@ -91,9 +102,9 @@ const LoggedUsersReviewPage = ({ navigation, route }) => {
                 />
                 <Text>{"(" + review.rating + " / 5)"}</Text>
                 <Text style={styles.input}>{review.review}</Text>
-            </View>
-
-            <TouchableOpacity onPress={handleLike}>
+                </View>
+                <View style={styles.likeContainer}>
+                <TouchableOpacity onPress={handleLike}>
                             <Ionicons
                                 name={liked ? 'heart' : 'heart-outline'}
                                 size={20}
@@ -101,14 +112,22 @@ const LoggedUsersReviewPage = ({ navigation, route }) => {
                                 style={styles.likeIcon}
                             />
                         </TouchableOpacity>
-                        <Text style={styles.likeText}>{item.likes.length}</Text>
-                        <TouchableOpacity onPress={() => navigation.navigate("Comment", { item })}>
+                        <Text style={styles.likeText}>{review.likes.length}</Text>
+                        
+                        <TouchableOpacity onPress={() => navigation.navigate("Comment", {item: review})}>
                             <Ionicons
                                 name="chatbox-outline"
                                 size={20}
                                 color="black"
                                 style={styles.commentIcon} />
+                                
                         </TouchableOpacity>
+                        <Text style={styles.likeText}>{review.commentIds.length}</Text>
+                        </View>
+            
+
+
+                        </ScrollView>
         </View>
     );
 };
@@ -134,9 +153,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     input: {
-        height: 450,
+        height: 400,
         width: 360,
-        margin: 22,
+        marginTop: 22,
         borderWidth: 1,
         padding: 5,
         fontSize: 15,
@@ -154,6 +173,24 @@ const styles = StyleSheet.create({
     StyleDate: {
         fontSize: 16,
         marginTop: 10,
+    },
+    likeIcon: {
+        marginRight: 8,
+    },
+    likeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+        marginLeft: 20
+        
+    },
+    likeText: {
+        fontSize: 14,
+        color: '#333',
+    },
+    commentIcon: {
+        marginLeft: 12,
+        marginRight: 8,
     },
 });
 
