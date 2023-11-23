@@ -8,16 +8,14 @@ import {
   Keyboard,
   Button,
   FlatList,
-  ScrollView,
-  Image
+  ScrollView
 } from 'react-native';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import { authentication, db } from "../../firebase";
 import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import axios from 'axios';
-import { getListUserReviews } from '../../domain/RecommendRepository/RecommendationRepository';
-import { getUserReviewData } from '../../domain/FirebaseRepository/UserRepository';
-const defaultCoverArt = require('../../assets/defaultSongImage.png')
+import { fetchRecommendedArtists } from './RecommendArtists';
+
 
 const Recommendations = ({ navigation, route }) => {
   const topArtists = [];
@@ -35,32 +33,51 @@ const Recommendations = ({ navigation, route }) => {
   const [apiResponseSongs, setApiResponseSongs] = useState(null); // Added state to store song recommendations
   const [inputArtist, setInputArtist] = useState('');
   const [searchResults, setSearchResults] = useState(null);
-
   // Query Firestore database with current UID
 
   useEffect(() => {
-    getUserReviews();
-    }, []);
+    const userRef = doc(db, 'users', userId);
+    fetchRecommendedArtists()
+    getDoc(userRef).then((doc) => {
+      setReviews(doc.data().reviews);
 
-    useEffect(() => {
-      if (reviews && reviews.length > 0) {
-        
-        fetchRecommendedSongs();
-      }
-    }, [reviews]);
+      // Get the length of the array for the number of reviews
+      reviewCount = doc.data().reviews.length;
+      // Get the array of reviews
+      reviewArray = doc.data().reviews;
+      
+      getTopUserArtists();
+      fetchRecommendedSongs();
+      
+    });
+  }, []);
 
-
-
-    async function getTopArtists(){
-      await getTopUserArtists()
+  useEffect(() => {
+    if (reviews && reviews.length > 0) {
+      
+      fetchRecommendedSongs();
     }
+  }, [reviews]);
+
+/*
+  function printReviews() {
+    reviews.forEach((item, index) => {
+      console.log(`Review ${index}:`);
+      console.log(`Artist: ${item.artistName}`);
+      console.log(`Rating: ${item.rating}`);
+      console.log(`Review: ${item.review}`);
+      console.log(`Song: ${item.songName}`);
+      console.log('------------------');
+    });
+  }
+*/
 
   async function getTopUserArtists() {
     const artistMap = new Map();
     const lambda = 0.5; // Might need to adjust after further testing and more reviews are made
 
     // Build the map with aggregate ratings and counts.
-    reviews.forEach(review => {
+    reviewArray.forEach(review => {
         const { artistName, rating } = review;
 
         if (artistMap.has(artistName)) {
@@ -91,6 +108,7 @@ const Recommendations = ({ navigation, route }) => {
   // Find the top 2 artists with the highest weighted scores.
   meanReviewList.sort((a, b) => b.weightedScore - a.weightedScore);
   const topTwoArtists = meanReviewList.slice(0, 2).map(artist => artist.name);
+
   fetchSimilarArtists(topTwoArtists);
 }
 
@@ -131,16 +149,13 @@ function getTopRatedReview(reviews) {
   const randomReview = topRatedReviews[Math.floor(Math.random() * topRatedReviews.length)];
   
   return randomReview;
-} 
+}
 
 async function fetchRecommendedSongs() {
-  
   const topReview = getTopRatedReview(reviews);
   if (topReview) {
-    const encodedSongTitle = encodeURIComponent(topReview.songName);
-    const encodedArtistTitle = encodeURIComponent(topReview.artistName);
     const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 
-    const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodedArtistTitle}&track=${encodedSongTitle}&api_key=${apiKey}&format=json`;
+    const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${topReview.artistName}&track=${topReview.songName}&api_key=${apiKey}&format=json`;
     
     try {
       const response = await fetch(url);
@@ -190,34 +205,58 @@ const ArtistItem = ({ artistName }) => (
 );
 
 return (
+  <ScrollView style={{flex: 1}} contentContainerStyle={{padding: 5}}>
+<View style={styles.songInputContainer}>
+    <Text style={styles.topHeader}>Find Similar Songs</Text>
     
-    <View>
-      
-      {apiResponseSongs ? (
+    <TextInput
+        style={styles.songInput}
+        value={inputSong}
+        onChangeText={(text) => setInputSong(text)}
+        placeholder="Song name"
+        placeholderTextColor="gray"
+    />
+    <TextInput
+        style={styles.songInput}
+        value={inputArtist}
+        onChangeText={(text) => setInputArtist(text)}
+        placeholder="Artist name"
+        placeholderTextColor="gray"
+    />
+  
+      <Button
+          title="Get Recommended Songs"
+          onPress={() => fetchRecommendedSongsForSearch(inputArtist, inputSong)}
+      />
+      {searchResults && (
         <View>
-        <Text style={styles.header}>Recommended Songs For You</Text>
-        <ScrollView horizontal={true}>
-          {apiResponseSongs.similartracks.track.slice(0, 6).map((item, index) => (
-            <View key={index} style={styles.box}>
-              <Image
-                source={defaultCoverArt}
-                style={styles.image}
-              />
-              <Text style={styles.songName}>
-                {item.name.length > 25 // Adjust the character limit as needed
-                  ? `${item.name.slice(0, 31)}...`
-                  : item.name
-                }
-              </Text>
-              <Text style={styles.artistName}>{item.artist.name}</Text>
-            </View>
+          <Text style={styles.header}>Search Results:</Text>
+          {searchResults.similartracks.track.slice(0, 6).map((item, index) => (
+            <Text key={index} style={styles.artistName}>{item.name}</Text>
           ))}
-        </ScrollView>
         </View>
-      ) : (
-        <Text>Loading...</Text> // Add your loading indicator here
       )}
     </View>
+    <View>
+      <Text style={styles.header}>Recommended Artists</Text>
+      <FlatList 
+          data={apiResponse && apiResponse.slice(0, 7)}
+          horizontal={true}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => <ArtistItem artistName={item} />}
+      />
+    </View>
+
+    <View>
+      <Text style={styles.header}>Recommended Songs For You</Text>
+      {apiResponseSongs && apiResponseSongs.similartracks.track.slice(0, 6).map((item, index) => (
+        <Text key={index} style={styles.ArtistName}>{item.name}</Text>
+      ))}
+    </View>
+
+   
+
+  </ScrollView>
 );
 };
 
@@ -285,7 +324,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 0,
   },
-
+  SongName: {
+    fontSize: 18,
+    marginVertical: 5,
+  },
   songInputContainer: {
     marginTop: 20,
   },
@@ -321,39 +363,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgray'
   },
 
-  image: {
-    width: 130, // Adjust the image width as needed
-    height: 130, // Adjust the image height as needed
-    alignSelf: 'center', // Center the image horizontally
-  },
-  songName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center', // Center the text horizontally
-  },
   artistName: {
     fontSize: 14,
-    textAlign: 'center', // Center the text horizontally
-  },
-  box: {
-    backgroundColor: 'lightgray',
-    borderRadius: 10,
-    margin: 10,
-    padding: 10,
-    width: 150, // Adjust the width as per your preference
+    textAlign: 'left',
+    paddingHorizontal: 8,
+    flexShrink: 1,   // allows the text to shrink if needed
+    width: '70%',    // adjust this as needed based on your design
   },
 });
 
 export default Recommendations;
-/*
-  function printReviews() {
-    reviews.forEach((item, index) => {
-      console.log(`Review ${index}:`);
-      console.log(`Artist: ${item.artistName}`);
-      console.log(`Rating: ${item.rating}`);
-      console.log(`Review: ${item.review}`);
-      console.log(`Song: ${item.songName}`);
-      console.log('------------------');
-    });
-  }
-*/

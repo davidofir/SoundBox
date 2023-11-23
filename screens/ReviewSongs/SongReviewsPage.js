@@ -147,8 +147,6 @@ const SongReviewsPage = ({ route, navigation }) => {
 
 
     const renderReview = (item) => {
-
-
         return (
         <View style={styles.postContainer} key={item.id}>
                 <TouchableOpacity onPress={() => navigateProfile(item)}>

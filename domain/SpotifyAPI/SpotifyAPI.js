@@ -138,8 +138,20 @@ async function getTrackID(songName, artistName) {
   }
 }
 
-async function searchAndFetchArtistImage(){
-  
+async function getArtistImage(artistName) {
+  const accessToken = await getAccessToken();
+
+  const response = await axios({
+    method: 'get',
+    url: `https://api.spotify.com/v1/search?q=${encodeURIComponent(artistName)}&type=artist`,
+    headers: {
+      'Authorization': 'Bearer ' + accessToken
+    },
+  });
+
+  const artist = response.data.artists.items[0]; // Assuming the artist is the first in the list
+  return artist.images; // This will be an array of images
 }
 
-export { searchAndFetchSongCoverArt, getTrackID };
+
+export { searchAndFetchSongCoverArt, getTrackID, getArtistImage };

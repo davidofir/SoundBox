@@ -10,14 +10,17 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import StarRating from 'react-native-star-rating-widget';
 import Toast from 'react-native-toast-message';
 import { getTrackID } from "../domain/SpotifyAPI/SpotifyAPI";
+import { fetchRecommendedArtists } from './Recommendations/RecommendArtists';
 const defaultCoverArt = require('../assets/defaultSongImage.png');
+const defaultCoverArtUri = Image.resolveAssetSource(defaultCoverArt).uri;
 
 const eventsRepo = new EventsRepository;
 export default SocialFeed = ({ navigation }) => {
     const [events, setEvents] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [following, setFollowing] = useState([]);
-
+    const [artistRecommendations, setArtistRecommendations] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     // Get the current user
     var userId = authentication.currentUser.uid;
 
@@ -25,6 +28,21 @@ export default SocialFeed = ({ navigation }) => {
     useEffect(() => {
 
         const userRef = doc(db, "users", userId);
+
+        //get artist recommendations
+        async function loadArtistRecommendations() {
+            try {
+                setIsLoading(true);
+                const recommendations = await fetchRecommendedArtists();
+                setArtistRecommendations(recommendations);
+                setIsLoading(false);
+
+            } catch (error) {
+                console.error('Failed to fetch artist recommendations:', error);
+                setIsLoading(false);
+            }
+        }
+          loadArtistRecommendations();
 
         getDoc(userRef)
             .then((doc) => {
@@ -260,26 +278,30 @@ export default SocialFeed = ({ navigation }) => {
     return (
         < View style={styles.container} >
             <ScrollView>
+                {/* Recommendations */}
                 <View style={styles.horizontalProfileContainer}>
                     <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Artists</Text>
                     <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
                 </View>
                 <View style={styles.artistContainer}>
+                {isLoading ? (
+                    <Text>Loading...</Text>
+                ) : (
                     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                        <View>
-                            <Image source={require("../assets/artists/jayz.png")} style={styles.imageContainer} />
+                        {Array.isArray(artistRecommendations) && artistRecommendations.map((artist, index) => (
+                        <View key={index} style={styles.artistView}>
+                            <Image
+                                source={{ uri: artist.imageUrl || defaultCoverArtUri }}
+                                style={styles.imageContainer}
+                            />
+                            <Text style={styles.artistName}>{artist.artistName}</Text>
                         </View>
-                        <View>
-                            <Image source={require("../assets/artists/Yonce.png")} style={styles.imageContainer} />
-                        </View>
-                        <View>
-                            <Image source={require("../assets/artists/cee.png")} style={styles.imageContainer} />
-                        </View>
-                        <View>
-                            <Image source={require("../assets/artists/swift.png")} style={styles.imageContainer} />
-                        </View>
+                    ))}
                     </ScrollView>
+                )}
                 </View>
+                    {/* Recommendations End */}
+
                 <View style={styles.container2}>
                     {reviews.map((item, index) => (
                         <Post
@@ -327,6 +349,17 @@ const styles = StyleSheet.create({
     artistContainer: {
         paddingLeft: 10,
     },
+    artistView: {
+        alignItems: 'center', // Center items vertically
+        marginRight: 10, // Add some spacing between the artist views
+      },
+      imageContainer: {
+        // your existing styles
+      },
+      artistName: {
+        marginTop: 5, // Space between the image and the text
+        textAlign: 'center', // Center the artist's name
+      },
     container2: {
         alignItems: 'center',
         justifyContent: 'center',
