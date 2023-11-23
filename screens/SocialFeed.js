@@ -361,9 +361,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-      imageContainer: {
-        // your existing styles
-      },
+
       artistName: {
         marginTop: 5, // Space between the image and the text
         textAlign: 'center', // Center the artist's name
