@@ -19,7 +19,7 @@ import { fetchRecommendedArtists } from './RecommendArtists';
 import { ActivityIndicator } from 'react-native';
 import { fetchRecommendedSongs } from './RecommendSongs';
 import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
-
+import SongsViewAllPage from './SongsViewAllPage';
 const Recommendations = ({ navigation, route }) => {
   const topArtists = [];
   const topGenres = [];
@@ -34,6 +34,7 @@ const Recommendations = ({ navigation, route }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const [songRecommendations, setSongRecommendations] = useState([]);
+  const [allSongRecommendations, setAllSongRecommendations] = useState([]);
   const [isLoadingSongs, setIsLoadingSongs] = useState(true);
 
     // Query Firestore database with current UID
@@ -58,6 +59,7 @@ const Recommendations = ({ navigation, route }) => {
           try {
             setIsLoadingSongs(true);
             const songRecs = await fetchRecommendedSongs();
+            
             const topSixSongs = songRecs.similartracks.track.slice(0, 6);
             const songsWithCoverArt = await Promise.all(
               topSixSongs.map(async (song) => {
@@ -65,8 +67,11 @@ const Recommendations = ({ navigation, route }) => {
                 const coverArtUrl = await searchAndFetchSongCoverArt(song.name, song.artist.name);
                 return { ...song, coverArtUrl };
               })
+              
             );
+
             setSongRecommendations(songsWithCoverArt);
+            setAllSongRecommendations(songRecs.similartracks.track.slice(0, 30))
             setIsLoadingSongs(false);
           } catch (error) {
             console.error('Failed to fetch song recommendations:', error);
@@ -90,11 +95,13 @@ const Recommendations = ({ navigation, route }) => {
             style={styles.songImage}
           />
           <Text style={styles.songName}>{songItem.name}</Text>
-          <Text style={styles.artistName}>{songItem.artist.name}</Text>
+          <Text style={styles.artistName2}>{songItem.artist.name}</Text>
         </View>
       </TouchableOpacity>
     );
   });
+
+
   
 return (
   <ScrollView style={{flex: 1}} contentContainerStyle={{padding: 5}}>
@@ -119,14 +126,15 @@ return (
           ))}
         </ScrollView>
       ) : (
-        <Text style={styles.noArtistText}>Interact with the app to receive tailored recommendations based on your activity."</Text>
+        <Text style={styles.noArtistText}>Interact with the app to receive tailored recommendations based on your activity.</Text>
       )}
     </View>
 
     {/* Song Recommendations Section */}
     <View style={styles.horizontalProfileContainer}>
       <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Songs</Text>
-      <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
+      <Text onPress={() => navigation.navigate('SongsViewAllPage', { songs: allSongRecommendations })} 
+      style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
     </View>
     
     {isLoadingSongs ? (
@@ -141,7 +149,7 @@ return (
       />
     ) : (
       <Text style={{ textAlign: 'center', marginTop: 20 }}>
-        No song recommendations available.
+        Interact with the app to receive tailored recommendations based on your activity.
       </Text>
     )}
   </ScrollView>
@@ -177,8 +185,7 @@ imageContainer: {
   overflow: 'hidden',
   marginHorizontal: 6,
 },
-  artistName: {
-    marginTop: 5, // Space between the image and the text
+  artistName2: {
     textAlign: 'center', // Center the artist's name
   },
   horizontalProfileContainer: {
