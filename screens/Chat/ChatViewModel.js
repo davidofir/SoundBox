@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import * as ChatRepository from '../../domain/ChatRepositroy/ChatRepository';
 import { authentication } from '../../firebase';
 import { getUserProfileData } from '../../domain/FirebaseRepository/UserRepository';
-
+import { v4 as uuidv4 } from 'uuid';
 export default function useChatViewModel(roomId) {
   const [messages, setMessages] = useState([]);
+  const [prevId,setPrevId] = useState();
   const fetchMessages = async () => {
     try {
         const pastMessages = await ChatRepository.getPastMessages(roomId);
@@ -44,21 +45,28 @@ export default function useChatViewModel(roomId) {
   }
 
     function onSend(newMessage) {
+
+        let currId = uuidv4();
+        if(currId !== prevId){
         const userData = getUserProfileData().then((user)=>{
             console.log(user)
             const messageToSend = {
                 ...newMessage,
+                id: currId,
                 createdAt: new Date().toISOString(),
                 user: {
                     _id: authentication.currentUser.uid,
                     name: user.userName,
                 },
             };
-      
-            ChatRepository.sendMessage(messageToSend);
-            setMessages((previousMessages) => [messageToSend, ...previousMessages]);
+
+                setPrevId(currId);
+                ChatRepository.sendMessage(messageToSend);
+                setMessages((previousMessages) => [messageToSend, ...previousMessages]);
+            
+
         })
-        console.log(userData);
+    }
 
   }
 
