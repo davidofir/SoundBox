@@ -19,8 +19,7 @@ import axios from 'axios';
 import { getListUserReviews } from '../../domain/RecommendRepository/RecommendationRepository';
 import { getUserReviewData } from '../../domain/FirebaseRepository/UserRepository';
 import { getArtistImage } from '../../domain/SpotifyAPI/SpotifyAPI';
-import defaultCoverArt from '../../assets/defaultSongImage.png';
-const defaultCoverArtUri = Image.resolveAssetSource(defaultCoverArt).uri;
+
 
 export async function fetchRecommendedArtists() {
     var reviews = await getUserReviews()
