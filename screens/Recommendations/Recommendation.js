@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { Feather, Entypo } from "@expo/vector-icons";
 import {
   StyleSheet,
@@ -18,6 +18,7 @@ import axios from 'axios';
 import { fetchRecommendedArtists } from './RecommendArtists';
 import { ActivityIndicator } from 'react-native';
 import { fetchRecommendedSongs } from './RecommendSongs';
+import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
 
 const Recommendations = ({ navigation, route }) => {
   const topArtists = [];
@@ -25,17 +26,8 @@ const Recommendations = ({ navigation, route }) => {
   const [reviews, setReviews] = useState([]);
   const [inputSong, setInputSong] = useState('');
   var userId = authentication.currentUser.uid;
-  var reviewCount = 0;
-  var reviewArray = [];
-  var currentArtist = '';
-  var artistIndex = '';
-  var currentReview = 0;
-  var favouriteArtist = '';
-  const [apiResponse, setApiResponse] = useState(null); // Added state to store API response
-  const [apiResponseSongs, setApiResponseSongs] = useState(null); // Added state to store song recommendations
-  const [inputArtist, setInputArtist] = useState('');
-  const [searchResults, setSearchResults] = useState(null);
- 
+
+
   const defaultCoverArt = require('../../assets/defaultSongImage.png');
 
   const [artistRecommendations, setArtistRecommendations] = useState([]);
@@ -46,7 +38,7 @@ const Recommendations = ({ navigation, route }) => {
 
     // Query Firestore database with current UID
     useEffect(() => {
-
+      
       //get artist recommendations
       async function loadArtistRecommendations() {
           try {
@@ -62,12 +54,19 @@ const Recommendations = ({ navigation, route }) => {
       }
         loadArtistRecommendations();
 
-        // Fetch song recommendations
         async function loadSongRecommendations() {
           try {
             setIsLoadingSongs(true);
             const songRecs = await fetchRecommendedSongs();
-            setSongRecommendations(songRecs.similartracks.track); // Access the track array
+            const topSixSongs = songRecs.similartracks.track.slice(0, 6);
+            const songsWithCoverArt = await Promise.all(
+              topSixSongs.map(async (song) => {
+
+                const coverArtUrl = await searchAndFetchSongCoverArt(song.name, song.artist.name);
+                return { ...song, coverArtUrl };
+              })
+            );
+            setSongRecommendations(songsWithCoverArt);
             setIsLoadingSongs(false);
           } catch (error) {
             console.error('Failed to fetch song recommendations:', error);
@@ -76,40 +75,27 @@ const Recommendations = ({ navigation, route }) => {
         }
         
         loadSongRecommendations();
-        console.log(songRecommendations)
+
   }, [])
 
-  // RecommendedSongCell component inside Recommendations
-const RecommendedSongCell = ({ songItem }) => {
-  const [coverArtUrl, setCoverArtUrl] = useState(null);
 
-  useEffect(() => {
-    const fetchCoverArt = async () => {
-      try {
-        console.log(songItem.name + "111")
-        const imageUrl = await searchAndFetchSongCoverArt(songItem.name, songItem.artist.name);
-        setCoverArtUrl(imageUrl);
-      } catch (error) {
-        console.error('Error fetching cover art:', error);
-      }
-    };
-    fetchCoverArt();
-  }, [songItem]);
-
-  return (
-    <TouchableOpacity onPress={() => {/* handle press action here */}}>
-      <View style={styles.songBox}>
-        <Image
-          source={coverArtUrl ? { uri: coverArtUrl } : defaultCoverArt}
-          style={styles.songImage}
-        />
-        <Text style={styles.songName}>{songItem.name}</Text>
-        <Text style={styles.artistName}>{songItem.artist.name}</Text>
-      </View>
-    </TouchableOpacity>
-  );
-};
-
+  
+  const RecommendedSongCell = memo(({ songItem }) => {
+    // Directly use the cover art URL from the song item
+    return (
+      <TouchableOpacity onPress={() => {/* handle press action here */}}>
+        <View style={styles.songBox}>
+          <Image
+            source={songItem.coverArtUrl ? { uri: songItem.coverArtUrl } : defaultCoverArt}
+            style={styles.songImage}
+          />
+          <Text style={styles.songName}>{songItem.name}</Text>
+          <Text style={styles.artistName}>{songItem.artist.name}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  });
+  
 return (
   <ScrollView style={{flex: 1}} contentContainerStyle={{padding: 5}}>
     {/* Artist Recommendations Section */}
@@ -142,14 +128,16 @@ return (
       <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Songs</Text>
       <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
     </View>
+    
     {isLoadingSongs ? (
       <ActivityIndicator size="large" color="black" />
     ) : songRecommendations && songRecommendations.length > 0 ? (
       <FlatList
         horizontal
-        data={songRecommendations}
+        data={songRecommendations.slice(0, 6)} // Only take the first 6 songs
         renderItem={({ item }) => <RecommendedSongCell songItem={item} />}
         keyExtractor={(_, index) => index.toString()}
+        showsHorizontalScrollIndicator={false}
       />
     ) : (
       <Text style={{ textAlign: 'center', marginTop: 20 }}>
@@ -170,6 +158,7 @@ const styles = StyleSheet.create({
   },
   artistContainer: {
     paddingLeft: 10,
+    marginBottom: 40,
 },
 artistView: {
     alignItems: 'center', // Center items vertically
@@ -272,6 +261,7 @@ imageContainer: {
     borderRadius: 15,  
     
 },
+
   flatListContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -285,6 +275,7 @@ imageContainer: {
     justifyContent: 'flex-start',
     padding: 5,
     width: '100%',  // adjust as needed
+    marginBottom: 50
   },
 
   circle: {
@@ -307,14 +298,27 @@ imageContainer: {
     height: 100, // Adjust the image height as needed
     alignSelf: 'center', // Center the image horizontally
   },
+  songBox: {
+    alignItems: 'center', // Center items vertically
+    marginRight: 10, // Add some spacing between the song views
+    // Add any additional styling as needed
+  },
+  songImage: {
+    width: 150,
+    height: 150,
+    backgroundColor: '#333',
+    overflow: 'hidden',
+    marginHorizontal: 6,
+  },
   songName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center', // Center the text horizontally
+    marginTop: 5, // Space between the image and the text
+    textAlign: 'center', // Center the song's name
+    fontWeight: 'bold'
   },
   artistName: {
     fontSize: 14,
     textAlign: 'center', // Center the text horizontally
+    fontWeight: 'bold'
   },
   box: {
     backgroundColor: '#F7F6F6',

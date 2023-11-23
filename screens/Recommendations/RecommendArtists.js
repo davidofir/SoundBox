@@ -27,7 +27,7 @@ export async function fetchRecommendedArtists() {
     var topArtists = await getTopUserArtists(reviews)
 
     var fetchedArtists = await fetchArtistsFromLastFM(topArtists)
-    console.log(fetchedArtists)
+
     var finalList = await compileRecommendations(fetchedArtists)
     return finalList
 }
