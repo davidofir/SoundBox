@@ -5,11 +5,12 @@ import React, { useEffect, useState } from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import ButtonComponent from '../../components/ButtonComponent';
 import EventsRepository from '../../domain/EventsAPI/EventsRepositoryImpl';
-import { authentication, db } from "../../firebase";
+import { authentication, db, storage } from "../../firebase";
 import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { updateEmail, signOut } from "firebase/auth";
 import useAccountProfileViewModel from "./AccountProfileViewModel";
 import * as ImagePicker from 'expo-image-picker';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default EditAccountPage = ({ navigation, route }) => {
 
@@ -21,6 +22,23 @@ export default EditAccountPage = ({ navigation, route }) => {
     const [newEmail, setNewEmail] = useState("");
 
     const [selectedImage, setSelectedImage] = useState(null);
+
+    const uploadImage = async () => {
+        const response = await fetch(selectedImage.assets[0].uri);
+        const blob = await response.blob();
+
+        // Create a reference to the storage location
+        const imageRef = ref(storage, `profilePictures/${authentication.currentUser.uid}`);
+
+        // Upload the image
+        await uploadBytes(imageRef, blob);;
+
+        // Get the download URL
+        const downloadURL = await getDownloadURL(imageRef);
+
+        // Return the download URL
+        return downloadURL;
+    };
 
     const pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
@@ -39,9 +57,13 @@ export default EditAccountPage = ({ navigation, route }) => {
         try {
             // Update the username in the database.
             const userDocRef = doc(db, "users", authentication.currentUser.uid);
+
+            // Upload the image and get the download URL
+            const imageUrl = selectedImage ? await uploadImage() : null;
+
             await updateDoc(userDocRef, {
                 userName: newUsername || username,
-                profilePicture: selectedImage ? selectedImage.assets[0].uri : null,
+                profilePicture: imageUrl,
             });
 
             // Update the email in the database.

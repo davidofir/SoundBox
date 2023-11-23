@@ -14,6 +14,7 @@ export default UserPage = ({ navigation, route }) => {
     const [username, setUser] = useState('');
     const [userFollowers, setUserFollowers] = useState([]);
     const [userFollowing, setUserFollowing] = useState([]);
+    const [profilePicture, setProfilePicture] = useState("");
     const [followers, setFollowers] = useState([]);
     const [following, setFollowing] = useState([]);
     const [reviews, setReviews] = useState([]);
@@ -46,6 +47,7 @@ export default UserPage = ({ navigation, route }) => {
                 setUser(userDoc.data().userName);
                 setFollowers(userDoc.data().followers);
                 setFollowing(userDoc.data().following);
+                setProfilePicture(userDoc.data().profilePicture)
 
                 setUserFollowing(userDoc2.data().following);
                 setUserFollowers(userDoc2.data().followers);
@@ -122,7 +124,7 @@ export default UserPage = ({ navigation, route }) => {
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
-                <Image source={require('../assets/defaultPic.png')} style={styles.profileImage} />
+                <Image source={profilePicture ? { uri: profilePicture } : require('../assets/defaultPic.png')} style={styles.profileImage} />
                 <Text style={styles.username}>{username || 'Loading...'}</Text>
             </View>
             <View style={styles.buttonContainer}>

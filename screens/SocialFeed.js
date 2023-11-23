@@ -43,7 +43,7 @@ export default SocialFeed = ({ navigation }) => {
                 setIsLoading(false);
             }
         }
-          loadArtistRecommendations();
+        loadArtistRecommendations();
 
         getDoc(userRef)
             .then((doc) => {
@@ -283,27 +283,27 @@ export default SocialFeed = ({ navigation }) => {
                 <View style={styles.horizontalProfileContainer}>
                     <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Artists</Text>
                     <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
-                        </View>
-                        <View style={styles.artistContainer}>
-                            {isLoading ? (
-                                <ActivityIndicator size="large" color="black" style={styles.spinner} />
-                            ) : artistRecommendations && artistRecommendations.length > 0 ? (
-                                <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                                    {artistRecommendations.map((artist, index) => (
-                                        <View key={index} style={styles.artistView}>
-                                            <Image
-                                                source={artist.imageUrl ? { uri: artist.imageUrl } : require("../assets/defaultPic.png")}
-                                                style={styles.imageContainer}
-                                            />
-                                            <Text style={styles.artistName}>{artist.artistName}</Text>
-                                        </View>
-                                    ))}
-                                </ScrollView>
-                            ) : (
-                                <Text style={styles.noArtistText}>Interact with the app to receive tailored recommendations based on your activity."</Text>
-                            )}
-                        </View>
-                    {/* Recommendations End */}
+                </View>
+                <View style={styles.artistContainer}>
+                    {isLoading ? (
+                        <ActivityIndicator size="large" color="black" style={styles.spinner} />
+                    ) : artistRecommendations && artistRecommendations.length > 0 ? (
+                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                            {artistRecommendations.map((artist, index) => (
+                                <View key={index} style={styles.artistView}>
+                                    <Image
+                                        source={artist.imageUrl ? { uri: artist.imageUrl } : require("../assets/defaultPic.png")}
+                                        style={styles.imageContainer}
+                                    />
+                                    <Text style={styles.artistName}>{artist.artistName}</Text>
+                                </View>
+                            ))}
+                        </ScrollView>
+                    ) : (
+                        <Text style={styles.noArtistText}>Interact with the app to receive tailored recommendations based on your activity."</Text>
+                    )}
+                </View>
+                {/* Recommendations End */}
 
                 <View style={styles.container2}>
                     {reviews.map((item, index) => (
@@ -355,17 +355,17 @@ const styles = StyleSheet.create({
     artistView: {
         alignItems: 'center', // Center items vertically
         marginRight: 10, // Add some spacing between the artist views
-      },
-      spinner: {
-        height: 170, 
+    },
+    spinner: {
+        height: 170,
         alignItems: 'center',
         justifyContent: 'center',
     },
 
-      artistName: {
+    artistName: {
         marginTop: 5, // Space between the image and the text
         textAlign: 'center', // Center the artist's name
-      },
+    },
     container2: {
         alignItems: 'center',
         justifyContent: 'center',
