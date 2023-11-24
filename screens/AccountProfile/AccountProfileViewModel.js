@@ -36,7 +36,7 @@ const useProfileViewModel = (navigation) => {
         };
 
         fetchUserProfileData();
-    }, [isFocused]);
+    }, []);
 
     const navigateToFollowers = () => {
         // Navigate to the Followers screen with the followers data
