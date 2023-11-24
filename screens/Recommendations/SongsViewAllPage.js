@@ -8,7 +8,7 @@ import {
     Button,
     FlatList,
     ScrollView, 
-    Image, TouchableOpacity, TouchableWithoutFeedback
+    Image, TouchableOpacity,
   } from 'react-native';
 import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI'; // Adjust the import path
 
