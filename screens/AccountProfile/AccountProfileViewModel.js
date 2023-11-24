@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { authentication, db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
+import { useIsFocused } from '@react-navigation/native';
 
 const useProfileViewModel = (navigation) => {
     const [username, setUsername] = useState("");
@@ -10,6 +11,7 @@ const useProfileViewModel = (navigation) => {
     const [reviews, setReviews] = useState([]);
     const [userEmail, setUserEmail] = useState("");
     const [image, setImage] = useState("");
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         const fetchUserProfileData = async () => {
@@ -34,7 +36,7 @@ const useProfileViewModel = (navigation) => {
         };
 
         fetchUserProfileData();
-    }, []);
+    }, [isFocused]);
 
     const navigateToFollowers = () => {
         // Navigate to the Followers screen with the followers data
