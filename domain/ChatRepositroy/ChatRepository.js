@@ -30,7 +30,6 @@ export async function getPastMessages(roomId) {
       }
 
       const messages = await response.json();
-      console.log(messages);
       return messages;
   } catch (error) {
       console.error('Error fetching messages:', error.message);
