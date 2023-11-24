@@ -7,7 +7,6 @@ import MerchRepositoryImpl from '../../domain/MerchAPI/MerchRepositoryImpl';
 import useViewModel from './MerchViewModel';
 
 
-
 //const merchRepo = new MerchRepositoryImpl;
 
 
@@ -54,7 +53,7 @@ export default Store = ({ route, navigation }) => {
             <FlatList
                 data={merch}
                 renderItem={renderItem}
-                keyExtractor={(item) => item.name}
+                keyExtractor={(item) => item.id}
             />
         </View>
     );
