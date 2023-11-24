@@ -16,6 +16,7 @@ const BottomTabNavigator = () => {
         name="Feed" 
         component={SocialFeed} 
         options={{
+          headerTitle:'',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="home" size={size} color={color} />
           ),
@@ -34,6 +35,7 @@ const BottomTabNavigator = () => {
         name="Search" 
         component={SearchPage} 
         options={{
+          headerTitle:'',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="search" size={size} color={color} />
           ),
