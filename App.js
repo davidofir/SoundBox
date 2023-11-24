@@ -22,6 +22,7 @@ import Chat from './screens/Chat/Chat';
 import EditAccountPage from './screens/AccountProfile/EditAccountPage';
 import SongReviewsPage from './screens/ReviewSongs/SongReviewsPage';
 import LoggedUsersReviewPage from './screens/ReviewSongs/LoggedUsersReviewPage'
+import SongsViewAllPage from './screens/Recommendations/SongsViewAllPage';
 import CommentPage from './screens/Feed/CommentPage';
 import * as Notifications from 'expo-notifications';
 import { useEffect } from 'react';
@@ -107,6 +108,7 @@ export default function App() {
         <Stack.Screen name="SongReviewsPage" component={SongReviewsPage} />
         <Stack.Screen name="LoggedUsersReviewPage" component={LoggedUsersReviewPage} />
         <Stack.Screen name="Comment" component={CommentPage} />
+        <Stack.Screen name="SongsViewAllPage" component={SongsViewAllPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -236,27 +236,27 @@ class App extends React.Component {
       
       // Horizontal list as the header component of the vertical list
       ListHeaderComponent={() => (
-        <>
-          <Text style={styles.heading}>Recommended For You</Text>
-          {isLoading ? (
-          <ActivityIndicator size="large" color="black" style={{ paddingTop: 10 }} />
-        ) : recommendedSongs ? (
-          <View>
-            
-            <FlatList
-              horizontal
-              data={recommendedSongs.similartracks.track.slice(0, 6)}
-              renderItem={({ item }) => <RecommendedSongCell songItem={item} />}
-              keyExtractor={(_, index) => index.toString()}
-            />
-          </View>
-        ) : (
-          <Text>Start reviewing songs to get personalized suggestions!</Text>// This message shows when there are no recommendations
-        )}
-
-          {/* Any other content you want at the top of the vertical list */}
-          <Text style={styles.heading}>Popular Right Now</Text>
-        </>
+        viewModel.flatlistSwitch === 0 && (
+          <>
+            <Text style={styles.heading}>Recommended For You</Text>
+            {isLoading ? (
+              <ActivityIndicator size="large" color="black" style={{ paddingTop: 10 }} />
+            ) : recommendedSongs ? (
+              <View>
+                <FlatList
+                  horizontal
+                  data={recommendedSongs.similartracks.track.slice(0, 6)}
+                  renderItem={({ item }) => <RecommendedSongCell songItem={item} />}
+                  keyExtractor={(_, index) => index.toString()}
+                />
+              </View>
+            ) : (
+              <Text>Start reviewing songs to get personalized suggestions!</Text>
+            )}
+      
+            <Text style={styles.heading}>Popular Right Now</Text>
+          </>
+        )
       )}
     />
   </View>
