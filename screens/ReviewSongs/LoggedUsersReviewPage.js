@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 
@@ -16,22 +16,40 @@ const defaultCoverArt = require('../../assets/defaultSongImage.png');
 const LoggedUsersReviewPage = ({ navigation, route }) => {
     const { review } = route.params;
     var userId = authentication.currentUser.uid;
-    const [liked, setLiked] = useState(review.likes.includes(userId));
+    const [liked, setLiked] = useState(false);
+
+    // Use useEffect to set the liked state
+    useEffect(() => {
+        if(review && review.likes && review.likes.includes(userId)) {
+            setLiked(true);
+        } else {
+            setLiked(false);
+        }
+    }, [review, userId]); // Depend on review and userId
     
 
     const LikePost = () => {
-        var tempLikes = review.likes;
+        if(!review || !review.likes){
+            return; // Exit the function if review is null
+        } else {
+            var tempLikes = review.likes;
 
-        tempLikes.push(userId)
+            tempLikes.push(userId)
+    
+            // Update the likes list in Firebase
+            const reviewDoc = doc(db, 'reviews', review.id);
+            updateDoc(reviewDoc, {
+                likes: tempLikes
+            })
+        }
 
-        // Update the likes list in Firebase
-        const reviewDoc = doc(db, 'reviews', review.id);
-        updateDoc(reviewDoc, {
-            likes: tempLikes
-        })
     }
 
     const UnlikePost = () => {
+        if (!review || !review.likes) {
+            return; // Exit the function if review is null or likes is not available
+        }
+    
         var tempLikes = review.likes;
 
         tempLikes.splice(tempLikes.indexOf(userId), 1);
@@ -44,6 +62,9 @@ const LoggedUsersReviewPage = ({ navigation, route }) => {
     }
 
     const handleLike = () => {
+        if (!review) {
+            return; // Exit the function if review is null
+        }
         if (liked) {
             UnlikePost();
         } else {

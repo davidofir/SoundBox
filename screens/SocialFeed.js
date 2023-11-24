@@ -300,7 +300,7 @@ export default SocialFeed = ({ navigation }) => {
                             ))}
                         </ScrollView>
                     ) : (
-                        <Text style={styles.noArtistText}>Interact with the app to receive tailored recommendations based on your activity."</Text>
+                        <Text style={styles.noArtistText}>Interact with the app to receive tailored recommendations based on your activity.</Text>
                     )}
                 </View>
                 {/* Recommendations End */}

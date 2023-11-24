@@ -419,7 +419,7 @@ const prepareTrackInfo = async () => {
                   </View>
                 </View>
                 <View style={styles.modalContent}>
-                  <StarRating rating={rating} onChange={setRating} starSize={50} />
+                  <StarRating rating={rating} onChange={setRating} starSize={50}  />
                   <Text style={styles.textStyle}>{"(" + rating + " / 5)"}</Text>
                   <TextInput
                     style={styles.input}
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
     bottom: 0, 
     width: '100%', 
     height: "100%",
-    backgroundColor: 'white',
+    backgroundColor: '#F4F4F4',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     paddingVertical: 10
@@ -630,6 +630,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginVertical: 20,
     alignItems: 'center',
+
   },
   buttonContainer: {
     flexDirection: 'row',
