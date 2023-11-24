@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     buttonOutline: {
         backgroundColor: colors.secondary,
         marginTop: 5,
-        borderColor: colors.primary,
+        borderColor: "#4f4f4f",
         borderWidth: 2,
     },
     buttonText: {
@@ -146,12 +146,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     buttonOutlineText: {
-        color: colors.primary,
+        color: "#4f4f4f",
         fontWeight: '700',
         fontSize: 16,
     },
     header: {
-        color: colors.primary,
+        color: "#4f4f4f",
         fontWeight: '700',
         paddingBottom: 30,
         fontSize: 25,

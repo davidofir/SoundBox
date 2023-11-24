@@ -44,7 +44,7 @@ const Login = ({ navigation }) => {
     */
     return (
         <KeyboardAvoidingView style={styles.container} keyboardVerticalOffset={-500} behavior="padding">
-            <ImageBackground source={require("../../assets/bkg.png")} resizeMode="cover" style={styles.image}>
+            <ImageBackground source={require("../../assets/black-blur.png")} resizeMode="cover" style={styles.image}>
                 <Text style={styles.title}>SoundBox</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         marginTop: 40
     },
     button: {
-        backgroundColor: colors.primary,
+        backgroundColor: "#4f4f4f",
         width: '100%',
         padding: 15,
         borderRadius: 10,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     buttonOutline: {
         backgroundColor: colors.secondary,
         marginTop: 5,
-        borderColor: colors.primary,
+        borderColor: "#4f4f4f",
         borderWidth: 2,
     },
     buttonText: {
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
     },
     buttonOutlineText: {
-        color: colors.primary,
+        color: '#4f4f4f',
         fontWeight: '700',
         fontSize: 16,
     }
