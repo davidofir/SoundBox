@@ -11,7 +11,11 @@ const Tab = createBottomTabNavigator();
 
 const BottomTabNavigator = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      tabBarOptions={{
+        activeTintColor: 'black', // Set the active tab color to black
+      }}
+    >
       <Tab.Screen
         name="Feed"
         component={SocialFeed}
