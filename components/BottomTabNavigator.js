@@ -12,52 +12,55 @@ const Tab = createBottomTabNavigator();
 const BottomTabNavigator = () => {
   return (
     <Tab.Navigator>
-      <Tab.Screen 
-        name="Feed" 
-        component={SocialFeed} 
+      <Tab.Screen
+        name="Feed"
+        component={SocialFeed}
         options={{
-          headerTitle:'',
+          headerTitle: '',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="home" size={size} color={color} />
           ),
-        }} 
+          unmountOnBlur: true,
+        }}
       />
-      <Tab.Screen 
-        name="Discover" 
-        component={Discover} 
+      <Tab.Screen
+        name="Discover"
+        component={Discover}
         options={{
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="plus-square" size={size} color={color} />
           ),
-        }} 
+        }}
       />
-      <Tab.Screen 
-        name="Search" 
-        component={SearchPage} 
+      <Tab.Screen
+        name="Search"
+        component={SearchPage}
         options={{
-          headerTitle:'',
+          headerTitle: '',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="search" size={size} color={color} />
           ),
-        }} 
+          unmountOnBlur: true,
+        }}
       />
-      <Tab.Screen 
-        name="For You" 
-        component={Recommendations} 
+      <Tab.Screen
+        name="For You"
+        component={Recommendations}
         options={{
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="heart" size={size} color={color} />
           ),
-        }} 
+        }}
       />
-      <Tab.Screen 
-        name="Profile" 
-        component={ProfilePage} 
+      <Tab.Screen
+        name="Profile"
+        component={ProfilePage}
         options={{
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="user" size={size} color={color} />
           ),
-        }} 
+          unmountOnBlur: true,
+        }}
       />
     </Tab.Navigator>
   );
