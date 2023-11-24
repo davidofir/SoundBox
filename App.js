@@ -25,6 +25,7 @@ import LoggedUsersReviewPage from './screens/ReviewSongs/LoggedUsersReviewPage'
 import CommentPage from './screens/Feed/CommentPage';
 import * as Notifications from 'expo-notifications';
 import { useEffect } from 'react';
+import BottomTabNavigator from './components/BottomTabNavigator';
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -94,7 +95,7 @@ export default function App() {
         <Stack.Screen name="Homepage" component={Homepage} />
         <Stack.Screen name="Register" component={Register} />
         <Stack.Screen name="Profile" component={ProfilePage} />
-        <Stack.Screen name="Home" component={SocialFeed} />
+        <Stack.Screen name="Home" component={BottomTabNavigator} options={{ headerShown: false }}/>
         <Stack.Screen name="Followers" component={FollowersPage} />
         <Stack.Screen name="Following" component={FollowingPage} />
         <Stack.Screen name="RatingPage" component={RatingPage} />

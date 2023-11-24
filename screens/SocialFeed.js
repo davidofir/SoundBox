@@ -318,28 +318,6 @@ export default SocialFeed = ({ navigation }) => {
                 </View>
             </ScrollView>
 
-            {/* Social Media Navigation Bar */}
-            <View style={styles.navigationContainer}>
-                <TouchableOpacity onPress={() => navigation.replace("Home")}>
-                    <FontAwesome name="home" size={24} color="#4f4f4f" />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => navigation.navigate("Search")}>
-                    <FontAwesome name="search" size={24} color="#4f4f4f" />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => navigation.navigate("Discover")}>
-                    <FontAwesome name="plus-square" size={24} color="#4f4f4f" />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => navigation.navigate("Recommendations")}>
-                    <FontAwesome name="heart" size={24} color="#4f4f4f" />
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
-                    <FontAwesome name="user" size={24} color="#4f4f4f" />
-                </TouchableOpacity>
-            </View>
         </View >
     )
 }
