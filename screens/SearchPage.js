@@ -105,6 +105,7 @@ export default SearchPage = ({ navigation }) => {
               <TextInput
                 style={styles.searchInput}
                 value={search}
+                autoCapitalize='none'
                 onChangeText={text => {
                   setSearch(text);
                   if (text.length === 0) {
