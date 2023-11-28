@@ -196,7 +196,7 @@ export default SocialFeed = ({ navigation }) => {
             <View style={styles.postContainer}>
                 <TouchableOpacity onPress={navigateProfile}>
                     <View style={styles.postHeader}>
-                        <Image source={require("../assets/defaultPic.png")} style={styles.profileImage} />
+                        <Image source={item.profilePicture ? { uri: item.profilePicture } : require('../assets/defaultPic.png')} style={styles.profileImage} />
                         <Text style={styles.username}>{item.username}</Text>
                     </View>
                 </TouchableOpacity>

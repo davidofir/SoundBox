@@ -17,6 +17,13 @@ const RatingModel = {
     return userData.userName
   },
 
+  async getUserImage(userId) {
+    const userRef = doc(db, "users", userId);
+    const docSnapshot = await getDoc(userRef);
+    const userData = docSnapshot.data();
+    return userData.profilePicture ? userData.profilePicture : ""
+  },
+
   async addReview(userId, reviewData) {
     const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
@@ -70,6 +77,7 @@ export const storeReviewData = async (userId, finalArtistName, songName, rating,
         likes: [],
         albumImgURL: coverArtUrl,
         commentIds: [],
+        profilePicture: await RatingModel.getUserImage(userId),
       };
 
       // Save the review data to the new document in the 'reviews' collection.
@@ -102,7 +110,7 @@ export const storeReviewData = async (userId, finalArtistName, songName, rating,
       });
       return true
 
-      
+
     } else {
       // If an existing review is found, update it
       const existingReviewId = existingReviewQuerySnapshot.docs[0].id;
