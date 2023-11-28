@@ -48,7 +48,7 @@ const RatingPage = ({ navigation, route }) => {
   //Set the title of the page
   useLayoutEffect(() => {
       navigation.setOptions({
-          title: songName 
+          title: "Review" 
       });
   }, [navigation]);
 
@@ -674,7 +674,8 @@ const styles = StyleSheet.create({
   rating: {
     marginTop: 4,
     alignItems: "center",
-    alignContent: "center"
+    alignContent: "center",
+    fontSize: 12
   },
   scrollViewContent: {
     paddingTop: 20, // Add top padding for white space

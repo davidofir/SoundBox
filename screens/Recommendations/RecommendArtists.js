@@ -26,7 +26,7 @@ export async function fetchRecommendedArtists() {
    
     var topArtists = await getTopUserArtists(reviews)
 
-    var fetchedArtists = await fetchArtistsFromLastFM(topArtists)
+    var fetchedArtists = await fetchArtistsFromAPI(topArtists)
 
     var finalList = await compileRecommendations(fetchedArtists)
     return finalList
@@ -80,32 +80,34 @@ async function getUserReviews(){
 }
   
 async function fetchArtistsFromAPI(artists) {
-    try {
-      const artistResponses = await Promise.all(
-        artists.map(artist => axios.get(`http://192.168.1.133:8080/recommend?artist_name=${artist}`))
-      );
-  
-      const combinedArtists = [];
-      const addedArtistsSet = new Set();
-  
-      // Iterate over each API response
-      for (let response of artistResponses) {
-        // Iterate over each recommended artist
-        for (let artist of response.data.recommended_artists) {
-          // Check if we already added this artist or if we reached the limit of 6
-          if (!addedArtistsSet.has(artist) && combinedArtists.length < 6) {
-            combinedArtists.push(artist);
-            addedArtistsSet.add(artist);
-          }
+  try {
+    const artistResponses = await Promise.all(
+      artists.map(artist => axios.get(`https://alexsoundbox.pythonanywhere.com/recommend?artist_name=${encodeURIComponent(artist)}`))
+    );
+
+    const combinedArtists = [];
+    const addedArtistsSet = new Set();
+
+    // Iterate over each API response
+    for (let response of artistResponses) {
+      // Iterate over each recommended artist
+      for (let artist of response.data.recommended_artists) {
+        // Check if we already added this artist or if we reached the limit of 6
+        if (!addedArtistsSet.has(artist) && combinedArtists.length < 6) {
+          combinedArtists.push(artist);
+          addedArtistsSet.add(artist);
         }
       }
-  
-      return combinedArtists;
-  
-    } catch (error) {
-      console.error('Fetch error:', error);
     }
+
+    return combinedArtists;
+
+  } catch (error) {
+    console.error('Fetch error from custom API:', error);
+    // If an error occurred, fall back to the Last.FM API
+    return await fetchArtistsFromLastFM(artists);
   }
+}
 
   async function fetchArtistsFromLastFM(artists){
     const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 

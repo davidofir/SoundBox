@@ -187,7 +187,7 @@ class App extends React.Component {
               />
               <Text style={styles.songName}>
                 {songItem.name.length > 25
-                  ? `${songItem.name.slice(0, 31)}...`
+                  ? `${songItem.name.slice(0, 24)}...`
                   : songItem.name
                 }
               </Text>
