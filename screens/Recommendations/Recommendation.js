@@ -74,7 +74,7 @@ const Recommendations = ({ navigation, route }) => {
             setAllSongRecommendations(songRecs.similartracks.track.slice(0, 30))
             setIsLoadingSongs(false);
           } catch (error) {
-            console.error('Failed to fetch song recommendations:', error);
+            
             setIsLoadingSongs(false);
           }
         }

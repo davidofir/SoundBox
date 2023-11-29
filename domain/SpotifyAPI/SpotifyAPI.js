@@ -117,18 +117,14 @@ async function getTrackID(songName, artistName) {
     });
 
     const track = searchResponse.data.tracks.items[0];
-    print(track + "track")
+
     if (track) {
       const trackId = track.id;
-      if (songName == 'vampire'){
-        print(track)
-      }
+
       return trackId
       
     } else {
-      if (songName == 'vampire'){
-        print(track + "DAWDADWW")
-      }
+
       return null;
     }
   }  catch (error) {

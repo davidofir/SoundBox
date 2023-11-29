@@ -25,7 +25,7 @@ export async function fetchRecommendedArtists() {
     var reviews = await getUserReviews()
    
     var topArtists = await getTopUserArtists(reviews)
-
+    console.log(topArtists)
     var fetchedArtists = await fetchArtistsFromAPI(topArtists)
 
     var finalList = await compileRecommendations(fetchedArtists)
@@ -40,74 +40,98 @@ async function getUserReviews(){
   }
 
   async function getTopUserArtists(reviewArray) {
+    if (reviewArray.length === 0 || reviewArray == undefined) {
+      return []; // Return an empty array if there are no reviews
+    }
+  
     const artistMap = new Map();
-    const lambda = 0.5; // Might need to adjust after further testing and more reviews are made
-
+  
     // Build the map with aggregate ratings and counts.
     reviewArray.forEach(review => {
-        const { artistName, rating } = review;
-
-        if (artistMap.has(artistName)) {
-            const currentArtistData = artistMap.get(artistName);
-            artistMap.set(artistName, {
-                rating: currentArtistData.rating + rating,
-                count: currentArtistData.count + 1,
-            });
-        } else {
-            artistMap.set(artistName, {
-                rating: rating,
-                count: 1,
-            });
-        }
+      const { artistName, rating } = review;
+      if (artistMap.has(artistName)) {
+        const currentArtistData = artistMap.get(artistName);
+        artistMap.set(artistName, {
+          rating: currentArtistData.rating + rating,
+          count: currentArtistData.count + 1,
+        });
+      } else {
+        artistMap.set(artistName, {
+          rating: rating,
+          count: 1,
+        });
+      }
     });
-
-    // Convert Map to Array and calculate the mean and weighted score for each artist.
-    const meanReviewList = Array.from(artistMap.entries()).map(([name, data]) => {
-        const averageRating = data.rating / data.count;
-        return {
-            name: name,
-            rating: averageRating,
-            count: data.count,
-            weightedScore: averageRating + (lambda * data.count)
-        };
-    });
-
-  // Find the top 2 artists with the highest weighted scores.
-  meanReviewList.sort((a, b) => b.weightedScore - a.weightedScore);
-  const topTwoArtists = meanReviewList.slice(0, 2).map(artist => artist.name);
-
-  return topTwoArtists;
-}
   
-async function fetchArtistsFromAPI(artists) {
-  try {
-    const artistResponses = await Promise.all(
-      artists.map(artist => axios.get(`https://alexsoundbox.pythonanywhere.com/recommend?artist_name=${encodeURIComponent(artist)}`))
-    );
-
-    const combinedArtists = [];
-    const addedArtistsSet = new Set();
-
-    // Iterate over each API response
-    for (let response of artistResponses) {
-      // Iterate over each recommended artist
-      for (let artist of response.data.recommended_artists) {
-        // Check if we already added this artist or if we reached the limit of 6
-        if (!addedArtistsSet.has(artist) && combinedArtists.length < 6) {
-          combinedArtists.push(artist);
-          addedArtistsSet.add(artist);
-        }
+    // Convert Map to Array and calculate the mean rating for each artist.
+    const meanReviewList = Array.from(artistMap.entries()).map(([name, data]) => {
+      const averageRating = data.rating / data.count;
+      return {
+        name: name,
+        rating: averageRating,
+      };
+    });
+  
+    // Sort artists by rating in descending order
+    meanReviewList.sort((a, b) => b.rating - a.rating);
+  
+    let results = [];
+  
+    // Determine if there are any top-rated artists
+    const topArtists = meanReviewList.filter(artist => artist.rating >= 2.5);
+  
+    // Add the top-rated artist if available, otherwise add the lowest-rated artist
+    results.push(topArtists.length > 0 ? 
+                 { name: topArtists[0].name, category: 'top' } : 
+                 { name: meanReviewList[meanReviewList.length - 1].name, category: 'bottom' });
+  
+    // Add the second artist based on availability and ratings
+    if (meanReviewList.length > 1) {
+      if (topArtists.length > 1) {
+        // If there's a second top-rated artist, add them
+        results.push({ name: topArtists[1].name, category: 'top' });
+      } else {
+        // Otherwise, add the second-lowest rated artist
+        results.push({ name: meanReviewList[meanReviewList.length - 2].name, category: 'bottom' });
       }
     }
-
-    return combinedArtists;
-
-  } catch (error) {
-    console.error('Fetch error from custom API:', error);
-    // If an error occurred, fall back to the Last.FM API
-    return await fetchArtistsFromLastFM(artists);
+  
+    return results;
   }
-}
+  
+  async function fetchArtistsFromAPI(artistData) {
+    try {
+      const artistResponses = await Promise.all(
+        artistData.map(data => 
+          axios.get(`https://alexsoundbox.pythonanywhere.com/recommend?artist_name=${encodeURIComponent(data.name)}&category=${encodeURIComponent(data.category)}`)
+        )
+      );
+  
+      const combinedArtists = [];
+      const addedArtistsSet = new Set();
+  
+      // Iterate over each API response
+      for (let response of artistResponses) {
+        // Iterate over each recommended artist
+        for (let artist of response.data.recommended_artists) {
+          // Check if we already added this artist or if we reached the limit of 6
+          if (!addedArtistsSet.has(artist) && combinedArtists.length < 6) {
+            combinedArtists.push(artist);
+            addedArtistsSet.add(artist);
+          }
+        }
+      }
+  
+      return combinedArtists;
+  
+    } catch (error) {
+      console.error('Fetch error from custom API:', error);
+      // If an error occurred, fall back to the Last.FM API
+      const artistNames = artistData.map(data => data.name);
+      return await fetchArtistsFromLastFM(artistNames);
+    }
+  }
+  
 
   async function fetchArtistsFromLastFM(artists){
     const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 

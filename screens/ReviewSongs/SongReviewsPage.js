@@ -151,7 +151,7 @@ const SongReviewsPage = ({ route, navigation }) => {
         <View style={styles.postContainer} key={item.id}>
                 <TouchableOpacity onPress={() => navigateProfile(item)}>
                     <View style={styles.postHeader}>
-                        <Image source={require("../../assets/defaultPic.png")} style={styles.profileImage} />
+                    <Image source={item.profilePicture ? { uri: item.profilePicture } : require('../../assets/defaultPic.png')} style={styles.profileImage} />
                         <Text style={styles.username}>{item.username}</Text>
                     </View>
                 </TouchableOpacity>
