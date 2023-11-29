@@ -1,6 +1,6 @@
 // ChatViewModel.js
 import { useState, useEffect } from 'react';
-import * as ChatRepository from '../../domain/ChatRepositroy/ChatRepository';
+import * as ChatManager from '../../Business Logic/ChatManager/ChatManager';
 import { authentication } from '../../firebase';
 import { getUserProfileData } from '../../domain/FirebaseRepository/UserRepository';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +9,7 @@ export default function useChatViewModel(roomId) {
   const [prevId,setPrevId] = useState();
   const fetchMessages = async () => {
     try {
-        const pastMessages = await ChatRepository.getPastMessages(roomId);
+        const pastMessages = await ChatManager.getPastMessages(roomId);
         const formattedMessages = pastMessages.map((msg) => {
             return {
                 _id: msg.id,
@@ -31,11 +31,11 @@ export default function useChatViewModel(roomId) {
 
       fetchMessages();
 
-      ChatRepository.joinRoom(roomId, authentication.currentUser.uid);
-      ChatRepository.onNewMessage(handleNewMessage);
+      ChatManager.joinRoom(roomId, authentication.currentUser.uid);
+      ChatManager.onNewMessage(handleNewMessage);
 
       return () => {
-          ChatRepository.cleanupListeners();
+          ChatManager.cleanupListeners();
       };
   }, [roomId]);
 
@@ -61,7 +61,7 @@ export default function useChatViewModel(roomId) {
             };
 
                 setPrevId(currId);
-                ChatRepository.sendMessage(messageToSend);
+                ChatManager.sendMessage(messageToSend);
                 setMessages((previousMessages) => [messageToSend, ...previousMessages]);
             
 

@@ -3,10 +3,10 @@ import { authentication, storage, db } from '../../firebase';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { removeUserToken } from '../../domain/FirebaseRepository/UserRepository';
 import { doc, updateDoc } from "firebase/firestore";
 import useAccountProfileViewModel from "./AccountProfileViewModel";
 import { updateEmail, signOut } from "firebase/auth";
+import {removeUserToken} from '../../Business Logic/NotificationManager/NotificationManager'
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
 
 const useEditAccountViewModel = (navigation) => {

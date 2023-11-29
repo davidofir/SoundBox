@@ -1,7 +1,7 @@
 import { useState } from "react";
 import * as FirebaseManager from "../../domain/FirebaseRepository/FirebaseManager";
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
-import * as NotificationManager from "../../domain/NotificationManager/NotificationManager"
+import * as NotificationManager from "../../Business Logic/NotificationManager/NotificationManager"
 const useRegisterViewModel = (navigation) => {
     const [userName, setUser] = useState("");
     const [email, setEmail] = useState("");

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { authentication } from "../../firebase";
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
-import * as NotificationManager from "../../domain/NotificationManager/NotificationManager"
+import * as NotificationManager from "../../Business Logic/NotificationManager/NotificationManager"
 const useLoginViewModel = (navigation) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
