@@ -1,9 +1,11 @@
-import { getDoc, setDoc, doc, updateDoc,arrayRemove } from "firebase/firestore";
-import { db, authentication } from "../../firebase";
+import { getDoc, setDoc, doc, updateDoc, arrayRemove } from "firebase/firestore";
+import { db, authentication, storage } from "../../firebase";
 import { signOut } from "firebase/auth";
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+
 const createUserDocument = async (userId, userData) => {
     try {
         await setDoc(doc(db, "users", userId), userData);
@@ -167,4 +169,14 @@ const registerForPushNotificationsAsync = async () => {
     console.log('Push token:', token);
     return token;
 };
-export { createUserDocument, getUserProfileData, getUserReviewData, updateUserFollowers, updateUserFollowing,updateUserToken,registerForPushNotificationsAsync,removeUserToken };
+
+const uploadProfilePicture = async (userId, selectedImage) => {
+    const response = await fetch(selectedImage.assets[0].uri);
+    const blob = await response.blob();
+    const imageRef = ref(storage, `profilePictures/${userId}`);
+    await uploadBytes(imageRef, blob);
+    const downloadURL = await getDownloadURL(imageRef);
+    return downloadURL;
+};
+
+export { createUserDocument, getUserProfileData, getUserReviewData, updateUserFollowers, updateUserFollowing, updateUserToken, registerForPushNotificationsAsync, removeUserToken, uploadProfilePicture };

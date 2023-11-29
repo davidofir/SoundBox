@@ -13,97 +13,12 @@ import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { removeUserToken } from '../../domain/FirebaseRepository/UserRepository';
-export default EditAccountPage = ({ navigation, route }) => {
+import useEditAccountViewModel from './EditAccountViewModel';
+
+export default EditAccountPage = ({ navigation }) => {
 
     // new changes - using viewmodel
-    const item = route.params.username;
-    const { username, userEmail, image } = useAccountProfileViewModel(navigation);
-
-    const [newUsername, setNewUsername] = useState("");
-    const [newEmail, setNewEmail] = useState("");
-
-    const [selectedImage, setSelectedImage] = useState(null);
-
-    const uploadImage = async () => {
-        const response = await fetch(selectedImage.assets[0].uri);
-        const blob = await response.blob();
-
-        // Create a reference to the storage location
-        const imageRef = ref(storage, `profilePictures/${authentication.currentUser.uid}`);
-
-        // Upload the image
-        await uploadBytes(imageRef, blob);;
-
-        // Get the download URL
-        const downloadURL = await getDownloadURL(imageRef);
-
-        // Return the download URL
-        return downloadURL;
-    };
-
-    const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 1,
-        });
-
-        if (!result.cancelled) {
-            setSelectedImage(result);
-        }
-    };
-
-    const saveChanges = async () => {
-        try {
-            // Update the username in the database.
-            const userDocRef = doc(db, "users", authentication.currentUser.uid);
-
-            // Upload the image and get the download URL
-            const imageUrl = selectedImage ? await uploadImage() : null;
-
-            await updateDoc(userDocRef, {
-                userName: newUsername || username,
-                profilePicture: imageUrl,
-            });
-
-            // Update the email in the database.
-            await updateEmail(authentication.currentUser, newEmail || userEmail);
-
-            // Navigate back or perform any other action.
-            // For example, you can navigate to the profile page.
-            navigation.replace("Profile");
-        } catch (error) {
-            console.error("Error saving changes:", error);
-        }
-    }
-
-    const SignOut = async () => {
-        try {
-            const token = await AsyncStorage.getItem('pushToken');
-            if (token) {
-                await removeUserToken(authentication.currentUser.uid, token); // Assuming removeUserToken is defined as shown earlier
-                await AsyncStorage.removeItem('pushToken');
-            }
-    
-            // Perform sign out from Firebase
-            await signOut(authentication);
-    
-            // Retrieve the token from AsyncStorage
-
-    
-            // Remove the token from the backend if it exists
-
-            // Reset navigation to show the login screen
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }],
-            });
-    
-        } catch (error) {
-            console.log('Error during sign out:', error);
-        }
-    };
+    const { username, userEmail, image, setNewUsername, setNewEmail, pickImage, saveChanges, SignOut } = useEditAccountViewModel(navigation);
 
     return (
         <View style={styles.container}>
@@ -114,7 +29,7 @@ export default EditAccountPage = ({ navigation, route }) => {
                         style={styles.profileImage}
                     />
                 </TouchableOpacity>
-                <Text style={styles.username}>{item}</Text>
+                <Text style={styles.username}>{username}</Text>
             </View>
             <View style={styles.editForm}>
                 <Text style={styles.sectionTitle}>Username</Text>
