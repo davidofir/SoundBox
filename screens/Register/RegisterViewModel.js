@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as FirebaseManager from "../../domain/FirebaseRepository/FirebaseManager";
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
+import * as NotificationManager from "../../domain/NotificationManager/NotificationManager"
 const useRegisterViewModel = (navigation) => {
     const [userName, setUser] = useState("");
     const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ const useRegisterViewModel = (navigation) => {
             const user = await FirebaseManager.signUpWithEmailAndPassword(email, password);
 
             // Save user data to Firestore
-            let newToken = await UserRepository.registerForPushNotificationsAsync();
+            let newToken = await NotificationManager.registerForPushNotificationsAsync();
             console.log('stored token:',newToken)
             const userData = {
                 userName,

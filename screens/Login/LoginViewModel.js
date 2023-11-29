@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { authentication } from "../../firebase";
 import * as UserRepository from "../../domain/FirebaseRepository/UserRepository";
+import * as NotificationManager from "../../domain/NotificationManager/NotificationManager"
 const useLoginViewModel = (navigation) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,11 +21,11 @@ const useLoginViewModel = (navigation) => {
   const signIn = () => {
     signInWithEmailAndPassword(authentication, email, password)
       .then(async(userCredentials) => {
-        let newToken = await UserRepository.registerForPushNotificationsAsync()
+        let newToken = await NotificationManager.registerForPushNotificationsAsync()
         console.log('stored token:',newToken)
         const user = userCredentials.user;
         console.log("Logged in with:", user.email);
-        UserRepository.updateUserToken(user.uid,newToken);
+        NotificationManager.updateUserToken(user.uid,newToken);
         
       })
       .catch((error) => alert(error.message));
