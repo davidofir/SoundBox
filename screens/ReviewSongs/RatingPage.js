@@ -135,7 +135,7 @@ const prepareTrackInfo = async () => {
           const average = totalRating / fetchedReviews.length;
           setAvgRating(Number(average.toFixed(2))); 
           setNumberOfReviews(fetchedReviews.length);
-          setReviewButton("Update Your Review")
+          
         } else {
           setAvgRating(0)
           setNumberOfReviews(fetchedReviews.length);
@@ -153,6 +153,7 @@ const prepareTrackInfo = async () => {
       
       setUsersReview(userReview); // Set the found review in state
       setUsersStarRating(userReview.rating)
+      setReviewButton("Update Your Review")
     } else {
       setUsersReview(null); // Set state to null if no review is found
       setUsersStarRating(null)
