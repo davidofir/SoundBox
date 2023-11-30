@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message';
 import { getTrackID } from "../domain/SpotifyAPI/SpotifyAPI";
 import { fetchRecommendedArtists } from './Recommendations/RecommendArtists';
 import { ActivityIndicator } from 'react-native';
+import { getArtistImage } from '../domain/SpotifyAPI/SpotifyAPI';
 const defaultCoverArt = require('../assets/defaultSongImage.png');
 
 
@@ -35,9 +36,21 @@ export default SocialFeed = ({ navigation }) => {
             try {
                 setIsLoading(true);
                 const recommendations = await fetchRecommendedArtists();
-                setArtistRecommendations(recommendations);
+        
+                // Fetch images for the first six artists
+                const updatedRecommendations = await Promise.all(
+                    recommendations.slice(0, 6).map(async artist => {
+                        const images = await getArtistImage(artist.artistName);
+                        return {
+                            ...artist,
+                            imageUrl: images.length > 0 ? images[0].url : null
+                        };
+                    })
+                );
+        
+                // Combine the updated recommendations with the rest of the recommendations
+                setArtistRecommendations([...updatedRecommendations, ...recommendations.slice(6)]);
                 setIsLoading(false);
-
             } catch (error) {
                 console.error('Failed to fetch artist recommendations:', error);
                 setIsLoading(false);
@@ -74,6 +87,8 @@ export default SocialFeed = ({ navigation }) => {
 
         fetchReviews();
     }, [following])
+
+    
 
     const LikePost = (item) => {
         var tempLikes = item.likes;
@@ -282,14 +297,15 @@ export default SocialFeed = ({ navigation }) => {
                 {/* Recommendations */}
                 <View style={styles.horizontalProfileContainer}>
                     <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Artists</Text>
-                    <Text onPress={() => navigation.navigate('Discover')} style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
+                    <Text onPress={() => navigation.navigate('ArtistsViewAllPage', { artists: artistRecommendations })} 
+                    style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
                 </View>
                 <View style={styles.artistContainer}>
                     {isLoading ? (
                         <ActivityIndicator size="large" color="black" style={styles.spinner} />
                     ) : artistRecommendations && artistRecommendations.length > 0 ? (
                         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                            {artistRecommendations.map((artist, index) => (
+                            {artistRecommendations.slice(0, 6).map((artist, index) => (
                                 <View key={index} style={styles.artistView}>
                                     <Image
                                         source={artist.imageUrl ? { uri: artist.imageUrl } : require("../assets/defaultPic.png")}

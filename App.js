@@ -27,6 +27,8 @@ import CommentPage from './screens/Feed/CommentPage';
 import * as Notifications from 'expo-notifications';
 import { useEffect } from 'react';
 import BottomTabNavigator from './components/BottomTabNavigator';
+import ArtistsViewAllPage from './screens/Recommendations/ArtistsViewAllPage';
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -109,6 +111,7 @@ export default function App() {
         <Stack.Screen name="LoggedUsersReviewPage" component={LoggedUsersReviewPage}/>
         <Stack.Screen name="Comment" component={CommentPage} options={{headerTitle:''}}/>
         <Stack.Screen name="SongsViewAllPage" component={SongsViewAllPage}/>
+        <Stack.Screen name="ArtistsViewAllPage" component={ArtistsViewAllPage}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

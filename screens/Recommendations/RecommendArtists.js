@@ -25,10 +25,11 @@ export async function fetchRecommendedArtists() {
     var reviews = await getUserReviews()
    
     var topArtists = await getTopUserArtists(reviews)
-    console.log(topArtists)
-    var fetchedArtists = await fetchArtistsFromAPI(topArtists)
 
+    var fetchedArtists = await fetchArtistsFromAPI(topArtists)
+   
     var finalList = await compileRecommendations(fetchedArtists)
+
     return finalList
 }
 
@@ -110,19 +111,24 @@ async function getUserReviews(){
       const combinedArtists = [];
       const addedArtistsSet = new Set();
   
+      // Limit the number of recommendations per artist
+      const maxRecommendationsPerArtist = 10; // Adjust as needed
+  
       // Iterate over each API response
       for (let response of artistResponses) {
+        let count = 0;
         // Iterate over each recommended artist
         for (let artist of response.data.recommended_artists) {
-          // Check if we already added this artist or if we reached the limit of 6
-          if (!addedArtistsSet.has(artist) && combinedArtists.length < 6) {
+          if (count < maxRecommendationsPerArtist && !addedArtistsSet.has(artist)) {
             combinedArtists.push(artist);
             addedArtistsSet.add(artist);
+            count++;
           }
         }
       }
   
       return combinedArtists;
+  
   
     } catch (error) {
       console.error('Fetch error from custom API:', error);
@@ -166,22 +172,8 @@ async function getUserReviews(){
     }
 
     async function compileRecommendations(fetchedArtists){
-        const artistImagesList = [];
-        for (const artistName of fetchedArtists) {
-            const artistImages = await getArtistImage(artistName);
-            var imageURL = ""
-
-            if (artistImages.length > 0) {
-              // get first image
-              imageURL = artistImages[0].url;
-
-            } else {
-                imageURL = ""
-            }
-            artistImagesList.push({
-                artistName: artistName,
-                imageUrl: imageURL
-              });
-          }
-          return artistImagesList;
-        }
+      return fetchedArtists.map(artistName => ({
+        artistName: artistName,
+        imageUrl: null // Initially no image URL
+      }));
+    }
