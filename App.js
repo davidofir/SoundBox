@@ -4,7 +4,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Discover from './screens//Discover/Discover'
-import Homepage from './screens/Homepage';
 import ArtistProfile from './screens/ArtistProfile/ArtistProfile';
 import Store from './screens/ArtistProfile/Store';
 import Events from './screens/ArtistProfile/Events';
@@ -90,28 +89,27 @@ export default function App() {
           headerShadowVisible: true,
           headerBackTitleVisible: false,
         }}>
-        <Stack.Screen name="Login" component={Login} options={{headerTitle:''}}/>
+        <Stack.Screen name="Login" component={Login} options={{ headerTitle: '' }} />
         <Stack.Screen name="Discover" component={Discover} />
-        <Stack.Screen name="Artist" component={ArtistProfile} options={{headerTitle:''}}/>
-        <Stack.Screen name="Merch Store" component={Store} options={{headerTitle:''}}/>
-        <Stack.Screen name="Upcoming Events" component={Events} options={{headerTitle:''}}/>
-        <Stack.Screen name="Homepage" component={Homepage} options={{headerTitle:''}}/>
-        <Stack.Screen name="Register" component={Register} options={{headerTitle:''}}/>
-        <Stack.Screen name="Profile" component={ProfilePage} options={{headerTitle:''}}/>
-        <Stack.Screen name="Home" component={BottomTabNavigator} options={{ headerShown: false }}/>
-        <Stack.Screen name="Followers" component={FollowersPage} options={{headerTitle:''}}/>
-        <Stack.Screen name="Following" component={FollowingPage} options={{headerTitle:''}}/>
-        <Stack.Screen name="RatingPage" component={RatingPage}/>
-        <Stack.Screen name="Search" component={SearchPage} options={{headerTitle:''}}/>
-        <Stack.Screen name="UserPage" component={UserPage} options={{headerTitle:''}}/>
-        <Stack.Screen name="Recommendations" component={Recommendations} options={{headerTitle:''}}/>
-        <Stack.Screen name="Chat" component={Chat}/>
-        <Stack.Screen name="EditAccount" component={EditAccountPage} options={{headerTitle:''}}/>
-        <Stack.Screen name="SongReviewsPage" component={SongReviewsPage}/>
-        <Stack.Screen name="LoggedUsersReviewPage" component={LoggedUsersReviewPage}/>
-        <Stack.Screen name="Comment" component={CommentPage} options={{headerTitle:''}}/>
-        <Stack.Screen name="SongsViewAllPage" component={SongsViewAllPage}/>
-        <Stack.Screen name="ArtistsViewAllPage" component={ArtistsViewAllPage}/>
+        <Stack.Screen name="Artist" component={ArtistProfile} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Merch Store" component={Store} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Upcoming Events" component={Events} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Register" component={Register} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Profile" component={ProfilePage} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Home" component={BottomTabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="Followers" component={FollowersPage} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Following" component={FollowingPage} options={{ headerTitle: '' }} />
+        <Stack.Screen name="RatingPage" component={RatingPage} />
+        <Stack.Screen name="Search" component={SearchPage} options={{ headerTitle: '' }} />
+        <Stack.Screen name="UserPage" component={UserPage} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Recommendations" component={Recommendations} options={{ headerTitle: '' }} />
+        <Stack.Screen name="Chat" component={Chat} />
+        <Stack.Screen name="EditAccount" component={EditAccountPage} options={{ headerTitle: '' }} />
+        <Stack.Screen name="SongReviewsPage" component={SongReviewsPage} />
+        <Stack.Screen name="LoggedUsersReviewPage" component={LoggedUsersReviewPage} />
+        <Stack.Screen name="Comment" component={CommentPage} options={{ headerTitle: '' }} />
+        <Stack.Screen name="SongsViewAllPage" component={SongsViewAllPage} />
+        <Stack.Screen name="ArtistsViewAllPage" component={ArtistsViewAllPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
