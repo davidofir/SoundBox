@@ -1,4 +1,6 @@
-
+import { authentication } from "../../firebase";
+import { getUserReviewData } from "../FirebaseRepository/UserRepository";
+import { getTopRatedReview } from "../../screens/Recommendations/RecommendAlgorithm";
 
 const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca";
 
@@ -54,5 +56,35 @@ export class TrackModel {
   
     getTracks() {
       return this.tracks;
+    }
+
+    async fetchRecommendedSongs() {
+      var currId = authentication.currentUser.uid;
+      var reviews = await getUserReviewData(currId)
+
+      const topReview = getTopRatedReview(reviews);
+      if (topReview) {
+        const encodedSongTitle = encodeURIComponent(topReview.songName);
+        const encodedArtistTitle = encodeURIComponent(topReview.artistName);
+        const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 
+        const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodedArtistTitle}&track=${encodedSongTitle}&api_key=${apiKey}&format=json`;
+        
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+    
+          const data = await response.json();
+          if (data.similartracks && data.similartracks.track) {
+            return data
+          } else {
+            console.error('Invalid API response format for song recommendations');
+          }
+        } catch (error) {
+          console.error(error);
+        }
+        
+      }
     }
   }

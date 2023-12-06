@@ -29,3 +29,13 @@ async function getTopUserArtists(reviewArray) {
         }
     });
 }
+
+export function getTopRatedReview(reviews) {
+    const maxRating = Math.max(...reviews.map(review => review.rating));
+    const topRatedReviews = reviews.filter(review => review.rating === maxRating);
+  
+    // If there are multiple reviews with the highest rating, pick a random one.
+    const randomReview = topRatedReviews[Math.floor(Math.random() * topRatedReviews.length)];
+    
+    return randomReview;
+  } 

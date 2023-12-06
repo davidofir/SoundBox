@@ -17,7 +17,7 @@ import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "fireba
 import axios from 'axios';
 import { fetchRecommendedArtists } from './RecommendArtists';
 import { ActivityIndicator } from 'react-native';
-import { fetchRecommendedSongs } from './RecommendSongs';
+import { getRecommendedSongs } from './RecommendSongs';
 import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
 import SongsViewAllPage from './SongsViewAllPage';
 import { getArtistImage } from '../../domain/SpotifyAPI/SpotifyAPI';
@@ -79,7 +79,7 @@ const Recommendations = ({ navigation, route }) => {
         async function loadSongRecommendations() {
           try {
             setIsLoadingSongs(true);
-            const songRecs = await fetchRecommendedSongs();
+            const songRecs = await getRecommendedSongs();
             
             const topSixSongs = songRecs.similartracks.track.slice(0, 6);
             const songsWithCoverArt = await Promise.all(
@@ -116,7 +116,7 @@ const Recommendations = ({ navigation, route }) => {
         })
       );
       setArtistRecommendations(updatedArtists);
-      console.log("2");
+
       setArtistImagesLoaded(true);
     }
   

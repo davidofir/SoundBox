@@ -18,50 +18,25 @@ import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "fireba
 import axios from 'axios';
 import { getListUserReviews } from '../../domain/RecommendRepository/RecommendationRepository';
 import { getUserReviewData } from '../../domain/FirebaseRepository/UserRepository';
+import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 
 
-export async function fetchRecommendedSongs() {
-  var reviews = await getUserReviews()
-  
-  const topReview = getTopRatedReview(reviews);
-  if (topReview) {
-    const encodedSongTitle = encodeURIComponent(topReview.songName);
-    const encodedArtistTitle = encodeURIComponent(topReview.artistName);
-    const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 
-    const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodedArtistTitle}&track=${encodedSongTitle}&api_key=${apiKey}&format=json`;
-    
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
 
-      const data = await response.json();
-      if (data.similartracks && data.similartracks.track) {
-        return data
-      } else {
-        console.error('Invalid API response format for song recommendations');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-    
+export async function getRecommendedSongs() {
+  const trackModel = new TrackModel()
+  try {
+      const recommendedSongs = await trackModel.fetchRecommendedSongs();
+      return recommendedSongs
+      
+  } catch (error) {
+      console.error('Error fetching recommended songs:', error);
+      return null
   }
 }
 
 //get all of the logged users reviews
 async function getUserReviews(){
-  var currId = authentication.currentUser.uid;
-  var reviews = await getUserReviewData(currId)
+
   return reviews
 }
 
-function getTopRatedReview(reviews) {
-  const maxRating = Math.max(...reviews.map(review => review.rating));
-  const topRatedReviews = reviews.filter(review => review.rating === maxRating);
-
-  // If there are multiple reviews with the highest rating, pick a random one.
-  const randomReview = topRatedReviews[Math.floor(Math.random() * topRatedReviews.length)];
-  
-  return randomReview;
-} 

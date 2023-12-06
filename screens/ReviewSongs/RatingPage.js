@@ -443,12 +443,6 @@ const prepareTrackInfo = async () => {
 export default RatingPage;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-  },
   songInfoContainer: {
     backgroundColor: '#e3e4e6', // Light grey background
     borderRadius: 10, // Curved edges
@@ -586,16 +580,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#4e4c4c"
   },
-  saveButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 4,
-    backgroundColor: 'green',
-  },
-  saveButtonText: {
-    color: 'white',
-    fontSize: 16,
-  },
   input: {
     height: 250,
     width: 360,
@@ -657,12 +641,6 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.22,
     shadowRadius: 2.22,
-  },
-  reviewContainer: {
-    flexDirection: 'row', // !!! Make sure the container allows for the items to be side by side
-    padding: 10,
-    justifyContent: 'space-between', // add space between the buttons
-    alignItems: 'center',
   },
   buttonText: {
     textAlign: 'center',
