@@ -4,9 +4,6 @@ import { StyleSheet, Text, View,FlatList } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import {REACT_APP_EVENTS_API_SECRET} from '@env'
 import EventItem from '../../components/EventItem';
-let artistName = "sum41";
-let time = "upcoming";
-const eventsURL = 'https://rest.bandsintown.com/artists'
 
 
 export default Events = ({ route,navigation }) => {

@@ -18,7 +18,6 @@ export default function useChatViewModel(roomId) {
                 user: {
                     _id: msg.senderID,
                     name: msg.senderName,
-                    // avatar: msg.senderAvatar,
                 },
             };
         });

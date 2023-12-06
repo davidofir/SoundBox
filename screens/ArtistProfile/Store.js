@@ -7,9 +7,6 @@ import MerchRepositoryImpl from '../../domain/MerchAPI/MerchRepositoryImpl';
 import useViewModel from './MerchViewModel';
 
 
-//const merchRepo = new MerchRepositoryImpl;
-
-
     
 export default Store = ({ route, navigation }) => {
     const { merch, getMerchByArtistName } = useViewModel();
