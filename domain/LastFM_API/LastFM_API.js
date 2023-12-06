@@ -1,7 +1,7 @@
 import { authentication } from "../../firebase";
 import { getUserReviewData } from "../FirebaseRepository/UserRepository";
-import { getTopRatedReview } from "../../screens/Recommendations/RecommendAlgorithm";
-
+import { getTopRatedReview, getUserReviews } from "../../screens/Recommendations/RecommendAlgorithm";
+import axios from "axios";
 const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca";
 
 export class TrackModel {
@@ -59,14 +59,12 @@ export class TrackModel {
     }
 
     async fetchRecommendedSongs() {
-      var currId = authentication.currentUser.uid;
-      var reviews = await getUserReviewData(currId)
+      reviews = await getUserReviews()
 
       const topReview = getTopRatedReview(reviews);
       if (topReview) {
         const encodedSongTitle = encodeURIComponent(topReview.songName);
         const encodedArtistTitle = encodeURIComponent(topReview.artistName);
-        const apiKey = 'a7e2af1bb0cdcdf46e9208c765a2f2ca'; 
         const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodedArtistTitle}&track=${encodedSongTitle}&api_key=${apiKey}&format=json`;
         
         try {
@@ -87,4 +85,39 @@ export class TrackModel {
         
       }
     }
+
+    async fetchArtistsFromLastFM(artists) {
+      try {
+          // Making API calls to fetch similar artists for each artist in the list
+          const artistResponses = await Promise.all(
+              artists.map(artistObj => 
+                  axios.get(`http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${encodeURIComponent(artistObj.name)}&api_key=${apiKey}&format=json&limit=12`)
+              )
+          );
+  
+          const combinedArtists = [];
+          const addedArtistsSet = new Set();
+  
+          // Iterate over each API response
+          for (let response of artistResponses) {
+              const similarArtistsData = response.data.similarartists.artist;
+              for (let artistData of similarArtistsData) {
+                  let artistName = artistData.name;
+                  if (!addedArtistsSet.has(artistName)) {
+                      combinedArtists.push(artistName);
+                      addedArtistsSet.add(artistName);
+                  }
+              }
+          }
+  
+          return combinedArtists;
+  
+      } catch (error) {
+          console.error('Fetch error:', error);
+          return []; // Optionally return an empty array or handle the error as needed
+      }
+  }
+  
+    
+  
   }

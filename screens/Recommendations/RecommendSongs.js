@@ -34,9 +34,4 @@ export async function getRecommendedSongs() {
   }
 }
 
-//get all of the logged users reviews
-async function getUserReviews(){
-
-  return reviews
-}
 

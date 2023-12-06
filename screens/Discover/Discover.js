@@ -17,7 +17,7 @@ import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
 import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 import { useState, useEffect, memo } from 'react';
 const defaultCoverArt = require('../../assets/defaultSongImage.png')
-import { fetchRecommendedSongs } from '../Recommendations/RecommendSongs';
+import { getRecommendedSongs } from '../Recommendations/RecommendSongs';
 
 // ViewModel Class
 class AppViewModel {
@@ -122,7 +122,7 @@ class App extends React.Component {
   }
   async componentDidMount() {
     try {
-      const songsData = await fetchRecommendedSongs();
+      const songsData = await getRecommendedSongs();
       this.setState({ recommendedSongs: songsData, isLoading: false });
     } catch (error) {
       console.error(error);
