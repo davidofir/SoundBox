@@ -36,7 +36,7 @@ export default SocialFeed = ({ navigation }) => {
             try {
                 setIsLoading(true);
                 const recommendations = await fetchRecommendedArtists();
-        
+
                 // Fetch images for the first six artists
                 const updatedRecommendations = await Promise.all(
                     recommendations.slice(0, 6).map(async artist => {
@@ -47,13 +47,13 @@ export default SocialFeed = ({ navigation }) => {
                         };
                     })
                 );
-        
+
                 // Combine the updated recommendations with the rest of the recommendations
                 setArtistRecommendations([...updatedRecommendations, ...recommendations.slice(6)]);
-                setIsLoading(false);
+                //setIsLoading(false);
             } catch (error) {
                 console.error('Failed to fetch artist recommendations:', error);
-                setIsLoading(false);
+                //setIsLoading(false);
             }
         }
         loadArtistRecommendations();
@@ -70,6 +70,7 @@ export default SocialFeed = ({ navigation }) => {
     // new change
     useEffect(() => {
         const fetchReviews = async () => {
+            setIsLoading(true);
             const tempReviews = [];
 
             for (let i = 0; i < following.length; i++) {
@@ -83,12 +84,13 @@ export default SocialFeed = ({ navigation }) => {
             }
 
             setReviews(tempReviews);
+            setIsLoading(false);
         };
 
         fetchReviews();
     }, [following])
 
-    
+
 
     const LikePost = (item) => {
         var tempLikes = item.likes;
@@ -293,47 +295,69 @@ export default SocialFeed = ({ navigation }) => {
 
     return (
         < View style={styles.container} >
-            <ScrollView>
-                {/* Recommendations */}
-                <View style={styles.horizontalProfileContainer}>
-                    <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Artists</Text>
-                    <Text onPress={() => navigation.navigate('ArtistsViewAllPage', { artists: artistRecommendations })} 
-                    style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
-                </View>
-                <View style={styles.artistContainer}>
-                    {isLoading ? (
-                        <ActivityIndicator size="large" color="black" style={styles.spinner} />
-                    ) : artistRecommendations && artistRecommendations.length > 0 ? (
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-                            {artistRecommendations.slice(0, 6).map((artist, index) => (
-                                <View key={index} style={styles.artistView}>
-                                    <Image
-                                        source={artist.imageUrl ? { uri: artist.imageUrl } : require("../assets/defaultPic.png")}
-                                        style={styles.imageContainer}
-                                    />
-                                    <Text style={styles.artistName}>{artist.artistName}</Text>
+            {isLoading ? (
+                <ActivityIndicator size="large" color="#ccc" style={styles.loadingIndicator} />
+            ) : (
+                <ScrollView>
+                    {/* Recommendations */}
+                    <View style={styles.horizontalProfileContainer}>
+                        <Text style={[styles.text, { fontSize: 22, padding: 10, fontWeight: '500' }]}>Discover Artists</Text>
+                        <Text onPress={() => navigation.navigate('ArtistsViewAllPage', { artists: artistRecommendations })}
+                            style={[styles.text, { fontSize: 18, padding: 13 }]}>View all</Text>
+                    </View>
+                    <View style={styles.artistContainer}>
+                        {artistRecommendations && artistRecommendations.length > 0 ? (
+                            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                                {artistRecommendations.slice(0, 6).map((artist, index) => (
+                                    <View key={index} style={styles.artistView}>
+                                        <Image
+                                            source={artist.imageUrl ? { uri: artist.imageUrl } : require("../assets/defaultPic.png")}
+                                            style={styles.imageContainer}
+                                        />
+                                        <Text style={styles.artistName}>{artist.artistName}</Text>
+                                    </View>
+                                ))}
+                            </ScrollView>
+                        ) : (
+                            <Text style={styles.noArtistText}>Interact with the app to receive tailored recommendations based on your activity.</Text>
+                        )}
+                    </View>
+                    {/* Recommendations End */}
+
+                    <View style={styles.container2}>
+                        {reviews.length > 0 ? (
+                            reviews.map((item, index) => (
+                                <Post
+                                    key={index}
+                                    item={item}
+                                    userId={userId}
+                                    LikePost={LikePost}
+                                    UnlikePost={UnlikePost}
+                                />
+                            ))
+                        ) : (
+                            // New user
+                            <View>
+                                <View style={styles.emptyReviewsContainer}>
+                                    <Text style={styles.emptyReviewsText}>
+                                        Welcome to SoundBox! {'\n\n'} Start following users to see posts in your social feed.
+                                    </Text>
                                 </View>
-                            ))}
-                        </ScrollView>
-                    ) : (
-                        <Text style={styles.noArtistText}>Interact with the app to receive tailored recommendations based on your activity.</Text>
-                    )}
-                </View>
-                {/* Recommendations End */}
-
-                <View style={styles.container2}>
-                    {reviews.map((item, index) => (
-                        <Post
-                            key={index}
-                            item={item}
-                            userId={userId}
-                            LikePost={LikePost}
-                            UnlikePost={UnlikePost}
-                        />
-                    ))}
-                </View>
-            </ScrollView>
-
+                                <View style={[styles.emptyReviewsContainer, { marginTop: 1 }]}>
+                                    <Text style={styles.emptyReviewsText}>
+                                        Start reviewing! {'\n\n'} Share your thoughts with the community by reviewing a song.
+                                    </Text>
+                                </View>
+                                <View style={[styles.emptyReviewsContainer, { marginTop: 1 }]}>
+                                    <Text style={styles.emptyReviewsText}>
+                                        Engage with other users! {'\n\n'} Like and comment on other user's posts.
+                                    </Text>
+                                </View>
+                            </View>
+                        )}
+                    </View>
+                </ScrollView>
+            )}
         </View >
     )
 }
@@ -426,8 +450,8 @@ const styles = StyleSheet.create({
     },
     noArtistText: {
         textAlign: 'center',
-        marginTop: 20, // Adjust as needed
-        fontSize: 16, // Adjust as needed
+        marginTop: 20,
+        fontSize: 16,
     },
     reviewText: {
         fontSize: 16,
@@ -497,5 +521,31 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 10,
         color: '#bfbfbf',
+    },
+    emptyReviewsContainer: {
+        backgroundColor: '#5d6b80',
+        borderRadius: 15,
+        margin: 15,
+        padding: 15,
+        width: 370,
+        minHeight: 150,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    emptyReviewsText: {
+        fontSize: 20,
+        textAlign: 'center',
+        color: 'white',
+    },
+    loadingIndicator: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 })
