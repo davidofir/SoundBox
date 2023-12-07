@@ -23,6 +23,7 @@ import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 import { getTopUserArtists, getUserReviews } from './RecommendAlgorithm';
 import { fetchArtistRecommendationFromAPI } from '../../domain/RecommendRepository/RecommendationRepository';
 
+
 export async function fetchRecommendedArtists() {
     var reviews = await getUserReviews()
    
@@ -32,9 +33,11 @@ export async function fetchRecommendedArtists() {
    
     var finalList = await compileRecommendations(fetchedArtists)
 
-    return finalList
+    var finalListWithImages = await fetchArtistImages(finalList)
+    
+    return finalListWithImages
 }
-  
+
 async function processArtistRecommendations(artistData) {
   try {
     const artistResponses = await fetchArtistRecommendationFromAPI(artistData);
@@ -83,4 +86,28 @@ async function compileRecommendations(fetchedArtists){
         artistName: artistName,
         imageUrl: null // Initially no image URL
       }));
+}
+
+async function fetchArtistImages(finalList){
+  const artists = await finalList;
+
+  // Optionally, fetch images for each artist here
+  const topSixArtistsWithImages = await Promise.all(
+      artists.slice(0, 6).map(async artist => {
+          const images = await getArtistImage(artist.artistName);
+          return {
+              ...artist,
+              imageUrl: images.length > 0 ? images[0].url : null
+          };
+      })
+  );
+
+  // Combine the top six artists with images with the rest of the recommendations
+  const finalRecommendations = [
+    ...topSixArtistsWithImages,
+    ...finalList.slice(6)
+  ];
+
+  return finalRecommendations;
+
 }

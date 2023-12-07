@@ -65,7 +65,7 @@ export class TrackModel {
       if (topReview) {
         const encodedSongTitle = encodeURIComponent(topReview.songName);
         const encodedArtistTitle = encodeURIComponent(topReview.artistName);
-        const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodedArtistTitle}&track=${encodedSongTitle}&api_key=${apiKey}&format=json`;
+        const url = `http://ws.audioscrobbler.com/2.0/?method=track.getsimilar&artist=${encodedArtistTitle}&track=${encodedSongTitle}&api_key=${apiKey}&format=json&limit=30`;
         
         try {
           const response = await fetch(url);

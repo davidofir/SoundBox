@@ -12,13 +12,12 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import Recommendations from '../Recommendations/Recommendation';
+
 import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
 import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 import { useState, useEffect, memo } from 'react';
 const defaultCoverArt = require('../../assets/defaultSongImage.png')
-import { getRecommendedSongs } from '../Recommendations/RecommendSongs';
-
+import SongRecommendations from '../Recommendations/RecommendSongView';
 // ViewModel Class
 class AppViewModel {
   constructor() {
@@ -113,21 +112,11 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = { tracks: [],
-                   recommendedSongs: null,
                    isLoading: true, };
 
     viewModel.fetchTopTracks().then(() => {
       this.setState({ tracks: viewModel.getTracks() });
     });
-  }
-  async componentDidMount() {
-    try {
-      const songsData = await getRecommendedSongs();
-      this.setState({ recommendedSongs: songsData, isLoading: false });
-    } catch (error) {
-      console.error(error);
-      this.setState({ isLoading: false });
-    }
   }
 
   componentWillUnmount() {
@@ -156,47 +145,7 @@ class App extends React.Component {
   
 
   render() {
-    const { recommendedSongs, isLoading } = this.state;
-
-      // New component for rendering each recommended song
-      const RecommendedSongCell = memo(({ songItem }) => {
-        const [coverArtUrl, setCoverArtUrl] = useState(null);
-
-        const fetchCoverArt = async () => {
-          // Assuming songItem has artist and name properties
-          try {
-            const imageUrl = await searchAndFetchSongCoverArt(songItem.name, songItem.artist.name);
-            if (imageUrl !== 3) {
-              setCoverArtUrl(imageUrl);
-            }
-          } catch (error) {
-            console.error('Error fetching cover art:', error);
-          }
-        };
-
-        useEffect(() => {
-          fetchCoverArt();
-        }, [songItem]); // Re-run the effect if songItem changes
-
-        return (
-          <TouchableOpacity onPress={() => this.handleRowPress(songItem)}>
-            <View style={styles.box}>
-              <Image
-                source={coverArtUrl ? { uri: coverArtUrl } : defaultCoverArt}
-                style={styles.image}
-              />
-              <Text style={styles.songName}>
-                {songItem.name.length > 25
-                  ? `${songItem.name.slice(0, 24)}...`
-                  : songItem.name
-                }
-              </Text>
-              <Text style={styles.artistName}>{songItem.artist.name}</Text>
-            </View>
-          </TouchableOpacity>
-        );
-      });
-
+    const { isLoading } = this.state;
 
     return (
       <View style={styles.container}>
@@ -238,21 +187,7 @@ class App extends React.Component {
       ListHeaderComponent={() => (
         viewModel.flatlistSwitch === 0 && (
           <>
-            <Text style={styles.heading}>Recommended For You</Text>
-            {isLoading ? (
-              <ActivityIndicator size="large" color="black" style={{ paddingTop: 10 }} />
-            ) : recommendedSongs ? (
-              <View>
-                <FlatList
-                  horizontal
-                  data={recommendedSongs.similartracks.track.slice(0, 6)}
-                  renderItem={({ item }) => <RecommendedSongCell songItem={item} />}
-                  keyExtractor={(_, index) => index.toString()}
-                />
-              </View>
-            ) : (
-              <Text>Start reviewing songs to get personalized suggestions!</Text>
-            )}
+            <SongRecommendations navigation={this.props.navigation} />
       
             <Text style={styles.heading}>Popular Right Now</Text>
           </>
