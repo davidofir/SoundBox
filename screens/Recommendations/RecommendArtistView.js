@@ -26,8 +26,8 @@ const ArtistRecommendations = ({ navigation }) => {
           if (isActive) {
             // Shuffle only the first 6 artists
             const firstSix = shuffleArray(recommendations.slice(0, 6));
-            // Keep the rest as is
-            const rest = recommendations.slice(6);
+            
+            const rest = shuffleArray(recommendations.slice(6));
             setArtistRecommendations([...firstSix, ...rest]);
           }
         } catch (error) {

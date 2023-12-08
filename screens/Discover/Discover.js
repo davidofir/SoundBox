@@ -189,7 +189,7 @@ class App extends React.Component {
             
             <SongRecommendations navigation={this.props.navigation} />
       
-            <Text style={styles.heading}>Popular Right Now</Text>
+            <Text style={{fontSize: 22, padding: 10, fontWeight: '500', paddingTop: 30} }>  Popular Right Now</Text>
           </>
         )
       )}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
   SafeAreaView, StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Dimensions, 
-  TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator, Linking, ScrollView
+  TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator, Linking, ScrollView, Alert
 } from "react-native";
 import { authentication, db } from "../../firebase";
 import Toast from 'react-native-toast-message';
@@ -225,28 +225,45 @@ const prepareTrackInfo = async () => {
   };
 
   const openSpotify = async () => {
-    trackId = null;
-    var spotifyUri = `spotify:track:${trackId}`;
-
+    let trackId = null;
+  
     try {
-      trackId = await getTrackID(songName, artistName)
+      trackId = await getTrackID(songName, artistName);
+      if (trackId) {
+        const spotifyUri = `spotify:track:${trackId}`;
+  
+        // Prompt the user with a confirmation dialog
+        Alert.alert(
+          'Open Spotify',
+          'Do you want to open this song in Spotify?',
+          [
+            {
+              text: 'Cancel',
+              style: 'cancel',
+            },
+            { 
+              text: 'OK', 
+              onPress: () => {
+                // Check if the Spotify app is installed
+                Linking.canOpenURL(spotifyUri).then((supported) => {
+                  if (supported) {
+                    Linking.openURL(spotifyUri);
+                  } else {
+                    // Open the track in the Spotify web if the app is not installed
+                    Linking.openURL(`https://open.spotify.com/track/${trackId}`);
+                  }
+                });
+              }
+            },
+          ],
+          { cancelable: true }
+        );
+      } else {
+        showToast('Error', 'Spotify Link Not Found');
+      }
     } catch (error) {
-      console.log(error)
-    }
-
-    if (trackId){
-      // Check if the Spotify app is installed
-      Linking.canOpenURL(spotifyUri).then((supported) => {
-        //if app is installed open app. if not open web
-        if (supported) {
-          Linking.openURL(spotifyUri);
-        } else {
-          spotifyUri = `https://open.spotify.com/track/${trackId}`
-          Linking.openURL(spotifyUri);
-        }
-      })
-    } else {
-      showToast('Error', 'Spotify Link Not Found');
+      console.log(error);
+      showToast('Error', 'There was a problem fetching the Spotify link');
     }
   };
   
