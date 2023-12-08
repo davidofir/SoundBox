@@ -16,7 +16,13 @@ export async function getRecommendedSongs() {
   const trackModel = new TrackModel();
   try {
     const songRecs = await trackModel.fetchRecommendedSongs();
-    
+
+    // Check if there are no song recommendations
+    if (!songRecs || !songRecs.similartracks || !songRecs.similartracks.track || songRecs.similartracks.track.length === 0) {
+
+      return []; // or return a message or any other appropriate response
+    }
+
     // Fetch cover art for the top six songs
     const topSixSongs = songRecs.similartracks.track.slice(0, 6);
     const songsWithCoverArt = await Promise.all(

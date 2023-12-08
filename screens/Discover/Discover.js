@@ -8,8 +8,7 @@ import {
   FlatList,
   Image,
   TouchableWithoutFeedback,
-  ScrollView,
-  ActivityIndicator,
+
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -187,6 +186,7 @@ class App extends React.Component {
       ListHeaderComponent={() => (
         viewModel.flatlistSwitch === 0 && (
           <>
+            
             <SongRecommendations navigation={this.props.navigation} />
       
             <Text style={styles.heading}>Popular Right Now</Text>

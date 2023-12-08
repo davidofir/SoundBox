@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -8,29 +8,42 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { fetchRecommendedArtists } from './RecommendArtists';
+import { useFocusEffect } from '@react-navigation/native';
 
 const ArtistRecommendations = ({ navigation }) => {
   const [artistRecommendations, setArtistRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const defaultCoverArt = require('../../assets/defaultSongImage.png');
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true; // flag to handle component state
 
-    loadArtistRecommendations();
+      const fetchRecommendations = async () => {
+        try {
+          setIsLoading(true);
+          const recommendations = await fetchRecommendedArtists();
+          if (isActive) {
+            setArtistRecommendations(recommendations);
+          }
+        } catch (error) {
+          console.error('Failed to fetch artist recommendations:', error);
+        } finally {
+          if (isActive) {
+            setIsLoading(false);
+          }
+        }
+      };
 
-  }, []);
+      fetchRecommendations();
 
-  async function loadArtistRecommendations() {
-    try {
-      setIsLoading(true);
-      const recommendations = await fetchRecommendedArtists();
-      setArtistRecommendations(recommendations);
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Failed to fetch artist recommendations:', error);
-      setIsLoading(false);
-    }
-  }
+
+      return () => {
+        isActive = false;
+      };
+    }, []) // Dependencies array
+  );
+
 
   return (
     <View>

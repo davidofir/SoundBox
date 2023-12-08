@@ -1,12 +1,20 @@
 import { authentication } from "../../firebase";
-import { getUserReviewData } from "../../domain/FirebaseRepository/UserRepository";
+import { getUserReviewData, getFollowingUsers } from "../../domain/FirebaseRepository/UserRepository";
 
 //get all of the logged users reviews
-export async function getUserReviews(){
-    var currId = authentication.currentUser.uid;
-    var reviews = await getUserReviewData(currId)
-    return reviews
+export async function getUserReviews() {
+  var currId = authentication.currentUser.uid;
+  var reviews = await getUserReviewData(currId);
+  
+  // Check if there are no reviews
+  if (reviews.length === 0) {
+
+      // Call NoReviewsFollowerRecommendations if there are no reviews
+      return await NoReviewsFollowerRecommendations();
   }
+  return reviews;
+}
+
 
 export function getTopRatedReview(reviews) {
     const maxRating = Math.max(...reviews.map(review => review.rating));
@@ -77,5 +85,28 @@ export async function getTopUserArtists(reviewArray) {
   
     return results;
   }
+
+  export async function NoReviewsFollowerRecommendations() {
+    const currentUserID = authentication.currentUser.uid;
+    
+    // Retrieve followers
+    const followers = await getFollowingUsers(currentUserID);
+    if (!followers.length) {
+      return []; // Return empty if no followers
+    }
+    
+    // Step 2: Aggregate reviews from followers
+    let aggregatedReviews = [];
+    for (const follower of followers) {
+
+        const followerReviews = await getUserReviewData(follower);
+
+        aggregatedReviews.push(...followerReviews);
+
+    }
+    // Step 3: Generate recommendations based on aggregated reviews
+
+    return aggregatedReviews;
+}
 
 

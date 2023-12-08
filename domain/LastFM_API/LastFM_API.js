@@ -60,7 +60,13 @@ export class TrackModel {
 
     async fetchRecommendedSongs() {
       reviews = await getUserReviews()
-
+    // Check if there are no reviews
+    if (!reviews || reviews.length === 0) {
+        // Handle the case where there are no reviews
+        // You can return a default set of songs, a message, or handle it differently
+        console.log('No reviews available for user');
+        return []; // Example: returning an empty array
+    }
       const topReview = getTopRatedReview(reviews);
       if (topReview) {
         const encodedSongTitle = encodeURIComponent(topReview.songName);

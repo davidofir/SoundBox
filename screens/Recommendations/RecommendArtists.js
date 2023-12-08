@@ -67,12 +67,13 @@ async function processArtistRecommendations(artistData) {
 
   //IS ONLY RAN IF RECOMMENDATIONS API IS NOT RUNNING AS A FALLBACK
 async function processArtistRecommendationsLastFM(artistNames) {
-    console.log(artistNames)
+
     try {
       const trackModel = new TrackModel()
       // Fetching similar artists for each artist name using the API handler
       const rawArtistData = await trackModel.fetchArtistsFromLastFM(artistNames);
-      console.log(rawArtistData)  
+
+      
       return rawArtistData;
   
     } catch (error) {
@@ -91,7 +92,7 @@ async function compileRecommendations(fetchedArtists){
 async function fetchArtistImages(finalList){
   const artists = await finalList;
 
-  // Optionally, fetch images for each artist here
+  //fetch images for each artist here
   const topSixArtistsWithImages = await Promise.all(
       artists.slice(0, 6).map(async artist => {
           const images = await getArtistImage(artist.artistName);

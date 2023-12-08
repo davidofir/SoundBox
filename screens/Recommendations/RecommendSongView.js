@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from 'react';
+import React, { useCallback, useState, memo } from 'react';
 import {
   View,
   Text,
@@ -9,31 +9,46 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { getRecommendedSongs } from './RecommendSongs';
+import { useFocusEffect } from '@react-navigation/native';
 
 const SongRecommendations = ({ navigation }) => {
   const [songRecommendations, setSongRecommendations] = useState([]);
   const [allSongRecommendations, setAllSongRecommendations] = useState([]);
   const [isLoadingSongs, setIsLoadingSongs] = useState(true);
   const defaultCoverArt = require('../../assets/defaultSongImage.png');
-  useEffect(() => {
-    loadSongRecommendations();
-  }, []);
 
-  async function loadSongRecommendations() {
-    try {
-      setIsLoadingSongs(true);
-      const songRecs = await getRecommendedSongs();
-      setSongRecommendations(songRecs);
-      setAllSongRecommendations(songRecs.slice(0, 30));
-      setIsLoadingSongs(false);
-    } catch (error) {
-      console.error('Failed to fetch song recommendations:', error);
-      setIsLoadingSongs(false);
-    }
-  }
+  useFocusEffect(
+    useCallback(() => {
+      const loadSongRecommendations = async () => {
+        try {
+          setIsLoadingSongs(true);
+          const songRecs = await getRecommendedSongs();
+          setSongRecommendations(songRecs);
+          setAllSongRecommendations(songRecs.slice(0, 30));
+          setIsLoadingSongs(false);
+        } catch (error) {
+          console.error('Failed to fetch song recommendations:', error);
+          setIsLoadingSongs(false);
+        }
+      };
+
+      loadSongRecommendations();
+
+      // Optional: Return a cleanup function if needed
+      return () => {
+        // Any cleanup logic goes here
+      };
+    }, [])
+  );
+
+
 
   const RecommendedSongCell = memo(({ songItem }) => {
-  
+    // Truncate song name if it's longer than 15 characters
+    const truncatedSongName = songItem.name.length > 15
+    ? songItem.name.substring(0, 20) + '...'
+    : songItem.name;
+
 
     return (
       <TouchableOpacity onPress={() => {navigation.navigate('RatingPage', {      
@@ -46,7 +61,7 @@ const SongRecommendations = ({ navigation }) => {
             source={songItem.coverArtUrl ? { uri: songItem.coverArtUrl } : defaultCoverArt}
             style={styles.songImage}
           />
-          <Text style={styles.songName}>{songItem.name}</Text>
+          <Text style={styles.songName}>{truncatedSongName}</Text>
           <Text style={styles.artistName}>{songItem.artist.name}</Text>
         </View>
       </TouchableOpacity>

@@ -99,4 +99,24 @@ const uploadProfilePicture = async (userId, selectedImage) => {
     return downloadURL;
 };
 
-export { createUserDocument, getUserProfileData, getUserReviewData, updateUserFollowers, updateUserFollowing, uploadProfilePicture };
+const getFollowingUsers = async (userId) => {
+    const userRef = doc(db, "users", userId);
+
+    try {
+        const docSnapshot = await getDoc(userRef);
+        const userData = docSnapshot.data();
+
+        if (!userData || !userData.followers) {
+            console.log("No followers data found for user:", userId);
+            return []; // Return an empty array if there are no followers
+        }
+
+        return userData.following; // Returns an array of following user IDs
+    } catch (error) {
+        console.error("Error fetching followers data:", error);
+        throw error;
+    }
+};
+
+
+export { createUserDocument, getUserProfileData, getUserReviewData, updateUserFollowers, updateUserFollowing, uploadProfilePicture, getFollowingUsers };
