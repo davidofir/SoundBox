@@ -22,8 +22,9 @@ const SongRecommendations = ({ navigation }) => {
       const loadSongRecommendations = async () => {
         try {
           setIsLoadingSongs(true);
-          const songRecs = await getRecommendedSongs();
-          setSongRecommendations(songRecs);
+          var songRecs = await getRecommendedSongs();
+          songRecs1 = shuffleArray(songRecs.slice(0, 6))
+          setSongRecommendations(songRecs1);
           setAllSongRecommendations(songRecs.slice(0, 30));
           setIsLoadingSongs(false);
         } catch (error) {
@@ -34,14 +35,20 @@ const SongRecommendations = ({ navigation }) => {
 
       loadSongRecommendations();
 
-      // Optional: Return a cleanup function if needed
+
       return () => {
-        // Any cleanup logic goes here
+        // cleanup logic goes here
       };
     }, [])
   );
 
-
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
 
   const RecommendedSongCell = memo(({ songItem }) => {
     // Truncate song name if it's longer than 15 characters

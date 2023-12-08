@@ -17,14 +17,18 @@ const ArtistRecommendations = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      let isActive = true; // flag to handle component state
+      let isActive = true;
 
       const fetchRecommendations = async () => {
         try {
           setIsLoading(true);
-          const recommendations = await fetchRecommendedArtists();
+          let recommendations = await fetchRecommendedArtists();
           if (isActive) {
-            setArtistRecommendations(recommendations);
+            // Shuffle only the first 6 artists
+            const firstSix = shuffleArray(recommendations.slice(0, 6));
+            // Keep the rest as is
+            const rest = recommendations.slice(6);
+            setArtistRecommendations([...firstSix, ...rest]);
           }
         } catch (error) {
           console.error('Failed to fetch artist recommendations:', error);
@@ -37,12 +41,19 @@ const ArtistRecommendations = ({ navigation }) => {
 
       fetchRecommendations();
 
-
       return () => {
         isActive = false;
       };
-    }, []) // Dependencies array
+    }, [])
   );
+
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
 
 
   return (
