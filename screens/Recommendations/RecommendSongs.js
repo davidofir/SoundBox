@@ -10,29 +10,37 @@ import { getListUserReviews } from '../../domain/RecommendRepository/Recommendat
 import { getUserReviewData } from '../../domain/FirebaseRepository/UserRepository';
 import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
-
+import { getSongReviews } from '../ReviewSongs/ReviewStorage';
 
 export async function getRecommendedSongs() {
   const trackModel = new TrackModel();
   try {
     const songRecs = await trackModel.fetchRecommendedSongs();
-
-    // Check if there are no song recommendations
     if (!songRecs || !songRecs.similartracks || !songRecs.similartracks.track || songRecs.similartracks.track.length === 0) {
-
-      return []; // or return a message or any other appropriate response
+      return [];
     }
 
-    // Fetch cover art for the top six songs
-    const topSixSongs = songRecs.similartracks.track.slice(0, 6);
-    const songsWithCoverArt = await Promise.all(
-      topSixSongs.map(async (song) => {
+    // Fetch cover art and reviews for the top six songs
+    let songsWithCoverArt = await Promise.all(
+      songRecs.similartracks.track.slice(0, 6).map(async (song) => {
         const coverArtUrl = await searchAndFetchSongCoverArt(song.name, song.artist.name);
-        return { ...song, coverArtUrl };
+        const reviews = await fetchReviews(song.name, song.artist.name);
+        let averageRating = 0;
+        if (reviews.length > 0) {
+          averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+        }
+        return { ...song, coverArtUrl, reviews, averageRating };
       })
     );
 
-    // Add the rest of the songs with null for cover art URL
+    // Sort songs with reviews to the front and by average rating
+    songsWithCoverArt.sort((a, b) => {
+      if (b.reviews.length === 0 && a.reviews.length === 0) return 0; // Both have no reviews
+      if (b.reviews.length === 0) return -1; // A has reviews, B does not
+      if (a.reviews.length === 0) return 1;  // B has reviews, A does not
+      return b.averageRating - a.averageRating; // Both have reviews, sort by average rating
+    });
+
     const restOfTheSongs = songRecs.similartracks.track.slice(6).map(song => ({ ...song, coverArtUrl: null }));
 
     return [...songsWithCoverArt, ...restOfTheSongs];
@@ -41,6 +49,17 @@ export async function getRecommendedSongs() {
     return null;
   }
 }
+
+const fetchReviews = async (songName, artistName) => {
+  try {
+    const fetchedReviews = await getSongReviews(songName, artistName);
+    const sortedReviews = fetchedReviews.sort((a, b) => b.likes.length - a.likes.length);
+    return sortedReviews;
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    return [];
+  }
+};
 
 
 

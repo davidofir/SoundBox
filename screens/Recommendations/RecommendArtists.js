@@ -1,23 +1,3 @@
-import React, { useEffect, useState } from 'react';
-import { Feather, Entypo } from "@expo/vector-icons";
-import {
-  StyleSheet,
-  TextInput,
-  Text,
-  View,
-  Keyboard,
-  Button,
-  FlatList,
-  ScrollView,
-  Image
-} from 'react-native';
-
-import { TouchableHighlight } from 'react-native-gesture-handler';
-import { authentication, db } from "../../firebase";
-import { getFirestore, collection, setDoc, doc, getDoc, updateDoc } from "firebase/firestore";
-import axios from 'axios';
-import { getListUserReviews } from '../../domain/RecommendRepository/RecommendationRepository';
-import { getUserReviewData } from '../../domain/FirebaseRepository/UserRepository';
 import { getArtistImage } from '../../domain/SpotifyAPI/SpotifyAPI';
 import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 import { getTopUserArtists, getUserReviews } from './RecommendAlgorithm';
