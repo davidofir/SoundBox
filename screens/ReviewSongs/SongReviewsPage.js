@@ -2,7 +2,7 @@ import React, { useEffect, useState, useLayoutEffect, } from 'react';
 import { Linking } from 'react-native';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { getSongReviews } from './ReviewStorage';
-import { FontAwesome, Ionicons, Entypo, Fontisto } from '@expo/vector-icons';
+import { Ionicons, Entypo, Fontisto } from '@expo/vector-icons';
 import StarRating from 'react-native-star-rating-widget';
 import { authentication, db, } from "../../firebase";
 import { doc, updateDoc, getDoc } from 'firebase/firestore';

@@ -15,7 +15,6 @@ export async function getUserReviews() {
   return reviews;
 }
 
-
 export function getTopRatedReview(reviews) {
     const maxRating = Math.max(...reviews.map(review => review.rating));
     const topRatedReviews = reviews.filter(review => review.rating === maxRating);
@@ -24,7 +23,7 @@ export function getTopRatedReview(reviews) {
     const randomReview = topRatedReviews[Math.floor(Math.random() * topRatedReviews.length)];
     
     return randomReview;
-  } 
+} 
 
 export async function getTopUserArtists(reviewArray) {
     if (reviewArray.length === 0 || reviewArray == undefined) {
@@ -84,7 +83,7 @@ export async function getTopUserArtists(reviewArray) {
     }
   
     return results;
-  }
+}
 
   export async function NoReviewsFollowerRecommendations() {
     const currentUserID = authentication.currentUser.uid;

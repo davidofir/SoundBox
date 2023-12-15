@@ -1,6 +1,6 @@
 import { doc, getDoc, updateDoc, collection, setDoc, arrayUnion, query, where, getDocs } from "firebase/firestore";
 
-import { authentication, db } from "../../firebase";
+import { db } from "../../firebase";
 
 const RatingModel = {
 

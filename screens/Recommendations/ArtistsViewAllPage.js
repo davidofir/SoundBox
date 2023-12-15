@@ -2,7 +2,7 @@ import React, { useEffect, useState, memo, useLayoutEffect } from 'react';
 import { Image, Text, TouchableOpacity, View, StyleSheet, FlatList,  } from 'react-native';
 import { getArtistImage } from '../../domain/SpotifyAPI/SpotifyAPI'; // Adjust the import path
 
-const Cell = memo(({ cellItem, navigation }) => {
+const Cell = memo(({ cellItem }) => {
     const [coverArtUrl, setCoverArtUrl] = useState(cellItem.imageUrl);
     const defaultCoverArt = require('../../assets/defaultPic.png'); // Adjust the path to your default image
   

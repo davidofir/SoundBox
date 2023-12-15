@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  ScrollView, View
-} from 'react-native';
-
+import { ScrollView, View } from 'react-native';
 import ArtistRecommendations from './RecommendArtistView';
 import SongRecommendations from './RecommendSongView';
 
@@ -21,7 +18,5 @@ const Recommendations = ({ navigation }) => {
     </ScrollView>
   );
 }
-  
-
 
 export default Recommendations;

@@ -8,7 +8,6 @@ import {
   FlatList,
   Image,
   TouchableWithoutFeedback,
-
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
@@ -191,66 +190,26 @@ const styles = StyleSheet.create({
     width: 40,
     justifyContent: 'center',
   },
-  textCenter: {
-    textAlign: 'center',
-  },
   whiteText: {
     color: 'black',
   },
   boldText: {
     fontWeight: 'bold',
   },
-  heading: {
-    color: "black",
-    fontWeight: 'bold',
-    fontSize: 30,
-    paddingBottom: 10,
-    paddingTop: 20,
-  },
   searchBarContainer: {
-    flexDirection: 'row', // Align children horizontally
-    alignItems: 'center', // Center children vertically
-    paddingHorizontal: 10, // Add some horizontal padding
-    paddingVertical: 5, // Add some vertical padding
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: 10, 
+    paddingVertical: 5, 
     marginBottom: 5
   },
   searchBar: {
-    flex: 1, // Take up as much space as possible
+    flex: 1, 
     backgroundColor: "whitesmoke",
     height: 35,
     borderRadius: 20,
     paddingLeft: 10,
-    marginRight: 10, // Add some margin to the right
-  },
-  image: {
-    width: 100, // Adjust the image width as needed
-    height: 100, // Adjust the image height as needed
-    alignSelf: 'center', // Center the image horizontally
-  },
-  songName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center', // Center the text horizontally
-  },
-  artistName: {
-    fontSize: 14,
-    textAlign: 'center', // Center the text horizontally
-  },
-  box: {
-    backgroundColor: '#F7F6F6',
-    borderRadius: 10,
-    margin: 10,
-    padding: 10,
-    width: 150, 
-    height: 170,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowOpacity: 0.30,
-    shadowRadius: 1.22,
-    elevation: 3,
+    marginRight: 10, 
   },
 });
 

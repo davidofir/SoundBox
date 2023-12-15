@@ -1,7 +1,6 @@
 import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
 
-
 // ViewModel Class
 export class DiscoverViewModel {
     constructor() {
@@ -43,7 +42,6 @@ export class DiscoverViewModel {
         const trackIdentifier = `${track.name}_${artistName}`; // Unique identifier for each track
         const imageUrl = await searchAndFetchSongCoverArt(track.name, artistName);
         this.coverArts[trackIdentifier] = imageUrl;
-
       } catch (error) {
         console.error('Error fetching cover art:', error);
         const trackIdentifier = `${track.name}_${artistName}`;

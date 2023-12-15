@@ -1,13 +1,11 @@
 import React, { useEffect, useState, useLayoutEffect } from "react";
 import {
-  SafeAreaView, StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Dimensions, 
+  StyleSheet, Text, View, Image, TextInput, TouchableOpacity, Dimensions, 
   TouchableWithoutFeedback, Keyboard, Modal, Animated, ActivityIndicator, Linking, ScrollView, Alert
 } from "react-native";
 import { authentication, db } from "../../firebase";
 import Toast from 'react-native-toast-message';
 import defaultCoverArt from '../../assets/defaultSongImage.png';
-import spotifyLogo from '../../assets/spotify.png'
-import appleMusicLogo from '../../assets/appleMusic.png'
 import StarRating from 'react-native-star-rating-widget'; //Source: https://github.com/bviebahn/react-native-star-rating-widget#animationConfig
 
 import {storeReviewData, RatingModel, getSongReviews} from "./ReviewStorage";
@@ -16,7 +14,6 @@ import { getTrackID } from "../../domain/SpotifyAPI/SpotifyAPI";
 
 const RatingPage = ({ navigation, route }) => {
   const userId = authentication.currentUser.uid;
-
   const {
     paramSongName: songName,
     paramSearched: isSearched,
@@ -34,7 +31,6 @@ const RatingPage = ({ navigation, route }) => {
   const [text, setText] = useState("");
   const [rating, setRating] = useState(0);
   const windowHeight = Dimensions.get('window').height;
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [avgRating, setAvgRating] = useState(0); 
   const [numberOfReviews, setNumberOfReviews] = useState(0); 
   const [usersReview, setUsersReview] = useState(null);
@@ -457,16 +453,17 @@ const prepareTrackInfo = async () => {
     </>
   );
 };
+
 export default RatingPage;
 
 const styles = StyleSheet.create({
   songInfoContainer: {
-    backgroundColor: '#e3e4e6', // Light grey background
-    borderRadius: 10, // Curved edges
-    padding: 10, // Padding inside the container
-    margin: 10, // Margin around the container
+    backgroundColor: '#e3e4e6', 
+    borderRadius: 10,
+    padding: 10,
+    margin: 10, 
     alignItems: 'center',
-    // Add shadow for depth
+ 
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -509,13 +506,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 9
   },
   labelColumn: {
-    width: 120, // Fixed width for labels
+    width: 120, 
     paddingRight: 10,
     
   },
   valueColumn: {
     flex: 1, // Take up remaining space
-    alignItems: 'flex-end', // Align values to the right
+    alignItems: 'flex-end', 
   },
   textStyleLabel: {
     fontWeight: 'bold',
@@ -609,7 +606,7 @@ const styles = StyleSheet.create({
   albumArtStyle: {
     width: 230,
     height: 230,
-    resizeMode: 'contain', //the image scales to fit within the dimensions and maintain its aspect ratio
+    resizeMode: 'contain', 
     marginVertical: 0,
     borderColor: 'black',
     borderWidth: 0.3
@@ -650,7 +647,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, 
     borderColor: '#000',
     borderRadius: 15, 
-    height: 70, // Set a fixed height
+    height: 70, 
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -674,8 +671,7 @@ const styles = StyleSheet.create({
     fontSize: 12
   },
   scrollViewContent: {
-    paddingTop: 20, // Add top padding for white space
-    paddingBottom: 20, // Add bottom padding for white space
+    paddingTop: 20, 
+    paddingBottom: 20, 
   },
-
 });

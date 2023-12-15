@@ -1,17 +1,13 @@
 import React, { useLayoutEffect, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
-
 import StarRating from 'react-native-star-rating-widget';
 import { Ionicons,} from '@expo/vector-icons';
-
 import { authentication, db, } from "../../firebase";
 import { doc, updateDoc } from 'firebase/firestore';
-
 import { ScrollView } from 'react-native-gesture-handler';
+
 const defaultCoverArt = require('../../assets/defaultSongImage.png');
-
-
 
 const LoggedUsersReviewPage = ({ navigation, route }) => {
     const { review } = route.params;
@@ -73,14 +69,12 @@ const LoggedUsersReviewPage = ({ navigation, route }) => {
         setLiked(!liked);
     };
 
-        //Set the title of the page
-        useLayoutEffect(() => {
-            navigation.setOptions({
-                title: "Your Review:" 
-            });
-        }, [navigation]);
-
-
+    //Set the title of the page
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            title: "Your Review:" 
+        });
+    }, [navigation]);
 
     if (!review) {
         return (
@@ -143,12 +137,9 @@ const LoggedUsersReviewPage = ({ navigation, route }) => {
                                 style={styles.commentIcon} />
                                 
                         </TouchableOpacity>
-                        <Text style={styles.likeText}>{review.commentIds.length}</Text>
-                        </View>
-            
-
-
-                        </ScrollView>
+                    <Text style={styles.likeText}>{review.commentIds.length}</Text>
+                </View>
+            </ScrollView>
         </View>
     );
 };

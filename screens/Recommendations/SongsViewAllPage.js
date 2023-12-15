@@ -1,20 +1,16 @@
 import React, { useState, useEffect, useLayoutEffect, memo } from 'react';
 import {
     StyleSheet,
-    TextInput,
     Text,
     View,
-    Keyboard,
-    Button,
     FlatList,
-    ScrollView, 
     Image, TouchableOpacity,
   } from 'react-native';
-import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI'; // Adjust the import path
+import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI'; 
 
 const Cell = memo(({ cellItem, navigation }) => {
   const [coverArtUrl, setCoverArtUrl] = useState(null);
-  const defaultCoverArt = require('../../assets/defaultSongImage.png'); // Adjust the path to your default image
+  const defaultCoverArt = require('../../assets/defaultSongImage.png'); 
 
   useEffect(() => {
     const fetchCoverArt = async () => {
@@ -55,8 +51,6 @@ const Cell = memo(({ cellItem, navigation }) => {
     </TouchableOpacity>
   );
 });
-
-
 
 const SongsViewAllPage = ({ route, navigation }) => {
   const { songs } = route.params;
@@ -102,7 +96,6 @@ const styles = StyleSheet.create({
   boldText: {
     fontWeight: 'bold',
   },
-  // Add more styles as needed for other components
 });
 
 export default SongsViewAllPage;
