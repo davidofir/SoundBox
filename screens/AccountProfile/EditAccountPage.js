@@ -18,7 +18,7 @@ import useEditAccountViewModel from './EditAccountViewModel';
 export default EditAccountPage = ({ navigation }) => {
 
     // new changes - using viewmodel
-    const { username, userEmail, image, setNewUsername, setNewEmail, pickImage, saveChanges, SignOut } = useEditAccountViewModel(navigation);
+    const { username, userEmail, image, setNewUsername, setNewEmail, pickImage, saveChanges, SignOut, setCurrentPassword, setNewPassword } = useEditAccountViewModel(navigation);
 
     return (
         <View style={styles.container}>
@@ -45,6 +45,20 @@ export default EditAccountPage = ({ navigation }) => {
                     placeholder={userEmail}
                     placeholderTextColor="#8c8c9c"
                     onChangeText={(text) => setNewEmail(text)}
+                />
+                <Text style={styles.sectionTitle}>Current Password</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder={"********"}
+                    placeholderTextColor="#8c8c9c"
+                    onChangeText={(text) => setCurrentPassword(text)}
+                />
+                <Text style={styles.sectionTitle}>Password</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder={"********"}
+                    placeholderTextColor="#8c8c9c"
+                    onChangeText={(text) => setNewPassword(text)}
                 />
                 <TouchableOpacity style={styles.saveButton} onPress={saveChanges}>
                     <Text style={styles.saveButtonText}>Save Changes</Text>
