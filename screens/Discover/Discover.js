@@ -11,45 +11,14 @@ import {
 
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
 import { searchAndFetchSongCoverArt } from '../../domain/SpotifyAPI/SpotifyAPI';
-import { TrackModel } from '../../domain/LastFM_API/LastFM_API';
 import { useState, useEffect, memo } from 'react';
-const defaultCoverArt = require('../../assets/defaultSongImage.png')
 import SongRecommendations from '../Recommendations/RecommendSongView';
-// ViewModel Class
-class AppViewModel {
-  constructor() {
-    this.trackModel = new TrackModel();
-    this.searchInput = '';
-    this.flatlistSwitch = 0;
-  }
-
-  async fetchTopTracks() {
-    await this.trackModel.fetchTopTracks();
-    this.flatlistSwitch = 0;
-  }
-
-  async fetchSong() {
-    await this.trackModel.fetchSong(this.searchInput);
-    this.flatlistSwitch = 1;
-  }
-
-  setSearchInput(text) {
-    this.searchInput = text;
-  }
-
-  setFlatlistSwitch(value) {
-    this.flatlistSwitch = value;
-  }
-
-  getTracks() {
-    return this.trackModel.getTracks();
-  }
-}
+import { DiscoverViewModel } from './DiscoverViewModel';
+const defaultCoverArt = require('../../assets/defaultSongImage.png')
 
 // Create a ViewModel instance
-const viewModel = new AppViewModel();
+const viewModel = new DiscoverViewModel();
 
 const Cell = memo(({ cellItem }) => {
   const [coverArtUrl, setCoverArtUrl] = useState(null);
@@ -71,9 +40,6 @@ const Cell = memo(({ cellItem }) => {
       console.error('Error fetching cover art:', error);
     }
   };
-
-
-
 
   useEffect(() => {
     fetchCoverArt();
@@ -105,6 +71,7 @@ const Cell = memo(({ cellItem }) => {
     </TouchableWithoutFeedback>
   );
 });
+
 
 // Main App Component
 class App extends React.Component {
@@ -140,8 +107,6 @@ class App extends React.Component {
       paramCoverArtUrl: coverArtUrl
     });
   }
-
-  
 
   render() {
     const { isLoading } = this.state;

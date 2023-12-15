@@ -13,7 +13,6 @@ const axiosInstance = axiosRateLimit(axios.create(), {
   perMilliseconds: 100, // Set the rate limit interval in milliseconds (1 request per second in this example)
 });
 
-// Define the getAccessToken function here
 async function getAccessToken() {
   try {
     const credentials = `${clientId}:${clientSecret}`;
@@ -148,6 +147,5 @@ async function getArtistImage(artistName) {
   const artist = response.data.artists.items[0]; // Assuming the artist is the first in the list
   return artist.images; // This will be an array of images
 }
-
 
 export { searchAndFetchSongCoverArt, getTrackID, getArtistImage };

@@ -1,5 +1,3 @@
-import { authentication } from "../../firebase";
-import { getUserReviewData } from "../FirebaseRepository/UserRepository";
 import { getTopRatedReview, getUserReviews } from "../../screens/Recommendations/RecommendAlgorithm";
 import axios from "axios";
 const apiKey = "a7e2af1bb0cdcdf46e9208c765a2f2ca";
@@ -122,7 +120,4 @@ export class TrackModel {
           return []; // Optionally return an empty array or handle the error as needed
       }
   }
-  
-    
-  
-  }
+}

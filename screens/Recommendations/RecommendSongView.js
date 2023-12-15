@@ -24,7 +24,7 @@ const SongRecommendations = ({ navigation }) => {
           setIsLoadingSongs(true);
           var songRecs = await getRecommendedSongs();
           //songRecs1 = shuffleArray(songRecs.slice(0, 6))
-          setSongRecommendations(songRecs1);
+          setSongRecommendations(songRecs);
           setAllSongRecommendations(songRecs.slice(0, 30));
           setIsLoadingSongs(false);
         } catch (error) {
