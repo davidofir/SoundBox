@@ -73,4 +73,3 @@ Begin your SoundBox experience by cloning the repository and following the setup
 ```bash
 git clone https://github.com/yourusername/SoundBox.git
 cd SoundBox
-# Follow the instructions in SETUP.md
