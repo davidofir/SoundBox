@@ -29,44 +29,43 @@ Welcome to SoundBox, the community-driven social platform where music enthusiast
 
 ## Discovery
 <p align="center">
-  <img src="https://github.com/davidofir/SoundBox/assets/discovery_screenshot.jpg" alt="SoundBox-Discovery" width="500">
+  <img src="https://github.com/davidofir/SoundBox/assets/60274691/8dce060c-12ee-4302-8a9f-d2b5c5ca3608" alt="SoundBox-Discovery" width="600">
 </p>
 
 ## Chat
 <p align="center">
-  <img src="https://github.com/davidofir/SoundBox/assets/chat_screenshot.jpg" alt="SoundBox-Chat" width="500">
+  <img src="https://github.com/davidofir/SoundBox/assets/60274691/24f776d1-12cb-4139-81a6-47556dc1409c" alt="SoundBox-Chat" width="600">
 </p>
 
 ## Edit Profile
 <p align="center">
-  <img src="https://github.com/davidofir/SoundBox/assets/edit_profile_screenshot.jpg" alt="SoundBox-EditProfile" width="500">
+  <img src="https://github.com/davidofir/SoundBox/assets/60274691/c0561ec0-3008-4a0d-a124-3d2e724a1ef9" alt="SoundBox-EditProfile" width="600">
 </p>
 
 ## Events
 <p align="center">
-  <img src="https://github.com/davidofir/SoundBox/assets/events_screenshot.jpg" alt="SoundBox-Events" width="500">
+  <img src="https://github.com/davidofir/SoundBox/assets/60274691/ae356b42-72e4-41c2-b368-bdd26d0986b9" alt="SoundBox-Events" width="600">
 </p>
 
 ## Feed
 <p align="center">
-  <img src="https://github.com/davidofir/SoundBox/assets/feed_screenshot.jpg" alt="SoundBox-Feed" width="500">
+  <img src="https://github.com/davidofir/SoundBox/assets/60274691/0fd511c8-6d1e-4729-ac2f-7638dde9716b" alt="SoundBox-Feed" width="600">
 </p>
 
 ## Merchandise
 <p align="center">
-  <img src="https://github.com/davidofir/SoundBox/assets/merch_screenshot.jpg" alt="SoundBox-Merch" width="500">
+  <img src="https://github.com/davidofir/SoundBox/assets/60274691/9a00c1b7-1328-4fb7-a181-1a52097300c2" alt="SoundBox-Merch" width="600">
 </p>
 
 ## Recommendations
 <p align="center">
-  <img src="https://github.com/davidofir/SoundBox/assets/recommendations_screenshot.jpg" alt="SoundBox-Recommendations" width="500">
+  <img src="https://github.com/davidofir/SoundBox/assets/60274691/ec17cc8a-a109-48e2-a38a-d25cd0bf3a94" alt="SoundBox-Recommendations" width="600">
 </p>
 
 ## Song Details
 <p align="center">
-  <img src="https://github.com/davidofir/SoundBox/assets/song_detail_screenshot.jpg" alt="SoundBox-Song" width="500">
+  <img src="https://github.com/davidofir/SoundBox/assets/60274691/082ea411-e737-4099-b80d-a24687629113" alt="SoundBox-Song" width="600">
 </p>
-
 ## Getting Started
 
 Begin your SoundBox experience by cloning the repository and following the setup instructions:
